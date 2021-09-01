@@ -1,21 +1,21 @@
-# Nut-prod calcs 
+## Data prep for nutrient productivity calcs##
 
-
-## Data prep ##
+# for comparison between calculation methods. Run on Madagascar data, using known species traits from Seychelles
 
 # Read in WCS Madagascar data:
-mada <- read.csv("data\\wcs\\madagascar_individuals.csv", header=T)
+mada <- read.csv("data/wcs/madagascar_individuals.csv", header=T)
 head(mada)
 str(mada)
 
 #Remove first column (row numbers):
 mada <- mada[,-c(1)]
 
+
 summary(unique(mada$fish_taxon))
 # 356 species
 
 # Read in Seychelles data:
-sey.fish <- read.csv("data\\SEY_UVC_fish_1994-2017.csv", header=T)
+sey.fish <- read.csv("data/SEY_UVC_fish_1994-2017.csv", header=T)
 str(sey.fish)
 
 summary(unique(sey.fish$species))
@@ -41,7 +41,7 @@ summary(unique(sey.mada$fish_taxon))
 
 
 #Load species trait data (from Seychelles productivity):
-sey.trait <- read.csv("data\\Species traits_Seychelles.csv", header=T)
+sey.trait <- read.csv("data/Species traits_Seychelles.csv", header=T)
 head(sey.trait)
 
 
