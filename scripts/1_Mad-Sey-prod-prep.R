@@ -41,7 +41,7 @@ summary(unique(sey.mada$fish_taxon))
 
 
 #Load species trait data (from Seychelles productivity):
-sey.trait <- read.csv("data/Species traits_Seychelles.csv", header=T)
+sey.trait <- read.csv("data/Species_traits_Seychelles.csv", header=T)
 head(sey.trait)
 
 
