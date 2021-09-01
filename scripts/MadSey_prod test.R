@@ -4,7 +4,7 @@
 ## Data prep ##
 
 # Read in WCS Madagascar data:
-mada <- read.csv("C:\\Users\\markh\\OneDrive - Lancaster University\\Fish nutrients\\nut-prod\\data\\wcs\\madagascar_individuals.csv", header=T)
+mada <- read.csv("data\\wcs\\madagascar_individuals.csv", header=T)
 head(mada)
 str(mada)
 
@@ -15,7 +15,7 @@ summary(unique(mada$fish_taxon))
 # 356 species
 
 # Read in Seychelles data:
-sey.fish <- read.csv("C:\\Users\\markh\\OneDrive - Lancaster University\\Fish nutrients\\nut-prod\\data\\SEY_UVC_fish_1994-2017.csv", header=T)
+sey.fish <- read.csv("data\\SEY_UVC_fish_1994-2017.csv", header=T)
 str(sey.fish)
 
 summary(unique(sey.fish$species))
@@ -41,7 +41,7 @@ summary(unique(sey.mada$fish_taxon))
 
 
 #Load species trait data (from Seychelles productivity):
-sey.trait <- read.csv("C:\\Users\\markh\\OneDrive - Lancaster University\\Fish nutrients\\nut-prod\\data\\Species traits_Seychelles.csv", header=T)
+sey.trait <- read.csv("data\\Species traits_Seychelles.csv", header=T)
 head(sey.trait)
 
 
@@ -67,11 +67,13 @@ length(unique(sey.trait2$species))   #105
 length(unique(sey.mada$species))  #105
 
 
+#Merge survey & trait data:
+mada.prod <- merge(sey.mada, sey.trait2, by=c("species"), all.x=T)
+head(mada.prod)
+ # (data is now ordered by species, alphabetically)
 
 
-
-
-
+# Now run productivity calculations on each individual fish (row) in the dataset.
 
 
 
