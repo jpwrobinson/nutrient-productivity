@@ -44,6 +44,13 @@ summary(unique(sey.mada$fish_taxon))
 sey.trait <- read.csv("data/Species_traits_Seychelles.csv", header=T)
 head(sey.trait)
 
+#Add in a and b coefficients (to convert lengths to weights later):
+sey.ab <- read.csv("data/Sey_species_a&b.csv", header=T)
+head(sey.ab)
+
+sey.trait <- merge(sey.trait, sey.ab, by=c("species"), all.x=T)
+head(sey.trait)
+
 
 #Keep species present in sey.mada:
 sey.trait$MADA <- sapply(sey.trait$species, function (x){
@@ -70,7 +77,7 @@ length(unique(sey.mada$species))  #105
 #Merge survey & trait data:
 mada.prod <- merge(sey.mada, sey.trait2, by=c("species"), all.x=T)
 head(mada.prod)
- # (data is now ordered by species, alphabetically)
+# (data is now ordered by species, alphabetically)
 
 
 # Now run productivity calculations on each individual fish (row) in the dataset.

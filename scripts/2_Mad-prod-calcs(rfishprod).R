@@ -30,7 +30,8 @@ summary(mada.prod[mada.prod$size == mada.prod$MaxSizeTL,])
 147/5219
 # 2.8 %
 
-#quite a lot. These need to be reduced to equal MaxSizeTL (prod= exactly 0) or 0.1cm below MaxSizeTL (tiny prod values)
+#quite a lot. These need to be reduced to equal MaxSizeTL (prod= exactly 0) 
+#  OR 0.1cm below MaxSizeTL (tiny prod values)
 
 mada.prod$size2 <- ifelse(mada.prod$size >= mada.prod$MaxSizeTL, mada.prod$MaxSizeTL-0.1, mada.prod$size)
 head(mada.prod)
@@ -58,7 +59,7 @@ fmod <- formula (~ sstmean + MaxSizeTL + Diet + Position + Method)
 
 # Predicting Kmax, the standardised VBGF parameter (Recommendation: use 100s to 1000s iterations) 
 # (takes a while)
-?predKmax
+# see ?predKmax
 datagr <- predKmax (mada.prod, 
                     dataset = db,
                     fmod = fmod,
@@ -109,17 +110,62 @@ range(VB_lngth)
 #  1.009271   101.314415
 
 
-# !!! NEED TO ADD a AND b COEFFICIENTS FROM SEYCHELLES !!! #
-
 #Convert lengths to weights using a & b coefficents:
 VB_wt <-  apply(VB_lngth, 2, function(x) datagr$a*(x^datagr$b))  
 head(VB_wt)
 nrow(VB_wt)
-# units= grams (per fish)
+# 5219 rows
+# units = mass in grams (per fish)
+
+head(datagr)
+
+biomass.g <- (datagr$a * datagr$size2^datagr$b)
+VB_wt2 <- cbind(biomass.g, VB_wt)
+head(VB_wt2)
+colnames(VB_wt2)[1] <- "Day_0"
+dim(VB_wt2)
+# 5219   366
+# First column = mass when observed during survey, then after 1 day, 2 days etc.
+
+#create new object:
+VB_prod_wt <- VB_wt2
+
+#calculate daily mass produced (productivity)
+for(u in 2:ncol(VB_prod_wt))
+  for(v in 1:nrow(VB_prod_wt)) {
+    VB_prod_wt[v,u] <- VB_wt2[v,u] - VB_wt2[v,(u-1)]
+  }
+
+View(VB_prod_wt)
+
+#Delete first column (still total mass in g)
+VB_prod_wt2 <- VB_prod_wt[,2:ncol(VB_prod_wt)]
+head(VB_prod_wt2) 
+# table of daily production in g/individual over a year (not cumulative)
 
 
+# Now sum row totals to get POTENTIAL productivity over 1 year (i.e. without accounting for mortality):
+prod_yr <- rowSums(VB_prod_wt2)
+prod_yr  # 1 value per fish (row)
+summary(prod_yr)
+#   Min.   1st Qu.    Median      Mean   3rd Qu.       Max. 
+# 0.1418   11.5866   26.8228   60.8488   77.3024  1171.2566 
 
 
+#Take value after 1 day as daily productivity value:
+prod_day <- VB_prod_wt2[,1] 
+prod_day
+summary(prod_day)
+#      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+# 0.0002209 0.0286485 0.0635776 0.1480279 0.1862414 3.1542922  
+
+
+prod.per.fish <- cbind(prod_day,prod_yr)
+head(prod.per.fish, 10)
+
+# Now have daily and annual potential productivity estimates per fish.
+
+write.csv(prod.per.fish, "data/Potential-prod-test_rfishprod.csv", row.names=F)
 
 
 
