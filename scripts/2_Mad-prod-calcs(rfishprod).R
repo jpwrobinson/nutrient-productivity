@@ -21,13 +21,13 @@ length(mada.prod$size)
 
 summary(mada.prod[mada.prod$size > mada.prod$MaxSizeTL,])
 # 57
-57/5219   
+#57/5219   
 # 1.0 %
 
 # or equal to max size
 summary(mada.prod[mada.prod$size == mada.prod$MaxSizeTL,])
 # 147
-147/5219
+#147/5219
 # 2.8 %
 
 #quite a lot. These need to be reduced to equal MaxSizeTL (prod= exactly 0) 
@@ -165,7 +165,15 @@ head(prod.per.fish, 10)
 
 # Now have daily and annual potential productivity estimates per fish.
 
-write.csv(prod.per.fish, "data/Potential-prod-test_rfishprod.csv", row.names=F)
+#write.csv(prod.per.fish, "data/Potential-prod-test_rfishprod.csv", row.names=F)
 
+#prod.per.fish <- read.csv("data/Potential-prod-test_rfishprod.csv")
+
+mada.prod2 <- cbind(mada.prod, prod.per.fish)
+head(mada.prod2)
+# WCS Madagascar data, with potential prod columns added in
+# NOTE: must join with mada.prod, not original raw data where individuals are in different order.
+
+write.csv(mada.prod2, "data/wcs/madagascar_potential-prod-test_rfishprod.csv", row.names=F)
 
 
