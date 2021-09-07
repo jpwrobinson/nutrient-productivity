@@ -6,7 +6,7 @@ predictions <- unique(predictions)
 length(unique(predictions$species)) #4547
 
 #Import Seychelles species list
-sp <- read.csv("data/Species traits_Seychelles.csv")
+sp <- read.csv("data/Species_traits_Seychelles.csv")
 
 length(unique(sp$species)) #130 species
 
