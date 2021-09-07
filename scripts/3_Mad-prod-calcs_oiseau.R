@@ -36,19 +36,25 @@ dat.list$temp<-temp
 dat.list$LogMaxSizeTL<-log(db$MaxSizeTL)
 dat.list$logK<-log(db$K)
 dat.list$Family<-as.factor(dat.list$Family)
+dat.list$sst_kelvin<-ctoK(dat.list$sstmean)
+dat.list$MaxMass<-dat.list$a * dat.list$MaxSizeTL^dat.list$b
+dat.list$LogMaxMass<-log(dat.list$MaxMass)
 
 ## Nicolas did not find strong Ea effect (B0)
 ## We want to estimate B1 and out sample family-level allometric relationship for K ~ M
 mod<-ulam(
   alist(
   logK ~ dnorm(mu, sigma),
-  mu <- log(K0) - # normalization constant
-      0.65/8.62e-5*sstmean + # boltzmann and temperature scaling
-      B1[Family]*LogMaxSizeTL, # allometric scaling with max size, family-level effect
+  mu <- log(K0) + # normalization constant
+      (-0.37/(8.62e-5*sst_kelvin)) + # boltzmann and temperature scaling
+      B1[Family]*LogMaxMass, # allometric scaling with max size, family-level effect
   
   c(K0) ~ dnorm(0, 1000),
-  B1[Family] ~ dnorm(0, sigmar),
-  c(sigma, sigmar) ~ dcauchy(0,2)
+  B1[Family] ~ dnorm(B1_mean, sigmar),
+  B1_mean ~ dnorm(-0.25, 1),
+  B_E ~ dnorm(0.65, 1),
+  c(sigma) ~ dcauchy(0,2),
+  sigmar ~ dexp(1)
   ),
   data = dat.list,  chains=3 ,iter = 2000, warmup=500, cores=4)
 
