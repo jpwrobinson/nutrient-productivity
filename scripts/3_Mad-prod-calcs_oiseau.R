@@ -36,6 +36,7 @@ dat.list$temp<-temp
 dat.list$LogMaxSizeTL<-log(db$MaxSizeTL)
 dat.list$logK<-log(db$K)
 dat.list$Family<-as.factor(dat.list$Family)
+dat.list$Diet<-as.factor(dat.list$Diet)
 dat.list$sst_kelvin<-ctoK(dat.list$sstmean)
 dat.list$MaxMass<-dat.list$a * dat.list$MaxSizeTL^dat.list$b
 dat.list$LogMaxMass<-log(dat.list$MaxMass)
@@ -46,13 +47,15 @@ mod<-ulam(
   alist(
   logK ~ dnorm(mu, sigma),
   mu <- log(K0) - # normalization constant
-      (B_E/(8.62e-5*sst_kelvin)) - # boltzmann and temperature scaling
-      B1[Family]*LogMaxMass, # allometric scaling with max size, family-level effect
+      (Ea/(8.62e-5*sst_kelvin)) - # boltzmann and temperature scaling
+      B1[Family]*LogMaxMass + # allometric scaling with max size, family-level effect
+      B2[Diet], # diet effect
   
   c(K0) ~ dnorm(0, 1000),
   B1[Family] ~ dnorm(B1_mean, sigmar),
   B1_mean ~ dnorm(0.25, 1),
-  B_E ~ dnorm(0.65, 1),
+  B2[Diet] ~ dnorm(0, 1),
+  Ea ~ dnorm(0.65, 1),
   c(sigma) ~ dcauchy(0,2),
   sigmar ~ dexp(1)
   ),
@@ -65,12 +68,12 @@ precis(mod,2)
 precis(mod,2)[rownames(precis(mod,2)) =='B1_mean',]
 
 ## Ea was -0.37 (Nicolas) and -0.31 (Sibly)
-precis(mod,2)[rownames(precis(mod,2)) =='B_E',]
+precis(mod,2)[rownames(precis(mod,2)) =='Ea',]
 
 ## check K predictions
 preds<-sim(mod)
 db$K_pred<-exp(apply(preds, 2, median))
-with(db, plot(K, K_pred))
+with(db, plot(log(K), log(K_pred)))
 abline(0, 1)
 
 ## 3. out-sample K based on temperature (28C) and family 
@@ -79,6 +82,7 @@ mada.prod$MaxMass<-with(mada.prod, a * MaxSizeTL^b)
 mada.prod$LogMaxMass<-log(mada.prod$MaxMass)
 mada.prod$sst_kelvin<-ctoK(mada.prod$sstmean)
 mada.prod$Family<-factor(mada.prod$fish_family)
+mada.prod$Diet<-factor(mada.prod$Diet)
 
 post<-extract.samples(mod)
 meds<-link(mod, data=mada.prod, n=1000, post=post)
@@ -89,11 +93,16 @@ mada.prod$upper95 <- exp(apply( meds , 2 , HPDI , prob=0.95 )[2,])
 
 
 ## 4. productivity equation
-lplus<-linf*(1 - exp(-k*(temp-t0)))
+lplus<-function(linf, K, age){linf*(1 - exp(-K*(age+1/365)))}
+age_est<-function(linf, lcensus, K, l0=0){(1/K)*log((linf - l0)/((1-lcensus)*linf))}
 
+## note that individuals above max size need to be reduced to max size
+mada.prod$size2 <- ifelse(mada.prod$size >= mada.prod$MaxSizeTL, mada.prod$MaxSizeTL-0.1, mada.prod$size)
 
+# estimate age of each fish
+mada.prod$age<-age_est(linf=mada.prod$MaxSizeTL, lcensus=mada.prod$size2/mada.prod$MaxSizeTL, K = mada.prod$K)
 
-head(mada.prod)
+## estimate productivity of each fish
+mada.prod$prod_day<-lplus(linf = mada.prod$MaxSizeTL, K = mada.prod$K, age = mada.prod$age )
 
-
-exp(-(Ea / Kb) * ((1/a) - (1/T)))
+write.csv(mada.prod, "data/wcs/madagascar_potential-prod-test_mte.csv", row.names=F)
