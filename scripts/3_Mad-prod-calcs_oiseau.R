@@ -36,9 +36,10 @@ dat.list$temp<-temp
 dat.list$LogMaxSizeTL<-log(db$MaxSizeTL)
 dat.list$logK<-log(db$K)
 dat.list$Family<-as.factor(dat.list$Family)
+dat.list$Species<-as.factor(dat.list$Species)
 dat.list$Diet<-as.factor(dat.list$Diet)
 dat.list$sst_kelvin<-ctoK(dat.list$sstmean)
-dat.list$MaxMass<-dat.list$a * dat.list$MaxSizeTL^dat.list$b
+dat.list$MaxMass<-dat.list$a * dat.list$LinfTL^dat.list$b
 dat.list$LogMaxMass<-log(dat.list$MaxMass)
 
 ## Nicolas did not find strong Ea effect (B0)
@@ -48,27 +49,29 @@ mod<-ulam(
   logK ~ dnorm(mu, sigma),
   mu <- log(K0) - # normalization constant
       (Ea/(8.62e-5*sst_kelvin)) - # boltzmann and temperature scaling
-      B1[Family]*LogMaxMass + # allometric scaling with max size, family-level effect
-      B2[Diet], # diet effect
+      B1[Family]*LogMaxMass, # allometric scaling with max size, family-level effect
+      # B2[Species]*LogMaxMass , # allometric scaling with max size, family-level effect
+      # B2[Diet], # diet effect
   
   c(K0) ~ dnorm(0, 1000),
   B1[Family] ~ dnorm(B1_mean, sigmar),
-  B1_mean ~ dnorm(0.25, 1),
-  B2[Diet] ~ dnorm(0, 1),
-  Ea ~ dnorm(0.65, 1),
+  B1_mean ~ dnorm(0.25, 10),
+  # B2[Species] ~ dnorm(0.36, 1),
+  Ea ~ dnorm(0.65, 10),
   c(sigma) ~ dcauchy(0,2),
   sigmar ~ dexp(1)
   ),
   data = dat.list,  chains=3 ,iter = 2000, warmup=500, cores=4)
 
 dashboard(mod)
+par(mfrow=c(1,1))
 precis(mod,2)
 
-## B1_mean was -0.23 (Nicolas and Sibly)
-precis(mod,2)[rownames(precis(mod,2)) =='B1_mean',]
+## B1_mean was -0.22 (Nicolas and Sibly)
+precis(mod,2)[rownames(precis(mod,2)) =='B1_mean',] # 0.28
 
 ## Ea was -0.37 (Nicolas) and -0.31 (Sibly)
-precis(mod,2)[rownames(precis(mod,2)) =='Ea',]
+precis(mod,2)[rownames(precis(mod,2)) =='Ea',] # 0.19
 
 ## check K predictions
 preds<-sim(mod)
@@ -76,7 +79,18 @@ db$K_pred<-exp(apply(preds, 2, median))
 with(db, plot(log(K), log(K_pred)))
 abline(0, 1)
 
-## 3. out-sample K based on temperature (28C) and family 
+# 4. estimate Kmax
+
+## We want to estimate Kmax based on the relationship in Morais+Bellwood 2018, using K and Lmax
+sl=-2.18
+mada.prod$gpi<-log10(mada.prod$K) - sl*log10(mada.prod$MaxSizeTL)
+hist(mada.prod$gpi)
+
+# convert K to Kmax
+mada.prod$Kmax <- 10^(mada.prod$gpi + sl*log10(mada.prod$MaxSizeTL))
+with(mada.prod, plot(K, Kmax))
+
+## 4. out-sample K based on temperature (28C) and family 
 #   assign K to each Madagascar observation
 mada.prod$MaxMass<-with(mada.prod, a * MaxSizeTL^b)
 mada.prod$LogMaxMass<-log(mada.prod$MaxMass)
@@ -92,17 +106,22 @@ mada.prod$lower95 <- exp(apply( meds , 2 , HPDI , prob=0.95 )[1,])
 mada.prod$upper95 <- exp(apply( meds , 2 , HPDI , prob=0.95 )[2,])
 
 
+
 ## 4. productivity equation
-lplus<-function(linf, K, age){linf*(1 - exp(-K*(age+1/365)))}
+lplus<-function(linf, K, age, days=1/365){linf*(1 - exp(-K*(age+days)))}
+# next_size <- MaxSizeTL[u]*(1-exp(-Kmax[u]*(EstAge[u] + age)))
+
 age_est<-function(linf, lcensus, K, l0=0){(1/K)*log((linf - l0)/((1-lcensus)*linf))}
+# EstAge <- (1/Kmax)*log((MaxSizeTL)/((1-size2/MaxSizeTL)*MaxSizeTL))
 
 ## note that individuals above max size need to be reduced to max size
 mada.prod$size2 <- ifelse(mada.prod$size >= mada.prod$MaxSizeTL, mada.prod$MaxSizeTL-0.1, mada.prod$size)
 
-# estimate age of each fish
+# estimate age of each fish (eq. 3 in Depczynski et al. 20070)
 mada.prod$age<-age_est(linf=mada.prod$MaxSizeTL, lcensus=mada.prod$size2/mada.prod$MaxSizeTL, K = mada.prod$K)
 
 ## estimate productivity of each fish
-mada.prod$prod_day<-lplus(linf = mada.prod$MaxSizeTL, K = mada.prod$K, age = mada.prod$age )
+mada.prod$prod_cm_day<-lplus(linf = mada.prod$MaxSizeTL, K = mada.prod$K, age = mada.prod$age ) - mada.prod$size2 
+mada.prod$prod_g_day<-mada.prod$a * mada.prod$prod_cm_day ^ mada.prod$b
 
 write.csv(mada.prod, "data/wcs/madagascar_potential-prod-test_mte.csv", row.names=F)
