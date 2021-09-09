@@ -63,7 +63,7 @@ fmod <- formula (~ sstmean + MaxSizeTL + Diet + Position + Method)
 datagr <- predKmax (mada.prod, 
                     dataset = db,
                     fmod = fmod,
-                    niter = 1000,
+                    niter = 100,
                     return = 'pred')
 
 datagr <- datagr$pred
@@ -103,7 +103,6 @@ VB_lngth <-  matrix(ncol=length(age), nrow=nrow(datagr), dimnames=list(NULL, pas
 for(u in 1:nrow(datagr)) {
   VB_lngth[u, ] <- datagr$MaxSizeTL[u]*(1-exp(-datagr$Kmax[u]*(datagr$EstAge[u] + age)))
 }
-VB_lngth
 
 #Now have a matrix of lengths for each day of the year per fish
 range(VB_lngth)
@@ -116,8 +115,6 @@ head(VB_wt)
 nrow(VB_wt)
 # 5219 rows
 # units = mass in grams (per fish)
-
-head(datagr)
 
 biomass.g <- (datagr$a * datagr$size2^datagr$b)
 VB_wt2 <- cbind(biomass.g, VB_wt)
@@ -135,8 +132,6 @@ for(u in 2:ncol(VB_prod_wt))
   for(v in 1:nrow(VB_prod_wt)) {
     VB_prod_wt[v,u] <- VB_wt2[v,u] - VB_wt2[v,(u-1)]
   }
-
-View(VB_prod_wt)
 
 #Delete first column (still total mass in g)
 VB_prod_wt2 <- VB_prod_wt[,2:ncol(VB_prod_wt)]
@@ -159,7 +154,6 @@ summary(prod_day)
 #      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
 # 0.0002209 0.0286485 0.0635776 0.1480279 0.1862414 3.1542922  
 
-
 prod.per.fish <- cbind(prod_day,prod_yr)
 head(prod.per.fish, 10)
 
@@ -169,8 +163,7 @@ head(prod.per.fish, 10)
 
 #prod.per.fish <- read.csv("data/Potential-prod-test_rfishprod.csv")
 
-mada.prod2 <- cbind(mada.prod, prod.per.fish)
-head(mada.prod2)
+mada.prod2 <- cbind(mada.prod, prod.per.fish, Kmax=datagr$Kmax)
 # WCS Madagascar data, with potential prod columns added in
 # NOTE: must join with mada.prod, not original raw data where individuals are in different order.
 
