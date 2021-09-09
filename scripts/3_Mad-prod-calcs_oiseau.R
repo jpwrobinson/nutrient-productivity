@@ -45,13 +45,13 @@ dat.list$LogMaxMass<-log(dat.list$MaxMass)
 mod<-ulam(
   alist(
   logK ~ dnorm(mu, sigma),
-  mu <- log(K0) + # normalization constant
-      (-0.37/(8.62e-5*sst_kelvin)) + # boltzmann and temperature scaling
+  mu <- log(K0) - # normalization constant
+      (B_E/(8.62e-5*sst_kelvin)) - # boltzmann and temperature scaling
       B1[Family]*LogMaxMass, # allometric scaling with max size, family-level effect
   
   c(K0) ~ dnorm(0, 1000),
   B1[Family] ~ dnorm(B1_mean, sigmar),
-  B1_mean ~ dnorm(-0.25, 1),
+  B1_mean ~ dnorm(0.25, 1),
   B_E ~ dnorm(0.65, 1),
   c(sigma) ~ dcauchy(0,2),
   sigmar ~ dexp(1)
@@ -61,14 +61,34 @@ mod<-ulam(
 dashboard(mod)
 precis(mod,2)
 
-out<-data.frame(Family = unique(mad$fish_family), sstmean = 28)
+## B1_mean was -0.23 (Nicolas and Sibly)
+precis(mod,2)[rownames(precis(mod,2)) =='B1_mean',]
+
+## Ea was -0.37 (Nicolas) and -0.31 (Sibly)
+precis(mod,2)[rownames(precis(mod,2)) =='B_E',]
+
+## check K predictions
+preds<-sim(mod)
+db$K_pred<-exp(apply(preds, 2, median))
+with(db, plot(K, K_pred))
+abline(0, 1)
 
 ## 3. out-sample K based on temperature (28C) and family 
+#   assign K to each Madagascar observation
+mada.prod$MaxMass<-with(mada.prod, a * MaxSizeTL^b)
+mada.prod$LogMaxMass<-log(mada.prod$MaxMass)
+mada.prod$sst_kelvin<-ctoK(mada.prod$sstmean)
+mada.prod$Family<-factor(mada.prod$fish_family)
+
+post<-extract.samples(mod)
+meds<-link(mod, data=mada.prod, n=1000, post=post)
+
+mada.prod$K<-exp(apply(meds, 2, median))
+mada.prod$lower95 <- exp(apply( meds , 2 , HPDI , prob=0.95 )[1,])
+mada.prod$upper95 <- exp(apply( meds , 2 , HPDI , prob=0.95 )[2,])
 
 
-## 4. assign K to each Madagascar observation
-
-## 5. productivity equation
+## 4. productivity equation
 lplus<-linf*(1 - exp(-k*(temp-t0)))
 
 
