@@ -1,4 +1,4 @@
-source('scripts/4_add_nutrients.R')
+source('scripts/5_add_nutrients.R')
 nut<-sey_species_nut %>% select(species, ends_with('mu'), -Protein_mu)
 
 # join mean nutrient concentrations with productivity estimates
