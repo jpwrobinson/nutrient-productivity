@@ -28,6 +28,12 @@ gg<-ggplot(nut, aes(Kmax, nut_density, col=trophic_lab)) +
   scale_fill_manual(values = trophic_cols.named) +
   scale_colour_manual(values = trophic_cols.named)
 
+# load('results/madagascar_nut_prod.rds')
+# mad_sp$Kmax<-nut$Kmax[match(mad_sp$species, nut$species)]
+# mad_sp$nut_density<-nut$nut_density[match(mad_sp$species, nut$species)]
+# ggplot(mad_sp, aes(log10(biomass_g), Kmax)) + geom_point()
+# ggplot(mad_sp, aes(log10(biomass_g), nut_density)) + geom_point()
+
 pdf(file = 'fig/Figure1.pdf', height=6, width=8)
 gg
 dev.off()
