@@ -67,26 +67,29 @@ mad_sp<-mad %>%
             prod_day = mean(prod_day),
             biomass_g = mean(biomass_g))
 
-# estimate top 5 nutrient productivity species, by nutrient
-mad_top_nut<-mad_sp %>% ungroup() %>% group_by(nutrient) %>% slice_max(nut_prod_day, n=5)
+mad_sp$trophic_lab<-trophic.cols$FG_lab[match(mad_sp$trophic_group, trophic.cols$FG)]
+
+# estimate top 20 nutrient productivity species, by nutrient
+mad_top_nut<-mad_sp %>% ungroup() %>% group_by(nutrient) %>% slice_max(nut_prod_day, n=20) 
+
 
 # scale nutrient productivity, estimate summed nutrient productivity across 6 nutriens
 mad_scale<-mad_sp %>% group_by(nutrient) %>% 
       mutate(nut_prod_day_scale = scale(nut_prod_day)) %>% 
-      ungroup() %>% group_by(species, trophic_group) %>% 
+      ungroup() %>% 
+      group_by(species, trophic_group, trophic_lab) %>% 
       summarise(nut_prod_score = sum(nut_prod_day_scale),
                 biomass_g = unique(biomass_g))
 
-mad_scale$trophic_lab<-trophic.cols$FG_lab[match(mad_scale$trophic_group, trophic.cols$FG)]
-
-pdf(file = 'fig/explore/mad_nutrient_prod_species.pdf', height=7, width=12)
-ggplot(mad_top_nut, aes(species, nut_prod_day)) + 
+pdf(file = 'fig/explore/mad_nutrient_prod_species.pdf', height=18, width=20)
+ggplot(mad_top_nut, aes(fct_reorder(species, nut_prod_day), nut_prod_day, fill=trophic_lab)) + 
     geom_bar(stat='identity') + coord_flip() + 
-    facet_wrap(~nutrient, scales='free')
+    facet_wrap(~nutrient, scales='free') +
+  labs(x = '', y = 'Nutrient productivity') +
+  scale_fill_manual(values = trophic_cols.named) +
+  theme(legend.position = c(0.9, 0.1)) +
+  scale_y_continuous(expand=c(0,0))
 
-ggplot(mad_scale, aes(log10(biomass_g), nut_prod_score)) + 
-  geom_point(aes(col = trophic_lab)) +
-  scale_fill_manual(values = trophic_cols.named) 
 dev.off()
 
 pdf(file = 'fig/explore/mad_nutrient_prod_species_score.pdf', height=14, width=8)
@@ -95,5 +98,9 @@ ggplot(mad_scale, aes(fct_reorder(species, nut_prod_score), nut_prod_score, fill
   labs(x = '', y = 'Combined nutrient productivity score')+
   coord_flip() +
   scale_fill_manual(values = trophic_cols.named) +
-  theme(legend.position = c(0.7, 0.1))
+  theme(legend.position = c(0.7, 0.1)) +
+  scale_y_continuous(expand=c(0,0))
 dev.off()
+
+
+save(mad_reef, mad_sp, mad_scale, file = 'results/madagascar_nut_prod.rds')
