@@ -1,4 +1,6 @@
 source('scripts/0_plot_theme.R')
+source('scripts/5_add_nutrients.R')
+
 set.seed(47)
 ## Script examining nutrient density and K of reef fishery target species
 nut<-sey_species_nut %>% select(species, ends_with('mu'), -Protein_mu) %>% 
@@ -27,25 +29,28 @@ gg<-ggplot(nut, aes(Kmax, nut_density, col=trophic_lab)) +
   labs(x = 'Growth coefficent (Kmax)', y = 'Nutrient density, %') +
   scale_x_continuous(breaks=seq(0, 0.6, by = 0.1)) +
   th +
-  theme(legend.position = c(0.85, 0.75)) +
+  theme(legend.position = c(0.75, 0.75), 
+        panel.border=element_rect(color='black'),
+        axis.line = element_blank()) +
   scale_fill_manual(values = trophic_cols.named) +
   scale_colour_manual(values = trophic_cols.named)
 
-gpan<-ggplot(nutl, aes(Kmax, conc, col=trophic_lab)) +
-  geom_point(size=4, pch=21, col='black', aes(fill=trophic_lab)) +
+gpan<-ggplot(nutl, aes(Kmax, conc)) +
+  geom_point(size=3, pch=21, col='black', aes(fill=trophic_lab)) +
   labs(x = 'Growth coefficent (Kmax)', y = expression(paste0('Nutrient concentration 100g'^'-1'))) +
   scale_x_continuous(breaks=seq(0, 0.6, by = 0.1)) +
   th +
   facet_wrap(~nutrient, scales='free', nrow=5) +
-  theme(legend.position = 'none') +
+  theme(legend.position = 'right') +
   scale_fill_manual(values = trophic_cols.named) +
-  scale_colour_manual(values = trophic_cols.named)
+  scale_colour_manual(values = trophic_cols.named) +
+  geom_smooth(method = 'gam', col='black')
 
 
 pdf(file = 'fig/Figure1.pdf', height=6, width=8)
-gg
+print(ggExtra::ggMarginal(gg, type='histogram', fill='grey50', col='white', bins=20))
 dev.off()
 
 pdf(file = 'fig/FigureS1.pdf', height=6, width=8)
-gpan
+print(gpan)
 dev.off()
