@@ -31,7 +31,7 @@ ggplot(mad_sp, aes(trophic_lab, nut_prod_day, fill=species)) +
   geom_bar(stat='identity') +
   coord_flip() +
   theme(legend.position = 'none') +
-  # scale_fill_manual(values = trophic_cols.named) +
+  # scale_fill_manual(values = trophic_cols.named) +  
   scale_color_manual(values = 'white') +
   facet_wrap(~nutrient, scales='free', nrow=6)
 
