@@ -25,7 +25,15 @@ n_distinct(mast$species) # 702
 ## how many species missing ?
 fish[!fish%in%mast_sp$species] ## 321
 
+## how many total species (renato + wcs)
+all_sp<-c(fish, mast_sp$species)
+all_sp<-all_sp[!duplicated(all_sp)]
+length(all_sp)
+
 # save missing species csv
 data.frame(species = fish[!fish%in%mast$species]) %>% 
-    write.csv(file = 'data/missing_species.csv', row.names=FALSE)
+    write.csv(file = 'data/trait/missing_species.csv', row.names=FALSE)
+
+data.frame(species = sort(all_sp)) %>% 
+  write.csv(file = 'data/trait/all_species.csv', row.names=FALSE)
 
