@@ -35,3 +35,5 @@ sp_data <- getTaxo(sp = species_list , tax = tax)
 #Test biology
 vert <- getVerticalPosition(sp_data,gaspar)
 vert
+
+
