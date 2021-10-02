@@ -1,4 +1,5 @@
-source('scripts/5_add_nutrients.R')
+library(tidyverse)
+source('scripts/prod-testing/5_add_nutrients.R')
 nut<-sey_species_nut %>% 
         select(species, ends_with('mu'), -Protein_mu) %>% 
         rename_at(vars(ends_with('mu')), ~str_replace_all(.x, '_mu', ''))
@@ -36,6 +37,15 @@ mad_reef<-mad %>% group_by(country, species, trophic_group, management, site, sa
                     biomass_g = sum(biomass_g),
                     nut_turnover=sum(nut_turnover),
                     biomass_turnover = sum(biomass_turnover))
+
+ggplot(mad_reef, aes(nut_prod_day, nut_turnover)) + geom_point() + facet_wrap(~nutrient, scales='free') +
+      stat_smooth(method='gam')
+ggplot(mad_reef, aes(prod_day, biomass_turnover)) + geom_point() + facet_wrap(~nutrient, scales='free') +
+  stat_smooth(method='gam')
+ggplot(mad_reef, aes(biomass_g, biomass_turnover)) + geom_point() + facet_wrap(~nutrient, scales='free') +
+  stat_smooth(method='gam')
+ggplot(mad_reef, aes(biomass_g, nut_turnover)) + geom_point()
+
 
 pdf(file = 'fig/explore/mad_nutrient_prod_reef.pdf', height=7, width=12)
 ggplot(mad_reef, aes(biomass_g, nut_prod_day)) + geom_point() + facet_wrap(~nutrient, scales='free')
