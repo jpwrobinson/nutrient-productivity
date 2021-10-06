@@ -23,17 +23,23 @@ sey <- read.csv("/Users/maire/Downloads/Species traits_Seychelles_exactMaxSizeTL
 species_list <- sey$species
 sp_data <- getTaxo(sp = species_list , tax = tax)
 
+#Test Lmax
 #lmax <- getLmax(sp_data)
 #lmax
 
+#Test MainFood
 #mainfood <- getMainFood(sp_data,Diet, Food)
 #mainfood
 
+#Test Demersal versus Pelagic
 #dem <- getDemersPelag(sp_data)
 #dem
 
 #Test biology
 vert <- getVerticalPosition(sp_data,gaspar)
 vert
+
+#
+
 
 
