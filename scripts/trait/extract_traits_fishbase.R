@@ -22,7 +22,12 @@ sp<-mermaid_get_reference(reference = c("fishspecies", 'fishgenera', 'fishfamili
 
 # species_list <- sp$species
 species_list <- sort(sp$fishspecies$species) # 3,293 species
+
+# validate names
 sp_data <- getTaxo(sp = species_list , tax = tax)
+
+getTaxo(sp = species_list , tax = tax)
+save(sp_data, file = 'data/trait/wcs_sp_data.rds')
 
 #Test Lmax
 lmax <- getLmax(sp_data)

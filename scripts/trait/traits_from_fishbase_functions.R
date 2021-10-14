@@ -18,13 +18,14 @@ getTaxo <- function(sp,tax){
   
   for(k in 1:length(Species)){
     test <- validate_names(Species[k])
-    print(k)
+    
     if(length(test)==1){
+      ## james added 'unique' to catch error when rfishbase returns more than 1 identical SpecCode (e.g."Carcharodon carcharias") )
       Species_corrected[k] <- test
-      SpecCode[k] <- as.numeric(rfishbase::species(test,fields="SpecCode"))
+      SpecCode[k] <- unique(as.numeric(rfishbase::species(test,fields="SpecCode")))
     }else{
       Species_corrected[k] <- test[1]
-      SpecCode[k] <- as.numeric(rfishbase::species(test[1],fields="SpecCode"))
+      SpecCode[k] <- unique(as.numeric(rfishbase::species(test[1],fields="SpecCode")))
       next
     }
     
@@ -1033,7 +1034,7 @@ getVerticalPosition <- function(sp_data,gaspar) {
     }else{
       VerticalPos[i] <- 'unknown'
     }
-  
+    
   }#end of i
   
   #Clean outputs 
@@ -1042,7 +1043,7 @@ getVerticalPosition <- function(sp_data,gaspar) {
   pos$VerticalPos <- fct_recode(VerticalPos, "benthic" = "Bottom",
                                 "benthopelagic" = "Low",
                                 "pelagic"="High")
-
+  
   res <- merge(sp_data,pos,by="Species_corrected",all.x=T)
   
   return(res)
