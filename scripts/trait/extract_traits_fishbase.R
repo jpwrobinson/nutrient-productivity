@@ -8,6 +8,8 @@ require(xml2)
 require(tidyverse)
 require(xlsx)
 
+library(mermaidr)
+
 #Load functions 
 source("scripts/trait/traits_from_fishbase_functions.R")
 
@@ -15,9 +17,11 @@ source("scripts/trait/traits_from_fishbase_functions.R")
 tax <- load_taxa() 
 
 #Import species list here
-sp <- read.csv("data/trait/all_species.csv")
+# sp <- read.csv("data/trait/all_species.csv")
+sp<-mermaid_get_reference(reference = c("fishspecies", 'fishgenera', 'fishfamilies'))
 
-species_list <- sp$species
+# species_list <- sp$species
+species_list <- sort(sp$fishspecies$species) # 3,293 species
 sp_data <- getTaxo(sp = species_list , tax = tax)
 
 #Test Lmax

@@ -18,6 +18,7 @@ getTaxo <- function(sp,tax){
   
   for(k in 1:length(Species)){
     test <- validate_names(Species[k])
+    print(k)
     if(length(test)==1){
       Species_corrected[k] <- test
       SpecCode[k] <- as.numeric(rfishbase::species(test,fields="SpecCode"))
