@@ -1,6 +1,6 @@
 # Productivity calcs - rfishprod version (Morais & Bellwood 2020)
 
-source("scripts/1_Mad-Sey-prod-prep.R")
+source("scripts/prod-testing/1_mad_data_prep.R")
 
 ls()
 head(mada.prod)
@@ -53,26 +53,26 @@ library(rfishprod)
 mada.prod <- tidytrait (mada.prod, sey.trait2) 
 
 # from Morais & Bellwood 2018:
-fmod <- formula (~ sstmean + MaxSizeTL + Diet + Position + Method) 
+fmod <- formula (~ sstmean + MaxSizeTL + Position + Diet + Method) 
 
 
 
 # Predicting Kmax, the standardised VBGF parameter (Recommendation: use 100s to 1000s iterations) 
 # (takes a while)
 # see ?predKmax
-datagr <- predKmax (mada.prod, 
+datagr2 <- predKmax (mada.prod, 
                     dataset = db,
                     fmod = fmod,
-                    niter = 100,
+                    niter = 10,
                     return = 'pred')
 
-datagr <- datagr$pred
+datagr2 <- datagr2$pred
 
 
 
 # Positioning fish in their growth trajectory 
 # i.e. what's the size they're supposed to have on the next day? 
-datagr$L.1day <- with (datagr, applyVBGF (Lmeas = size2,
+datagr2$L.1day <- with (datagr2, applyVBGF (Lmeas = size2,
                                           Lmax = MaxSizeTL,
                                           Kmax = Kmax))
 
