@@ -28,31 +28,42 @@ getTaxo <- function(sp,tax){
       next
     }
     
+    ## validate names can return NA for species in species table, so adding in speccode for these:
+    if(is.na(test)){
+      Species_corrected[k] <- Species[k]
+      SpecCode[k] <- species(Species[k])$SpecCode
+    }
+    
   }#end of k
   
   correctNames <- data.frame(Species,Species_corrected,SpecCode)
+  # 
+  # taxoFB <- as.data.frame(tax)
+  # 
+  # Genus <- rep("NA",nrow(correctNames))
+  # Family <- rep("NA",nrow(correctNames))
+  # Order <- rep("NA",nrow(correctNames))
+  # Class <- rep("NA",nrow(correctNames))
+  # 
+  # for(k in 1:nrow(correctNames)){
+  #   id <- which(taxoFB$Species == correctNames$Species_corrected[k])
+  #   if(length(id)==1){
+  #     Genus[k] <- taxoFB$Genus[id]
+  #     Family[k] <- taxoFB$Family[id]
+  #     Order[k] <- taxoFB$Order[id]
+  #     Class[k] <- taxoFB$Class[id]
+  #   }else{
+  #     next
+  #   }
+  # } #end of k
   
-  taxoFB <- as.data.frame(tax)
+  # taxo <- data.frame(Species_corrected,Genus,Family,Order,Class)
+  # sp_data<-merge(correctNames,taxo,by="Species_corrected",all.x=T)
+  # sp_data<-sp_data[!duplicated(sp_data),]
   
-  Genus <- rep("NA",nrow(correctNames))
-  Family <- rep("NA",nrow(correctNames))
-  Order <- rep("NA",nrow(correctNames))
-  Class <- rep("NA",nrow(correctNames))
-  
-  for(k in 1:nrow(correctNames)){
-    id <- which(taxoFB$Species == correctNames$Species_corrected[k])
-    if(length(id)==1){
-      Genus[k] <- taxoFB$Genus[id]
-      Family[k] <- taxoFB$Family[id]
-      Order[k] <- taxoFB$Order[id]
-      Class[k] <- taxoFB$Class[id]
-    }else{
-      next
-    }
-  } #end of k
-  
-  taxo <- data.frame(Species_corrected,Genus,Family,Order,Class)
-  sp_data<-merge(correctNames,taxo,by="Species_corrected",all.x=T)
+  sp_data<-left_join(correctNames, 
+                     as.data.frame(tax) %>% 
+                       select(Genus, Family, Order, Class, Species_corrected), by = 'Species_corrected')
   
   return(sp_data)
   
@@ -892,7 +903,6 @@ getLmax<-function(sp_data){
   
   #Delete missing species and create empty vector to fill in
   sp <- unique(sp_data$Species_corrected)
-  
   lmax <- vector()
   lmaxLevel <- rep("species",length(sp))
   lmaxtype <- vector()
@@ -900,7 +910,7 @@ getLmax<-function(sp_data){
   for(i in 1:length(sp)) {
     cat("i",i,"\n")
     # Grab species page
-    
+  
     urly = paste('https://www.fishbase.se/summary/',str_replace_all(sp[i]," ", "-"),'.html',sep="")
     
     #Extract URLs and Links
@@ -933,11 +943,11 @@ getLmax<-function(sp_data){
       ## Extract selected options ----
       test <- grep("option.*selected", x)
       
-      if(length(test)==1){
-        type <- x[test]
-        type <- gsub("\"", "", regmatches(type, regexpr("\"[A-Z]{2}\"", type)))
-        
-      }else{
+      # if(length(test)==1){
+      #   type <- x[test]
+      #   type <- gsub("\"", "", regmatches(type, regexpr("\"[A-Z]{2}\"", type)))
+      #   
+      # }else{
         #Extract type if text (fixed) value
         l_text <- value %>%
           html_text()
@@ -955,7 +965,7 @@ getLmax<-function(sp_data){
       
       #Save
       lmaxtype[i] <- type
-    }
+    # }
     
     
   }#end of i
