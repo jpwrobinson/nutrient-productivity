@@ -44,18 +44,16 @@ save(sp_data, file = 'data/trait/wcs_sp_data.rds')
 
 sp_data %>% filter(is.na(SpecCode))
 
-load(file = 'data/trait/wcs_sp_data.rds')
-sp_data<-sp_data[!duplicated(sp_data),]
 
 #Test Lmax
-lmax <- getLmax(sp_data[159,])
+lmax <- getLmax(sp_data)
 
 
 ## get Diet (Parravicini et al. 2020, PLoS ONE)
-diet<-read.csv('data/trait/parravicini_trophic_guilds_2020.csv') %>% clean_names() %>% 
+diet<-read.csv('data/trait/parravicini_trophic_guilds_2020.csv') %>% janitor::clean_names() %>% 
       mutate(species = str_replace_all(species, '_', '\\ '))
 
-lmax$diet<-diet$trophic_guild_predicted_text[match(sp_lmax$Species_corrected, diet$species)]
+lmax$diet<-diet$trophic_guild_predicted_text[match(lmax$Species_corrected, diet$species)]
 
 #rename and save
 trait<-lmax
