@@ -18,14 +18,13 @@ getTaxo <- function(sp,tax){
   
   for(k in 1:length(Species)){
     test <- validate_names(Species[k])
-    
+    print(paste(k, ':', Species[k])) ## print species name for debugging
     if(length(test)==1){
-      ## james added 'unique' to catch error when rfishbase returns more than 1 identical SpecCode (e.g."Carcharodon carcharias") )
       Species_corrected[k] <- test
-      SpecCode[k] <- unique(as.numeric(rfishbase::species(test,fields="SpecCode")))
+      SpecCode[k] <- as.numeric(unique(rfishbase::species(test,fields="SpecCode")$SpecCode))
     }else{
-      Species_corrected[k] <- test[1]
-      SpecCode[k] <- unique(as.numeric(rfishbase::species(test[1],fields="SpecCode")))
+      Species_corrected[k] <- test[k]
+      SpecCode[k] <- as.numeric(unique(rfishbase::species(test[k],fields="SpecCode")$SpecCode))
       next
     }
     
