@@ -28,50 +28,62 @@ dupe$NAsum<-rowSums(is.na(dupe[,3:9]))
 duped<-dupe %>% group_by(SpecCode) %>% slice(which.min(NAsum)) %>% select(-dupe_count, -NAsum)
 
 ## remove dupes in tax and replace with the single, most informative value from duped
-tax<-tax %>% filter(!SpecCode %in% dupe$SpecCode) %>% rbind(duped) %>% arrange(Species)
+tax<-tax %>% filter(!SpecCode %in% dupe$SpecCode) %>% rbind(duped) %>% 
+      mutate(Species_corrected = Species)
 
 #Import species list here
 # sp <- read.csv("data/trait/all_species.csv")
 sp<-mermaid_get_reference(reference = c("fishspecies", 'fishgenera', 'fishfamilies'))
 
 # species_list <- sp$species
-species_list <- sort(sp$fishspecies$species) # 3,293 species
-rm(sp)
+species_list <- sort(sp$fishspecies$display) # 3,293 species
+
 # validate names
 sp_data <- getTaxo(sp = species_list , tax = tax)
-# species_list2<-species_list[-c(1:500)]
-# getTaxo(sp = species_list , tax = tax)
 save(sp_data, file = 'data/trait/wcs_sp_data.rds')
 
-getTaxo(sp = 'Carcharodon carcharias', tax = tax)
+sp_data %>% filter(is.na(SpecCode))
+
+load(file = 'data/trait/wcs_sp_data.rds')
+sp_data<-sp_data[!duplicated(sp_data),]
 
 #Test Lmax
-lmax <- getLmax(sp_data)
-head(lmax)
-summary(lmax)
+lmax <- getLmax(sp_data[159,])
 
-########################################
-#Testing area for Reef position with Seychelles data
-sey <- read.csv("/Users/maire/Downloads/Species traits_Seychelles_exactMaxSizeTL.csv")
 
-species_list <- sey$species
+## get Diet (Parravicini et al. 2020, PLoS ONE)
+diet<-read.csv('data/trait/parravicini_trophic_guilds_2020.csv') %>% clean_names() %>% 
+      mutate(species = str_replace_all(species, '_', '\\ '))
 
-#Load GASPAR database
-gaspar <- read.csv("data/trait/gaspar.csv")
+lmax$diet<-diet$trophic_guild_predicted_text[match(sp_lmax$Species_corrected, diet$species)]
 
-#Test MainFood
-Diet <- read.xlsx("data/trait/SAU data/FeedingPathway_Fishbase.xlsx",sheetName = "Diet")
-Food <- read.xlsx("data/trait/FeedingPathway_Fishbase.xlsx",sheetName = "Food Items")
-
-mainfood <- getMainFood(sp_data,Diet, Food)
-mainfood
-
-#Test Demersal versus Pelagic
-dem <- getDemersPelag(sp_data)
-dem
-
-#Test biology
-vert <- getVerticalPosition(sp_data,gaspar)
-vert
+#rename and save
+trait<-lmax
+save(trait, file = 'data/trait/wcs_sp_lmax_diet.rds')
 
 #END
+
+
+########################################
+# #Testing area for Reef position with Seychelles data
+# sey <- read.csv("/Users/maire/Downloads/Species traits_Seychelles_exactMaxSizeTL.csv")
+# 
+# species_list <- sey$species
+# 
+# #Load GASPAR database
+# gaspar <- read.csv("data/trait/gaspar.csv")
+# 
+# #Test MainFood
+# Diet <- read.xlsx("data/trait/SAU data/FeedingPathway_Fishbase.xlsx",sheetName = "Diet")
+# Food <- read.xlsx("data/trait/FeedingPathway_Fishbase.xlsx",sheetName = "Food Items")
+# 
+# mainfood <- getMainFood(sp_data,Diet, Food)
+# mainfood
+# 
+# #Test Demersal versus Pelagic
+# dem <- getDemersPelag(sp_data)
+# dem
+# 
+# #Test biology
+# vert <- getVerticalPosition(sp_data,gaspar)
+# vert
