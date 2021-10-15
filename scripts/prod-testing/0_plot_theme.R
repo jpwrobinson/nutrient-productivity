@@ -18,9 +18,6 @@ pd<-position_dodge(width=0.4)
 
 ## colour vectors
 
-nut.cols<-c('Calcium'='#de2d26', 'Iron'='#636363', 'Zinc'='#3182bd', 'Vitamin A'='#31a354',
-            'Omega-3' = '#F77D29', 'Selenium' = '#776EB0')
-
 library(ggrepel)
 
 empty_margin<-theme(plot.margin=unit(c(0, 0, 0, 0), 'cm'))
