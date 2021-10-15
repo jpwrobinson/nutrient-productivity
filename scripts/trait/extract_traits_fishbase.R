@@ -14,7 +14,21 @@ library(mermaidr)
 source("scripts/trait/traits_from_fishbase_functions.R")
 
 #Get fish Taxonomy from Fishbase 
-tax <- load_taxa() 
+tax <- load_taxa() %>% 
+        filter(!is.na(SpecCode)) %>% 
+        filter(!SpecCode %in% c('<p>', '', '.')) %>% 
+        as.data.frame()
+tax<-tax[!duplicated(tax),]
+
+## dupes in SpecCode cause problems - duplicated SpecCodes can have NA for taxonomic fields
+dupe<-tax %>% as.data.frame() %>% janitor::get_dupes(SpecCode) 
+
+# count the NAs for each dupe, then select the dupe with fewest NAs (ie most taxa info)
+dupe$NAsum<-rowSums(is.na(dupe[,3:9]))
+duped<-dupe %>% group_by(SpecCode) %>% slice(which.min(NAsum)) %>% select(-dupe_count, -NAsum)
+
+## remove dupes in tax and replace with the single, most informative value from duped
+tax<-tax %>% filter(!SpecCode %in% dupe$SpecCode) %>% rbind(duped) %>% arrange(Species)
 
 #Import species list here
 # sp <- read.csv("data/trait/all_species.csv")
@@ -22,12 +36,14 @@ sp<-mermaid_get_reference(reference = c("fishspecies", 'fishgenera', 'fishfamili
 
 # species_list <- sp$species
 species_list <- sort(sp$fishspecies$species) # 3,293 species
-
+rm(sp)
 # validate names
 sp_data <- getTaxo(sp = species_list , tax = tax)
-
-getTaxo(sp = species_list , tax = tax)
+# species_list2<-species_list[-c(1:500)]
+# getTaxo(sp = species_list , tax = tax)
 save(sp_data, file = 'data/trait/wcs_sp_data.rds')
+
+getTaxo(sp = 'Carcharodon carcharias', tax = tax)
 
 #Test Lmax
 lmax <- getLmax(sp_data)
@@ -59,6 +75,3 @@ vert <- getVerticalPosition(sp_data,gaspar)
 vert
 
 #END
-
-
-
