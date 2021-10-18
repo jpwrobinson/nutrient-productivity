@@ -9,17 +9,19 @@ sp<-all$fishspecies %>% mutate(species = display)
 
 ## load micronutrient predictions
 nut<-read.csv('data/Species_Nutrient_Predictions.csv', header=TRUE) 
+tax<-rfishbase::load_taxa() %>%  mutate(species = Species) %>% as.data.frame()
+nut<-left_join(nut, tax, by = 'species')
 
 # # ## match - how many species?
-length(sp$species[sp$species %in% nut$Species_corrected]) # 2491 reef species with predictions
-length(sp$species[sp$species %in% nut$Species_corrected])/uniques(sp$species)*100 # 76% prediction success
+length(sp$species[sp$species %in% nut$species]) # 2501 reef species with predictions
+length(sp$species[sp$species %in% nut$species])/length(unique(sp$species))*100 # 76% prediction success
 
-sp$calcium.mg<-nut$Calcium_mu[match(sp$species,nut$Species_corrected)]
-sp$iron.mg<-nut$Iron_mu[match(sp$species,nut$Species_corrected)]
-sp$selenium.mug<-nut$Selenium_mu[match(sp$species,nut$Species_corrected)]
-sp$zinc.mg<-nut$Zinc_mu[match(sp$species,nut$Species_corrected)]
-sp$omega3.g<-nut$Omega3_mu[match(sp$species,nut$Species_corrected)]
-sp$vitamin_a.mug<-nut$Vitamin_A_mu[match(sp$species,nut$Species_corrected)]
+sp$calcium.mg<-nut$Calcium_mu[match(sp$species,nut$species)]
+sp$iron.mg<-nut$Iron_mu[match(sp$species,nut$species)]
+sp$selenium.mug<-nut$Selenium_mu[match(sp$species,nut$species)]
+sp$zinc.mg<-nut$Zinc_mu[match(sp$species,nut$species)]
+sp$omega3.g<-nut$Omega3_mu[match(sp$species,nut$species)]
+sp$vitamin_a.mug<-nut$Vitamin_A_mu[match(sp$species,nut$species)]
 
 ## get family averages
 fam <- nut %>% group_by(Family) %>% 
