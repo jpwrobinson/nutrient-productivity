@@ -17,7 +17,7 @@ source("scripts/trait/traits_from_fishbase_functions.R")
 tax <- load_taxa() %>% 
         filter(!is.na(SpecCode)) %>% 
         filter(!SpecCode %in% c('<p>', '', '.')) %>% 
-        as.data.frame()
+        collect()
 tax<-tax[!duplicated(tax),]
 
 ## dupes in SpecCode cause problems - duplicated SpecCodes can have NA for taxonomic fields
@@ -40,12 +40,16 @@ species_list <- sort(sp$fishspecies$display) # 3,293 species
 
 # validate names
 sp_data <- getTaxo(sp = species_list , tax = tax)
+sp_data<- sp_data[!duplicated(sp_data),]
 save(sp_data, file = 'data/trait/wcs_sp_data.rds')
 
 sp_data %>% filter(is.na(SpecCode))
 
 
-#Test Lmax
+
+#Get Lmax
+# fix a species_corrected NA (Upeneus indicus)
+sp_data$Species_corrected[is.na(sp_data$Species_corrected)]<-sp_data$Species[is.na(sp_data$Species_corrected)]
 lmax <- getLmax(sp_data)
 
 
