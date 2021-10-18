@@ -1,7 +1,10 @@
 pacman::p_load(tidyverse, skimr, cowplot, here, funk,disco, patchwork, mermaidr, mermaidreporting, install=FALSE)
 
-# load nutrient datasets
+# load nutrient data
 load('data/WCS_nutrient_profiles.rds')
+load(file = 'data/trait/wcs_sp_lmax_diet.rds')
+
+# load trait data
 
 ## merge fish with nutrients and check coverage in each country
 fish<-read.csv(file='data/wcs/fish_individuals.csv')
