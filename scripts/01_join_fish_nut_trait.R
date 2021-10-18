@@ -22,7 +22,6 @@ sum(biom$b[!biom$fish_taxon %in% nut$Species_corrected])/ tot * 100  ## 7.7% bio
 # key (missing) species
 biom[!biom$fish_taxon %in% nut$Species_corrected,] %>% slice_max(order_by = b, n = 10)
 
-
 ## now match
 
 ## 1. nutrients
