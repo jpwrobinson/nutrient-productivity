@@ -1,10 +1,8 @@
 pacman::p_load(tidyverse, skimr, cowplot, here, funk,disco, patchwork, mermaidr, mermaidreporting, install=FALSE)
 
-# load nutrient data
+# load nutrient + trait data
 load('data/WCS_nutrient_profiles.rds')
 load(file = 'data/trait/wcs_sp_lmax_diet.rds')
-
-# load trait data
 
 ## merge fish with nutrients and check coverage in each country
 fish<-read.csv(file='data/wcs/fish_individuals.csv')
@@ -26,11 +24,13 @@ biom[!biom$fish_taxon %in% nut$Species_corrected,] %>% slice_max(order_by = b, n
 
 
 ## now match
+
+## 1. nutrients
 fish$calcium.mg<-nut$Calcium_mu[match(fish$fish_taxon,nut$Species_corrected)]
 fish$iron.mg<-nut$Iron_mu[match(fish$fish_taxon,nut$Species_corrected)]
 fish$selenium.mug<-nut$Selenium_mu[match(fish$fish_taxon,nut$Species_corrected)]
 fish$zinc.mg<-nut$Zinc_mu[match(fish$fish_taxon,nut$Species_corrected)]
-fish$omega3.g<-nut$Omega3_mu[match(fish$fish_taxon,nut$Species_corrected)]
+fish$omega3.g<-nut$Omega_3_mu[match(fish$fish_taxon,nut$Species_corrected)]
 fish$vitamin_a.mug<-nut$Vitamin_A_mu[match(fish$fish_taxon,nut$Species_corrected)]
 
 ##  anything missing gets genus mean
@@ -38,7 +38,7 @@ fish$calcium.mg[is.na(fish$calcium.mg)]<-genus$Calcium_mu[match(fish$fish_genus[
 fish$iron.mg[is.na(fish$iron.mg)]<-genus$Iron_mu[match(fish$fish_genus[is.na(fish$iron.mg)],genus$Genus)]
 fish$selenium.mug[is.na(fish$selenium.mug)]<-genus$Selenium_mu[match(fish$fish_genus[is.na(fish$selenium.mug)],genus$Genus)]
 fish$zinc.mg[is.na(fish$zinc.mg)]<-genus$Zinc_mu[match(fish$fish_genus[is.na(fish$zinc.mg)],genus$Genus)]
-fish$omega3.g[is.na(fish$omega3.g)]<-genus$Omega3_mu[match(fish$fish_genus[is.na(fish$omega3.g)],genus$Genus)]
+fish$omega3.g[is.na(fish$omega3.g)]<-genus$Omega_3_mu[match(fish$fish_genus[is.na(fish$omega3.g)],genus$Genus)]
 fish$vitamin_a.mug[is.na(fish$vitamin_a.mug)]<-genus$Vitamin_A_mu[match(fish$fish_genus[is.na(fish$vitamin_a.mug)],genus$Genus)]
 
 ##  anything missing gets family mean
@@ -46,12 +46,31 @@ fish$calcium.mg[is.na(fish$calcium.mg)]<-fam$Calcium_mu[match(fish$fish_family[i
 fish$iron.mg[is.na(fish$iron.mg)]<-fam$Iron_mu[match(fish$fish_family[is.na(fish$iron.mg)],fam$Family)]
 fish$selenium.mug[is.na(fish$selenium.mug)]<-fam$Selenium_mu[match(fish$fish_family[is.na(fish$selenium.mug)],fam$Family)]
 fish$zinc.mg[is.na(fish$zinc.mg)]<-fam$Zinc_mu[match(fish$fish_family[is.na(fish$zinc.mg)],fam$Family)]
-fish$omega3.g[is.na(fish$omega3.g)]<-fam$Omega3_mu[match(fish$fish_family[is.na(fish$omega3.g)],fam$Family)]
+fish$omega3.g[is.na(fish$omega3.g)]<-fam$Omega_3_mu[match(fish$fish_family[is.na(fish$omega3.g)],fam$Family)]
 fish$vitamin_a.mug[is.na(fish$vitamin_a.mug)]<-fam$Vitamin_A_mu[match(fish$fish_family[is.na(fish$vitamin_a.mug)],fam$Family)]
 
-unique(fish$fish_taxon[is.na(fish$calcium.mg)]) ## 2 species still missing
-sum(fish$biomass_kgha[is.na(fish$calcium.mg)]) ## 12175 kg biomass 
-sum(fish$biomass_kgha[is.na(fish$calcium.mg)])/tot*100 ## 1% biomass 
+## 2. Lmax + trophic group
+fish$lmax<-trait$lmax[match(fish$fish_taxon, trait$Species)]
+fish$diet<-trait$diet[match(fish$fish_taxon, trait$Species)]
+
+
+## What is missing?
+
+# 1. Nutrients
+unique(fish$fish_taxon[is.na(fish$calcium.mg)]) ## 76 species missing nutrients
+sum(fish$biomass_kgha[is.na(fish$calcium.mg)]) ## 170,210 kg biomass 
+sum(fish$biomass_kgha[is.na(fish$calcium.mg)])/tot*100 ## 13% biomass 
+
+# 2. Lmax
+unique(fish$fish_taxon[is.na(fish$lmax)]) ## families missing Lmax
+sum(fish$biomass_kgha[is.na(fish$lmax)]) ## 90,766 kg biomass 
+sum(fish$biomass_kgha[is.na(fish$lmax)])/tot*100 ## 7% biomass 
+
+# 2. Diet
+unique(fish$fish_taxon[is.na(fish$diet)]) ## 75 species missing Diet
+sum(fish$biomass_kgha[is.na(fish$diet)]) ## 
+sum(fish$biomass_kgha[is.na(fish$diet)])/tot*100 ## 
+
 
 drops<-unique(fish$fish_taxon[is.na(fish$calcium.mg)])
 ## drop these species (no genus info)
