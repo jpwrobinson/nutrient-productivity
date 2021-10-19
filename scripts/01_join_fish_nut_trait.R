@@ -61,17 +61,31 @@ unique(fish$fish_taxon[is.na(fish$calcium.mg)]) ## 0 species missing nutrients
 # 2. Lmax
 unique(fish$fish_taxon[is.na(fish$lmax)]) ## 42 families missing Lmax
 sum(fish$biomass_kgha[is.na(fish$lmax)]) ## 90,766 kg biomass 
-sum(fish$biomass_kgha[is.na(fish$lmax)])/tot*100 ## 7% biomass 
+sum(fish$biomass_kgha[is.na(fish$lmax)])/tot*100 ## 7% biomass
 
-# 2. Diet
+# can we use genus or family level Lmax?
+# the code below shows that family and genus level Lmax is highly variable (>25% of Lmax)
+# lmax_genus<-trait %>% filter(Species %in% fish$fish_taxon) %>% group_by(Genus) %>% 
+#     summarise_at('lmax', funs(min, max, median)) %>% 
+#     mutate(range = max - min, prop_range = range / median * 100)
+# 
+# lmax_fam<-trait %>% filter(Species %in% fish$fish_taxon) %>% group_by(Family) %>% 
+#   summarise_at('lmax', funs(min, max, median)) %>% 
+#   mutate(range = max - min, prop_range = range / median * 100)
+# 
+# ## if lmax range is <25% of the median lmax, then use the median genus lmax
+# lmax_genus_use<-lmax_genus %>% filter(prop_range <= 25)
+# fish$lmax[is.na(fish$lmax)]<-lmax_genus_use$median[match(fish$fish_genus[is.na(fish$lmax)], lmax_genus_use$Genus)]
+# 
+# lmax_family_use<-lmax_fam %>% filter(prop_range <= 25)
+# fish$lmax[is.na(fish$lmax)]<-lmax_family_use$median[match(fish$fish_family[is.na(fish$lmax)], lmax_family_use$Family)]
+
+
+# 3. Diet
 unique(fish$fish_taxon[is.na(fish$diet)]) ## 74 species missing Diet (mostly families)
 sum(fish$biomass_kgha[is.na(fish$diet)], na.rm=TRUE) ## 264,392 kg
 sum(fish$biomass_kgha[is.na(fish$diet)], na.rm=TRUE)/tot*100 ## 20% biomass is missing diet
 
-
-drops<-unique(fish$fish_taxon[is.na(fish$calcium.mg)])
-## drop these species (no genus info)
-fish<-fish %>% filter(!(fish_taxon %in% drops))
 
 ## estimate nutrient score
 ## rda for nut density
