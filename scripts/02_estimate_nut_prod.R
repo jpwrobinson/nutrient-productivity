@@ -25,17 +25,12 @@ fish$size2 <- ifelse(fish$size >= fish$lmax, fish$lmax-0.1, fish$size)
 # Use rfishprod package to estimate productivity (i.e. biomass production over time)
 library(rfishprod)
 
-# from Morais & Bellwood 2018:
-fmod <- formula (~ sstmean + lmax + Position + Diet + Method) 
-
 # need to update db (rfishprod) with our diet cats
 load(file = 'data/trait/wcs_sp_lmax_diet.rds')
 diet<-read.csv('data/trait/parravicini_trophic_guilds_2020.csv') %>% janitor::clean_names() %>% 
   mutate(species = str_replace_all(species, '_', '\\ '))
 
 db$diet2<-diet$trophic_guild_predicted_text[match(db$Species, diet$species)] ## 111 missing species
-
-db %>% filter(is.na(diet2)) %>% distinct(Species, Diet)
 
 ## check how Renato diets correspond with Vale diets
 cat_key<-db %>% filter(!is.na(diet2)) %>% distinct(Species, Diet, diet2) %>% 
@@ -50,9 +45,35 @@ ggplot(cat_key, aes(diet2, prop)) + geom_bar(stat='identity') + facet_wrap(~Diet
        subtitle = 'Number of Parravicini diet categories (bars) within Morais diet categories (panels)')
 dev.off()
 
+## Paravicinni db has good resolution on invertivores, leading to many groups. Condense into mobile and sessile to be closer with Morais db
+db <- db %>% mutate(diet2 = recode(diet2, 'microinvertivore' = 'Mobile invertivore',
+                                          'macroinvertivore' = 'Mobile invertivore',
+                                          'crustacivore' = 'Mobile invertivore',
+                                        'corallivore' = 'Sessile invertivore',
+                                        'sessile invertivores' = 'Sessile invertivore',
+                                        'planktivore' = 'Planktivore',
+                                        'piscivore' = 'Piscivore'))
+
+## assign missing species using Morais categories and cat_key fig
+db$diet2[is.na(db$diet2) & db$Diet == 'Plktiv']<-'Planktivore'
+db$diet2[is.na(db$diet2) & db$Diet == 'InvMob']<-'Mobile invertivore'
+db$diet2[is.na(db$diet2) & db$Diet == 'FisCep']<-'Piscivore'
+db$diet2[is.na(db$diet2) & db$Diet == 'HerDet']<-'Herbivores Microvores Detritivores'
+db$diet2[is.na(db$diet2) & db$Diet == 'HerMac']<-'Herbivores Microvores Detritivores'
+
+## omnivores by species (fishbase)
+db$diet2[is.na(db$diet2) & db$Diet == 'Omnivr' & db$Species == 'Diplodus cervinus']<-'Mobile invertivore'
+db$diet2[is.na(db$diet2) & db$Diet == 'Omnivr' & db$Species == 'Hyporhamphus australis']<-'Herbivores Microvores Detritivores'
+
+db %>% filter(is.na(diet2)) %>% distinct(Species, Diet)
+
 # Predicting Kmax, the standardised VBGF parameter (Recommendation: use 100s to 1000s iterations) 
 # (takes a while)
 # see ?predKmax
+
+# from Morais & Bellwood 2018:
+fmod <- formula (~ sstmean + lmax + Diet) 
+
 datagr2 <- predKmax (fish, 
                      dataset = db,
                      fmod = fmod,
@@ -62,15 +83,13 @@ datagr2 <- predKmax (fish,
 datagr2 <- datagr2$pred
 
 
-
 # Positioning fish in their growth trajectory 
 # i.e. what's the size they're supposed to have on the next day? 
 datagr2$L.1day <- with (datagr2, applyVBGF (Lmeas = size2,
                                             Lmax = lmax,
                                             Kmax = Kmax))
 
-head(datagr)
-#each fish has grown a tiny amount (in length).
+head(datagr) #each fish has grown a tiny amount (in length).
 
 
 #Calculate age estimates:
