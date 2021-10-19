@@ -57,7 +57,16 @@ lmax <- getLmax(sp_data)
 diet<-read.csv('data/trait/parravicini_trophic_guilds_2020.csv') %>% janitor::clean_names() %>% 
       mutate(species = str_replace_all(species, '_', '\\ '))
 
-lmax$diet<-diet$trophic_guild_predicted_text[match(lmax$Species_corrected, diet$species)]
+## Paravicinni db has good resolution on invertivores, leading to many groups. Condense into mobile and sessile to be closer with Morais db
+diet <- diet %>% mutate(dietP = recode(trophic_guild_predicted_text, 'microinvertivore' = 'Mobile invertivore',
+                                       'macroinvertivore' = 'Mobile invertivore',
+                                       'crustacivore' = 'Mobile invertivore',
+                                       'corallivore' = 'Sessile invertivore',
+                                       'sessile invertivores' = 'Sessile invertivore',
+                                       'planktivore' = 'Planktivore',
+                                       'piscivore' = 'Piscivore'))
+
+lmax$diet<-diet$dietP[match(lmax$Species_corrected, diet$species)]
 
 #rename and save
 trait<-lmax
