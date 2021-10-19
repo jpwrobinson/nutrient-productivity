@@ -1,14 +1,19 @@
 source('scripts/0_plot_theme.R')
+library(rfishprod)
+library(tidyverse)
+
+
 ## Script to estimate productivity of all individual fish in WCS dataset
-fish<-read.csv('data/wcs/wcs_nutrients_individuals.csv')
+fish<-read.csv('data/wcs/wcs_nutrients_individuals.csv') %>% mutate(dietP = diet)
 summary(fish$size)
 #min = 2.5cm, max = 280cm, median = 17.5cm
 
 hist(fish$size)
 hist(log10(fish$size))
 
+## Data prep of fish and db (Morais) before modelling
 
-# Check if any individuals are larger than species max size:
+# 1. Check if any individuals are larger than species max size:
 length(fish$size)
 # 5219
 
@@ -22,57 +27,67 @@ fish$size2 <- ifelse(fish$size >= fish$lmax, fish$lmax-0.1, fish$size)
 #Now use size2 for further analyses
 
 
-# Use rfishprod package to estimate productivity (i.e. biomass production over time)
-library(rfishprod)
-
-# need to update db (rfishprod) with our diet cats
+# 2. Need to update db (rfishprod) with our diet cats
 load(file = 'data/trait/wcs_sp_lmax_diet.rds')
 diet<-read.csv('data/trait/parravicini_trophic_guilds_2020.csv') %>% janitor::clean_names() %>% 
   mutate(species = str_replace_all(species, '_', '\\ '))
 
-db$diet2<-diet$trophic_guild_predicted_text[match(db$Species, diet$species)] ## 111 missing species
+## Paravicinni db has good resolution on invertivores, leading to many groups. Condense into mobile and sessile to be closer with Morais db
+diet <- diet %>% mutate(dietP = recode(trophic_guild_predicted_text, 'microinvertivore' = 'Mobile invertivore',
+                                   'macroinvertivore' = 'Mobile invertivore',
+                                   'crustacivore' = 'Mobile invertivore',
+                                   'corallivore' = 'Sessile invertivore',
+                                   'sessile invertivores' = 'Sessile invertivore',
+                                   'planktivore' = 'Planktivore',
+                                   'piscivore' = 'Piscivore'))
+
+db$dietP<-diet$dietP[match(db$Species, diet$species)] ## 111 missing species
 
 ## check how Renato diets correspond with Vale diets
-cat_key<-db %>% filter(!is.na(diet2)) %>% distinct(Species, Diet, diet2) %>% 
+cat_key<-db %>% filter(!is.na(dietP)) %>% distinct(Species, Diet, dietP) %>% 
           group_by(Diet) %>% mutate(tot = length(Species)) %>%
-          group_by(Diet, diet2, tot) %>% summarise(n = length(diet2)) %>% ungroup() %>% 
+          group_by(Diet, dietP, tot) %>% summarise(n = length(dietP)) %>% ungroup() %>% 
           mutate(prop = n / tot * 100)
 
 pdf(file = 'fig/explore/diet_categories_Kmax.pdf', height=6, width=10)
-ggplot(cat_key, aes(diet2, prop)) + geom_bar(stat='identity') + facet_wrap(~Diet) +
+ggplot(cat_key, aes(dietP, prop)) + geom_bar(stat='identity') + facet_wrap(~Diet) +
   coord_flip() +
   labs(x = 'Parravicini diet', y = 'Number of species', 
        subtitle = 'Number of Parravicini diet categories (bars) within Morais diet categories (panels)')
 dev.off()
 
-## Paravicinni db has good resolution on invertivores, leading to many groups. Condense into mobile and sessile to be closer with Morais db
-db <- db %>% mutate(diet2 = recode(diet2, 'microinvertivore' = 'Mobile invertivore',
-                                          'macroinvertivore' = 'Mobile invertivore',
-                                          'crustacivore' = 'Mobile invertivore',
-                                        'corallivore' = 'Sessile invertivore',
-                                        'sessile invertivores' = 'Sessile invertivore',
-                                        'planktivore' = 'Planktivore',
-                                        'piscivore' = 'Piscivore'))
+
 
 ## assign missing species using Morais categories and cat_key fig
-db$diet2[is.na(db$diet2) & db$Diet == 'Plktiv']<-'Planktivore'
-db$diet2[is.na(db$diet2) & db$Diet == 'InvMob']<-'Mobile invertivore'
-db$diet2[is.na(db$diet2) & db$Diet == 'FisCep']<-'Piscivore'
-db$diet2[is.na(db$diet2) & db$Diet == 'HerDet']<-'Herbivores Microvores Detritivores'
-db$diet2[is.na(db$diet2) & db$Diet == 'HerMac']<-'Herbivores Microvores Detritivores'
+db$dietP[is.na(db$dietP) & db$Diet == 'Plktiv']<-'Planktivore'
+db$dietP[is.na(db$dietP) & db$Diet == 'InvMob']<-'Mobile invertivore'
+db$dietP[is.na(db$dietP) & db$Diet == 'FisCep']<-'Piscivore'
+db$dietP[is.na(db$dietP) & db$Diet == 'HerDet']<-'Herbivores Microvores Detritivores'
+db$dietP[is.na(db$dietP) & db$Diet == 'HerMac']<-'Herbivores Microvores Detritivores'
 
 ## omnivores by species (fishbase)
-db$diet2[is.na(db$diet2) & db$Diet == 'Omnivr' & db$Species == 'Diplodus cervinus']<-'Mobile invertivore'
-db$diet2[is.na(db$diet2) & db$Diet == 'Omnivr' & db$Species == 'Hyporhamphus australis']<-'Herbivores Microvores Detritivores'
+db$dietP[is.na(db$dietP) & db$Diet == 'Omnivr' & db$Species == 'Diplodus cervinus']<-'Mobile invertivore'
+db$dietP[is.na(db$dietP) & db$Diet == 'Omnivr' & db$Species == 'Hyporhamphus australis']<-'Herbivores Microvores Detritivores'
 
-db %>% filter(is.na(diet2)) %>% distinct(Species, Diet)
+db %>% filter(is.na(dietP)) %>% distinct(Species, Diet)
 
-# Predicting Kmax, the standardised VBGF parameter (Recommendation: use 100s to 1000s iterations) 
+## 3. add SST
+sst<-read.csv('data/env/sst_mean_extracted.csv')
+fish$sstmean<-sst$sst
+
+# 4. Predicting Kmax, the standardised VBGF parameter (Recommendation: use 100s to 1000s iterations) 
 # (takes a while)
 # see ?predKmax
 
+# change db names to match
+db$lmax<-db$MaxSizeTL
+
+## drop levels
+db<-droplevels(db)
+fish<-droplevels(fish)
+
 # from Morais & Bellwood 2018:
-fmod <- formula (~ sstmean + lmax + Diet) 
+fmod <- formula (~ sstmean + lmax + dietP) 
 
 datagr2 <- predKmax (fish, 
                      dataset = db,
