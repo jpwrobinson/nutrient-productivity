@@ -9,7 +9,10 @@ library(tidyverse)
 ## Data prep of fish and db (Morais) before modelling ##
 ##--------------------------------------------------##
 
-fish<-read.csv('data/wcs/wcs_nutrients_individuals.csv') %>% mutate(dietP = diet)
+fish<-read.csv('data/wcs/wcs_nutrients_individuals.csv') %>% 
+    mutate(dietP = diet) %>% 
+    filter(!is.na(lmax)) ## 0.6% of biomass / 1.4% abundance dropped
+    
 summary(fish$size)
 #min = 2.5cm, max = 280cm, median = 17.5cm
 

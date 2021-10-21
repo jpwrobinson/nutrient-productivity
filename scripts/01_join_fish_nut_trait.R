@@ -20,6 +20,7 @@ fish$functional_group[fish$fish_taxon == 'Parapercis tetracantha']<-'micro-inver
 # check biomass of missing species
 biom<-fish %>% group_by(fish_taxon) %>% summarise(b = sum(biomass_kgha))
 tot<-sum(biom$b, na.rm=TRUE)
+tot_abund<-sum(fish$count, na.rm=TRUE)
 sum(biom$b[!biom$fish_taxon %in% nut$Species])/ tot * 100  ## 1.2% biomass missing species-level nutrients
 
 # key (missing) species (all families)
@@ -65,6 +66,7 @@ unique(fish$fish_taxon[is.na(fish$calcium.mg)]) ## 0 species missing nutrients
 unique(fish$fish_taxon[is.na(fish$lmax)]) ## 45 families missing Lmax
 sum(fish$biomass_kgha[is.na(fish$lmax)]) ## 7,057 kg biomass 
 sum(fish$biomass_kgha[is.na(fish$lmax)])/tot*100 ## 0.6% biomass
+sum(fish$count[is.na(fish$lmax)])/tot_abund*100 ## 1.4% abundance
 
 # can we use genus or family level Lmax?
 # the code below shows that family and genus level Lmax is highly variable (>25% of Lmax)
