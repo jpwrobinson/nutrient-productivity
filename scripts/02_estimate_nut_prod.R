@@ -95,62 +95,62 @@ fish<-droplevels(fish)
 fmod <- formula (~ sstmean + lmax + dietP) 
 
 # fit xgboost model to predict Kmax
-datagr2 <- predKmax (fish, 
+fishp <- predKmax (fish, 
                      dataset = db,
                      fmod = fmod,
-                     niter = 10,
+                     niter = 1000,
                      return = 'pred')
 
 # save Kmax predictions
-datagr2 <- datagr2$pred
+fishp <- fishp$pred
 
 # 
 # # Positioning fish in their growth trajectory 
 # # i.e. what's the size they're supposed to have on the next day? 
-# datagr2$L.1day <- with (datagr2, applyVBGF (Lmeas = size2,
-#                                             Lmax = lmax,
-#                                             Kmax = Kmax))
-# 
-# head(datagr) #each fish has grown a tiny amount (in length).
-# 
-# 
-# #Calculate age estimates:
-# datagr$EstAge <- (1/datagr$Kmax)*log((datagr$lmax)/((1-datagr$size2/datagr$lmax)*datagr$lmax))
-# summary(datagr$EstAge)
-# #(if lengths not reduced below lmax, will have infinite age values)
-# 
-# 
-# #Calculate growth with von Bertalanffy growth function (VBGF), using ages:
-# #VBGF:  Lt = Lmax*(1-exp(-K*t))
-# # t = Estimated age + time interval
-# # Morais & Bellwood (2019), interval = 1day (i.e. 1/365)
-# 
-# # Calculate over a full year: age + (1:365)/365
-# 
-# #Age to add for each day of the year:
-# age <- (1:365)/365
-# 
-# #Create table for new length: 1 column per day, 1 row per individual fish
-# VB_lngth <-  matrix(ncol=length(age), nrow=nrow(datagr), dimnames=list(NULL, paste("Day", 1:365, sep="_")))
-# 
-# # for each individual, calculate new length for each day using VBGF formula
-# for(u in 1:nrow(datagr)) {
-#   VB_lngth[u, ] <- datagr$lmax[u]*(1-exp(-datagr$Kmax[u]*(datagr$EstAge[u] + age)))
-# }
-# 
-# #Now have a matrix of lengths for each day of the year per fish
-# range(VB_lngth)
-# #  1.009271   101.314415
-# 
+fishp$L.1day <- with (fishp, applyVBGF (Lmeas = size2,
+                                            Lmax = lmax,
+                                            Kmax = Kmax))
+
+head(fishp) #each fish has grown a tiny amount (in length).
+
+
+#Calculate age estimates:
+fishp$EstAge <- (1/fishp$Kmax)*log((fishp$lmax)/((1-fishp$size2/fishp$lmax)*fishp$lmax))
+summary(fishp$EstAge)
+#(if lengths not reduced below lmax, will have infinite age values)
+
+
+#Calculate growth with von Bertalanffy growth function (VBGF), using ages:
+#VBGF:  Lt = Lmax*(1-exp(-K*t))
+# t = Estimated age + time interval
+# Morais & Bellwood (2019), interval = 1day (i.e. 1/365)
+
+# Calculate over a full year: age + (1:365)/365
+
+#Age to add for each day of the year:
+age <- (1:365)/365
+
+#Create table for new length: 1 column per day, 1 row per individual fish
+VB_lngth <-  matrix(ncol=length(age), nrow=nrow(fishp), dimnames=list(NULL, paste("Day", 1:365, sep="_")))
+
+# for each individual, calculate new length for each day using VBGF formula
+for(u in 1:nrow(fishp)) {
+  VB_lngth[u, ] <- fishp$lmax[u]*(1-exp(-fishp$Kmax[u]*(fishp$EstAge[u] + age)))
+}
+
+#Now have a matrix of lengths for each day of the year per fish
+range(VB_lngth)
+#  1.009271   101.314415
+
 # 
 # #Convert lengths to weights using a & b coefficents:
-# VB_wt <-  apply(VB_lngth, 2, function(x) datagr$a*(x^datagr$b))  
+# VB_wt <-  apply(VB_lngth, 2, function(x) fishp$a*(x^fishp$b))  
 # head(VB_wt)
 # nrow(VB_wt)
 # # 5219 rows
 # # units = mass in grams (per fish)
 # 
-# biomass.g <- (datagr$a * datagr$size2^datagr$b)
+# biomass.g <- (fishp$a * fishp$size2^fishp$b)
 # VB_wt2 <- cbind(biomass.g, VB_wt)
 # head(VB_wt2)
 # colnames(VB_wt2)[1] <- "Day_0"
@@ -197,4 +197,4 @@ datagr2 <- datagr2$pred
 # 
 # #prod.per.fish <- read.csv("data/Potential-prod-test_rfishprod.csv")
 # 
-# fish2 <- cbind(fish, prod.per.fish, Kmax=datagr$Kmax)
+# fish2 <- cbind(fish, prod.per.fish, Kmax=fishp$Kmax)
