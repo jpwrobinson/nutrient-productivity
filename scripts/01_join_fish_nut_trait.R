@@ -4,8 +4,11 @@ pacman::p_load(tidyverse, skimr, cowplot, here, funk,disco, patchwork, mermaidr,
 load('data/WCS_nutrient_profiles.rds')
 load(file = 'data/trait/wcs_sp_lmax_diet.rds')
 
+focs<-c('Fiji', 'Madagascar', 'Solomon Islands', 'Belize')
+
+
 ## merge fish with nutrients and check coverage in each country
-fish<-read.csv(file='data/wcs/fish_individuals.csv')
+fish<-read.csv(file='data/wcs/fish_individuals.csv') %>% filter(country %in% focs)
 uniques(fish$fish_taxon[fish$fish_taxon %in% nut$Species]) # 508 in nut
 uniques(fish$fish_taxon[!fish$fish_taxon %in% nut$Species]) # 53 missing
 print(paste(round(53/(508+53), 2) * 100, '% species missing species-species nutrient preds')) # 9% missing 
