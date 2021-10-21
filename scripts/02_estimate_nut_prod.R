@@ -103,6 +103,7 @@ fishp <- predKmax (fish,
 
 # save Kmax predictions
 fishp <- fishp$pred
+save(fishp, file = 'results/wcs_productivity.rds')
 
 # 
 # # Positioning fish in their growth trajectory 
