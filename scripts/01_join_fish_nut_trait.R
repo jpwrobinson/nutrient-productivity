@@ -9,9 +9,9 @@ focs<-c('Fiji', 'Madagascar', 'Solomon Islands', 'Belize')
 
 ## merge fish with nutrients and check coverage in each country
 fish<-read.csv(file='data/wcs/fish_individuals.csv') %>% filter(country %in% focs)
-uniques(fish$fish_taxon[fish$fish_taxon %in% nut$Species]) # 508 in nut
-uniques(fish$fish_taxon[!fish$fish_taxon %in% nut$Species]) # 53 missing
-print(paste(round(53/(508+53), 2) * 100, '% species missing species-species nutrient preds')) # 9% missing 
+uniques(fish$fish_taxon[fish$fish_taxon %in% nut$Species]) # 632 in nut
+uniques(fish$fish_taxon[!fish$fish_taxon %in% nut$Species]) # 69 missing
+print(paste(round(69/(632+69), 2) * 100, '% species missing species-species nutrient preds')) # 9% missing 
 
 ## add trophic group for Parapercis tetracantha
 fish$trophic_group[fish$fish_taxon == 'Parapercis tetracantha']<-'invertivore-mobile'
@@ -20,7 +20,7 @@ fish$functional_group[fish$fish_taxon == 'Parapercis tetracantha']<-'micro-inver
 # check biomass of missing species
 biom<-fish %>% group_by(fish_taxon) %>% summarise(b = sum(biomass_kgha))
 tot<-sum(biom$b, na.rm=TRUE)
-sum(biom$b[!biom$fish_taxon %in% nut$Species])/ tot * 100  ## 7.7% biomass missing species-level nutrients
+sum(biom$b[!biom$fish_taxon %in% nut$Species])/ tot * 100  ## 1.2% biomass missing species-level nutrients
 
 # key (missing) species (all families)
 biom[!biom$fish_taxon %in% nut$Species,] %>% slice_max(order_by = b, n = 10)
@@ -62,9 +62,9 @@ fish$diet<-trait$diet[match(fish$fish_taxon, trait$Species)]
 unique(fish$fish_taxon[is.na(fish$calcium.mg)]) ## 0 species missing nutrients
 
 # 2. Lmax
-unique(fish$fish_taxon[is.na(fish$lmax)]) ## 42 families missing Lmax
-sum(fish$biomass_kgha[is.na(fish$lmax)]) ## 90,766 kg biomass 
-sum(fish$biomass_kgha[is.na(fish$lmax)])/tot*100 ## 7% biomass
+unique(fish$fish_taxon[is.na(fish$lmax)]) ## 45 families missing Lmax
+sum(fish$biomass_kgha[is.na(fish$lmax)]) ## 7,057 kg biomass 
+sum(fish$biomass_kgha[is.na(fish$lmax)])/tot*100 ## 0.6% biomass
 
 # can we use genus or family level Lmax?
 # the code below shows that family and genus level Lmax is highly variable (>25% of Lmax)
@@ -85,9 +85,9 @@ sum(fish$biomass_kgha[is.na(fish$lmax)])/tot*100 ## 7% biomass
 
 
 # 3. Diet
-unique(fish$fish_taxon[is.na(fish$diet)]) ## 74 species missing Diet (mostly families)
-sum(fish$biomass_kgha[is.na(fish$diet)], na.rm=TRUE) ## 264,392 kg
-sum(fish$biomass_kgha[is.na(fish$diet)], na.rm=TRUE)/tot*100 ## 20% biomass is missing diet
+unique(fish$fish_taxon[is.na(fish$diet)]) ## 86 species missing Diet (mostly families)
+sum(fish$biomass_kgha[is.na(fish$diet)], na.rm=TRUE) ## 191234.7 kg
+sum(fish$biomass_kgha[is.na(fish$diet)], na.rm=TRUE)/tot*100 ## 15% biomass is missing diet
 
 
 ## estimate nutrient score
