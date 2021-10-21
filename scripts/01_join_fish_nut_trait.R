@@ -89,6 +89,38 @@ unique(fish$fish_taxon[is.na(fish$diet)]) ## 86 species missing Diet (mostly fam
 sum(fish$biomass_kgha[is.na(fish$diet)], na.rm=TRUE) ## 191234.7 kg
 sum(fish$biomass_kgha[is.na(fish$diet)], na.rm=TRUE)/tot*100 ## 15% biomass is missing diet
 
+## which species are missing diets?
+missing<-fish %>% filter(is.na(fish$diet)) %>% distinct(fish_taxon, fish_genus, fish_family)
+
+pdf(file = 'fig/explore/missing_diet_categories.pdf', height=10, width=14)
+ggplot(trait %>% filter(Genus %in% missing$fish_genus & !is.na(diet)), 
+        aes(diet)) + geom_bar(stat='count') +
+  coord_flip() +
+  facet_wrap(~Genus, scales='free_x') +
+  labs(x = '', y = 'Number of species', subtitle = 'Diets by genus')
+
+ggplot(trait %>% filter(Family %in% missing$fish_family & !is.na(diet)), 
+       aes(diet)) + geom_bar(stat='count') +
+  coord_flip() +
+  facet_wrap(~Family, scales='free_x') +
+  labs(x = '', y = 'Number of species', subtitle = 'Diets by family')
+dev.off()
+
+## looks safe to assign species a genus level diet - most genus are dominated by 1 diet category
+genus_diets<-trait %>% filter(!is.na(diet)) %>% group_by(Genus) %>% 
+        count(diet) %>% 
+        summarise(diet=diet[which.max(n)])
+
+fish$diet[is.na(fish$diet)]<-genus_diets$diet[match(fish$fish_genus[is.na(fish$diet)], genus_diets$Genus)]
+
+## this leaves 36 species: sharks, rays, caesioinidae, scombridae
+fish %>% filter(is.na(fish$diet)) %>% distinct(fish_taxon, fish_genus, fish_family)
+# some decisions here:
+fish$diet[is.na(fish$diet) & fish$fish_family %in% c('Scombridae', 'Carcharhinidae', 'Aulostomidae', 'Sphyrnidae')]<-'Piscivore'
+fish$diet[is.na(fish$diet) & fish$fish_family=='Caesioinidae']<-'Planktivore'
+fish$diet[is.na(fish$diet) & fish$fish_family %in% 
+            c('Myliobatidae', 'Gerreidae', 'Ginglymostomatidae', 'Scatophagidae','Chanidae','Dasyatidae', 'Ephippidae', 'Centriscidae')]<-'Mobile invertivore'
+
 
 ## estimate nutrient score
 ## rda for nut density

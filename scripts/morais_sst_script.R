@@ -23,8 +23,10 @@ data.sstmean <- readGDAL('data/env/Present.Surface.Temperature.Mean.asc')
 #------------------------------------------------------------------# 
 ## A data-frame with the geographic coordinates to extract values ## 
 ## It is important that these coordinates are in decimal degrees  ## 
-#------------------------------------------------------------------# 
-fish<-read.csv(file='data/wcs/fish_individuals.csv')
+#------------------------------------------------------------------#
+focs<-c('Fiji', 'Madagascar', 'Solomon Islands', 'Belize')
+fish<-read.csv(file='data/wcs/fish_individuals.csv') %>% filter(country %in% focs)
+# fish<-read.csv(file='data/wcs/fish_individuals.csv')
 
 coords <- fish %>% dplyr::select(longitude, latitude)
 
