@@ -95,11 +95,11 @@ fish<-droplevels(fish)
 fmod <- formula (~ sstmean + lmax + dietP) 
 
 # fit xgboost model to predict Kmax
-fishp <- predKmax (fish, 
-                     dataset = db,
-                     fmod = fmod,
-                     niter = 1000,
-                     return = 'pred')
+# fishp <- predKmax (fish, 
+#                      dataset = db,
+#                      fmod = fmod,
+#                      niter = 1000,
+#                      return = 'pred')
 
 # save Kmax predictions
 fishp <- fishp$pred
