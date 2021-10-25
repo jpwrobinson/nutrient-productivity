@@ -52,7 +52,6 @@ sp_data %>% filter(is.na(SpecCode))
 sp_data$Species_corrected[is.na(sp_data$Species_corrected)]<-sp_data$Species[is.na(sp_data$Species_corrected)]
 lmax <- getLmax(sp_data)
 
-
 ## get Diet (Parravicini et al. 2020, PLoS ONE)
 diet<-read.csv('data/trait/parravicini_trophic_guilds_2020.csv') %>% janitor::clean_names() %>% 
       mutate(species = str_replace_all(species, '_', '\\ '))
