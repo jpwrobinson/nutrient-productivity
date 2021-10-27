@@ -26,9 +26,10 @@ data.sstmean <- readGDAL('data/env/Present.Surface.Temperature.Mean.asc')
 #------------------------------------------------------------------#
 focs<-c('Fiji', 'Madagascar', 'Solomon Islands', 'Belize')
 fish<-read.csv('data/wcs/wcs_nutrients_individuals.csv') %>% 
-      filter(country %in% focs) %>% 
-      filter(!is.na(lmax))
-# fish<-read.csv(file='data/wcs/fish_individuals.csv')
+          mutate(dietP = diet) %>% 
+          filter(!is.na(biomass_kgha)) %>%  ## 1 fish in Belize with no L-W conversion
+          filter(!is.na(lmax)) %>%  ## 0.6% of biomass / 1.4% abundance dropped
+          filter(size >= 5 & lmax >= 6) ## 1.4% of biomass dropped
 
 coords <- fish %>% dplyr::select(longitude, latitude)
 

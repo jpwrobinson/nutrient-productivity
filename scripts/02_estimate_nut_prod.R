@@ -11,10 +11,12 @@ library(tidyverse)
 
 fish<-read.csv('data/wcs/wcs_nutrients_individuals.csv') %>% 
     mutate(dietP = diet) %>% 
-    filter(!is.na(lmax)) ## 0.6% of biomass / 1.4% abundance dropped
+    filter(!is.na(biomass_kgha)) %>%  ## 1 fish in Belize with no L-W conversion
+    filter(!is.na(lmax)) %>%  ## 0.6% of biomass / 1.4% abundance dropped
+    filter(size >= 5 & lmax >= 6) ## 1.4% of biomass dropped
     
 summary(fish$size)
-#min = 2.5cm, max = 280cm, median = 17.5cm
+#min = 5 cm, max = 280 cm, median = 17.5cm
 
 hist(fish$size)
 hist(log10(fish$size))
@@ -22,8 +24,8 @@ hist(log10(fish$size))
 ##--------------------------------------------------##
 # 1. Check if any individuals are larger than species max size:
 ##--------------------------------------------------##
-fish %>% filter(size >= lmax) %>% dim() ## 1042 observations
-fish %>% filter(size >= lmax) %>% summarise(sum(count)) ## 3144 fishes
+fish %>% filter(size >= lmax) %>% dim() ## 913 observations
+fish %>% filter(size >= lmax) %>% summarise(sum(count)) ## 2700 fishes
 
 # These need to be reduced to equal lmax (prod= exactly 0) 
 # OR 0.1cm below lmax (tiny prod values)
@@ -95,14 +97,15 @@ fish<-droplevels(fish)
 fmod <- formula (~ sstmean + lmax + dietP) 
 
 # fit xgboost model to predict Kmax
-# fishp <- predKmax (fish, 
-#                      dataset = db,
-#                      fmod = fmod,
-#                      niter = 1000,
-#                      return = 'pred')
+fishp <- predKmax (fish,
+                     dataset = db,
+                     fmod = fmod,
+                     niter = 1000,
+                     return = 'pred')
 
 # save Kmax predictions
 fishp <- fishp$pred
+hist(fishp$Kmax)
 save(fishp, file = 'results/wcs_productivity.rds')
 
 # 

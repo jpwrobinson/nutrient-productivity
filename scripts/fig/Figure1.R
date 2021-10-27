@@ -1,31 +1,31 @@
+pacman::p_load(tidyverse, skimr, cowplot, here, funk,disco, patchwork, mermaidr, mermaidreporting, install=FALSE)
 source('scripts/0_plot_theme.R')
-source('scripts/5_add_nutrients.R')
 
-set.seed(47)
-## Script examining nutrient density and K of reef fishery target species
-nut<-sey_species_nut %>% select(species, ends_with('mu'), -Protein_mu) %>% 
-  mutate(nut_density = rowSums(across(c(Selenium_mu:Vitamin_A_mu)))) %>% 
-  rename_at(vars(ends_with('mu')), ~str_replace_all(.x, '_mu', ''))
 
-# join nutrient concentrations with K estimate
-mad<-read.csv("data/wcs/madagascar_potential-prod-test_rfishprod.csv") %>% 
-  distinct(species, Kmax, trophic_group)
 
-nut<-left_join(nut, mad, by = 'species') %>% droplevels() 
-nut$trophic_lab<-trophic.cols$FG_lab[match(nut$trophic_group, trophic.cols$FG)]
+## Figure viz of nutrient density and K of reef fishery target species
+
+## load Kmax predictions for WCS fish
+load(file = 'results/wcs_productivity.rds')
+## get average Kmax, as these have uncertainty and were predicted for each observed species in fish
+fish2<-fishp %>% group_by(fish_taxon, trophic_group, dietP, lmax, nscore,
+                            calcium.mg, iron.mg, selenium.mug, zinc.mg, omega3.g, vitamin_a.mug) %>% 
+    summarise(Kmax =mean(Kmax)) 
+
+fish2$trophic_lab<-trophic.cols$FG_lab[match(fish2$trophic_group, trophic.cols$FG)]
 
 ## species labs
-sp<-str_split_fixed(nut$species, '\\ ', 2)
-# nut$species.lab<-paste0(substring(sp[,1],1,5),  '. ', sp[,2], '.')
-nut$species.lab<-paste0(sp[,1],'\n', sp[,2])
+sp<-str_split_fixed(fish2$fish_taxon, '\\ ', 2)
+# fish2$species.lab<-paste0(substring(sp[,1],1,5),  '. ', sp[,2], '.')
+fish2$species.lab<-paste0(sp[,1],'\n', sp[,2])
 
 # long version
-nutl <- nut %>% pivot_longer(Selenium:Vitamin_A, names_to = 'nutrient', values_to = 'conc')
+fish2l <- fish2 %>% pivot_longer(calcium.mg:vitamin_a.mug, names_to = 'nutrient', values_to = 'conc')
 
-gg<-ggplot(nut, aes(Kmax, nut_density, col=trophic_lab)) + 
+gg<-ggplot(fish2, aes(Kmax, nscore, col=trophic_lab)) + 
   geom_point(size=4, pch=21, col='black', aes(fill=trophic_lab)) +
-  geom_label_repel(data = nut %>% filter(nut_density>400), aes(label = species.lab), fontface=1,size=2, show.legend=FALSE) +
-  geom_label_repel(data = nut %>% filter(Kmax>0.4), aes(label = species.lab), fontface=1,size=2, show.legend=FALSE) +
+  # geom_label_repel(data = fish2 %>% filter(nscore>400), aes(label = species.lab), fontface=1,size=2, show.legend=FALSE) +
+  # geom_label_repel(data = fish2 %>% filter(Kmax>0.4), aes(label = species.lab), fontface=1,size=2, show.legend=FALSE) +
   labs(x = 'Growth coefficent (Kmax)', y = 'Nutrient density, %') +
   scale_x_continuous(breaks=seq(0, 0.6, by = 0.1)) +
   th +
@@ -35,7 +35,7 @@ gg<-ggplot(nut, aes(Kmax, nut_density, col=trophic_lab)) +
   scale_fill_manual(values = trophic_cols.named) +
   scale_colour_manual(values = trophic_cols.named)
 
-gpan<-ggplot(nutl, aes(Kmax, conc)) +
+gpan<-ggplot(fish2l, aes(Kmax, conc)) +
   geom_point(size=3, pch=21, col='black', aes(fill=trophic_lab)) +
   labs(x = 'Growth coefficent (Kmax)', y = expression(paste0('Nutrient concentration 100g'^'-1'))) +
   scale_x_continuous(breaks=seq(0, 0.6, by = 0.1)) +
