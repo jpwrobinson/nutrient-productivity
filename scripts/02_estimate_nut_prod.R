@@ -106,7 +106,7 @@ fishp <- predKmax (fish,
 # save Kmax predictions
 fishp <- fishp$pred
 hist(fishp$Kmax)
-save(fishp, file = 'results/wcs_productivity.rds')
+# save(fishp, file = 'results/wcs_productivity.rds')
 
 # 
 # # Positioning fish in their growth trajectory 
@@ -120,11 +120,9 @@ head(fishp) #each fish has grown a tiny amount (in length).
 
 #Calculate age estimates:
 ## 4. productivity equation
-lplus<-function(lmax, Kmax, age, days=1/365){lmax*(1 - exp(-Kmax*(age+days)))} ## Renato approach
+lplus<-function(lmax, Kmax, age, days=1/365){lmax*(1 - exp(-Kmax*(age+days)))} ## Renato approach, VBGF growth based on age
 
-
-
-# estimate age of each fish (eq. 3 in Depczynski et al. 20070)
+# estimate age of each fish (eq. 3 in Depczynski et al. 2007)
 age_est<-function(lmax, lcensus, K, l0=0){(1/K)*log(lmax/((1-lcensus)*lmax))}
 fishp$age<-age_est(lmax=fishp$lmax, lcensus=fishp$size2/fishp$lmax, K = fishp$Kmax)
 
@@ -144,82 +142,4 @@ fishp<-fishp %>% mutate(
 with(fishp, plot(prod_cm_day_perfish, prod_g_day_perfish))
 with(fishp, plot(log10(prod_cm_day_perfish), log10(prod_g_day_perfish)))
 
-
-#Calculate growth with von Bertalanffy growth function (VBGF), using ages:
-#VBGF:  Lt = Lmax*(1-exp(-K*t))
-# t = Estimated age + time interval
-# Morais & Bellwood (2019), interval = 1day (i.e. 1/365)
-
-# Calculate over a full year: age + (1:365)/365
-
-#Age to add for each day of the year:
-age <- (1:365)/365
-
-#Create table for new length: 1 column per day, 1 row per individual fish
-VB_lngth <-  matrix(ncol=length(age), nrow=nrow(fishp), dimnames=list(NULL, paste("Day", 1:365, sep="_")))
-
-# for each individual, calculate new length for each day using VBGF formula
-for(u in 1:nrow(fishp)) {
-  VB_lngth[u, ] <- fishp$lmax[u]*(1-exp(-fishp$Kmax[u]*(fishp$EstAge[u] + age)))
-}
-
-#Now have a matrix of lengths for each day of the year per fish
-range(VB_lngth)
-# 5 - 303
-
-# 
-# #Convert lengths to weights using a & b coefficents:
-# VB_wt <-  apply(VB_lngth, 2, function(x) fishp$a*(x^fishp$b))  
-# head(VB_wt)
-# nrow(VB_wt)
-# # 5219 rows
-# # units = mass in grams (per fish)
-# 
-# biomass.g <- (fishp$a * fishp$size2^fishp$b)
-# VB_wt2 <- cbind(biomass.g, VB_wt)
-# head(VB_wt2)
-# colnames(VB_wt2)[1] <- "Day_0"
-# dim(VB_wt2)
-# # 5219   366
-# # First column = mass when observed during survey, then after 1 day, 2 days etc.
-# 
-# #create new object:
-# VB_prod_wt <- VB_wt2
-# 
-# #calculate daily mass produced (productivity)
-# for(u in 2:ncol(VB_prod_wt))
-#   for(v in 1:nrow(VB_prod_wt)) {
-#     VB_prod_wt[v,u] <- VB_wt2[v,u] - VB_wt2[v,(u-1)]
-#   }
-# 
-# #Delete first column (still total mass in g)
-# VB_prod_wt2 <- VB_prod_wt[,2:ncol(VB_prod_wt)]
-# head(VB_prod_wt2) 
-# # table of daily production in g/individual over a year (not cumulative)
-# 
-# 
-# # Now sum row totals to get POTENTIAL productivity over 1 year (i.e. without accounting for mortality):
-# prod_yr <- rowSums(VB_prod_wt2)
-# prod_yr  # 1 value per fish (row)
-# summary(prod_yr)
-# #   Min.   1st Qu.    Median      Mean   3rd Qu.       Max. 
-# # 0.1418   11.5866   26.8228   60.8488   77.3024  1171.2566 
-# 
-# 
-# #Take value after 1 day as daily productivity value:
-# prod_day <- VB_prod_wt2[,1] 
-# prod_day
-# summary(prod_day)
-# #      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
-# # 0.0002209 0.0286485 0.0635776 0.1480279 0.1862414 3.1542922  
-# 
-# prod.per.fish <- cbind(prod_day,prod_yr)
-# head(prod.per.fish, 10)
-# 
-# # Now have daily and annual potential productivity estimates per fish.
-# 
-# #write.csv(prod.per.fish, "data/Potential-prod-test_rfishprod.csv", row.names=F)
-# 
-# #prod.per.fish <- read.csv("data/Potential-prod-test_rfishprod.csv")
-# 
-# fish2 <- cbind(fish, prod.per.fish, Kmax=fishp$Kmax)
+save(fishp, file = 'results/wcs_productivity.rds')

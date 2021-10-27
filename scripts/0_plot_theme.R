@@ -29,6 +29,12 @@ trophic.cols<-data.frame(col=c('#fdae61', '#377eb8', '#4d9221', '#d9ef8b', '#beb
 
 trophic_cols.named<-setNames(as.character(trophic.cols$col), trophic.cols$FG_lab)
 
+diet.cols<-data.frame(col=c('#fdae61', '#377eb8',  '#4d9221', '#bebada', '#ffd92f'),
+                         dietP=c('Mobile invertivore', 'Piscivore','Herbivores Microvores Detritivores','Planktivore',  'Sessile invertivore'),
+                         dietP_lab=c("Invertivore (mobile)", 'Piscivore', 'Herbivore/detritivore', 'Planktivore',  'Invertivore (sessile)'))
+
+diet_cols.named<-setNames(as.character(diet.cols$col), diet.cols$dietP_lab)
+
 # fg.cols<-data.frame(col=c('#1b9e77', '#bebada',),
 #                     FG = c("detritivore","planktivore",
 # 		"micro-invertivore", "corallivore","macro-invertivore", "pisci-invertivore", 
