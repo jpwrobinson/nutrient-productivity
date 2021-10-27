@@ -119,9 +119,30 @@ head(fishp) #each fish has grown a tiny amount (in length).
 
 
 #Calculate age estimates:
-fishp$EstAge <- (1/fishp$Kmax)*log((fishp$lmax)/((1-fishp$size2/fishp$lmax)*fishp$lmax))
-summary(fishp$EstAge)
-#(if lengths not reduced below lmax, will have infinite age values)
+## 4. productivity equation
+lplus<-function(lmax, Kmax, age, days=1/365){lmax*(1 - exp(-Kmax*(age+days)))} ## Renato approach
+
+
+
+# estimate age of each fish (eq. 3 in Depczynski et al. 20070)
+age_est<-function(lmax, lcensus, K, l0=0){(1/K)*log(lmax/((1-lcensus)*lmax))}
+fishp$age<-age_est(lmax=fishp$lmax, lcensus=fishp$size2/fishp$lmax, K = fishp$Kmax)
+
+# convert length to mass
+lwp<-read.csv('data/wcs/mermaid_length_weight_params.csv')
+fishp<-left_join(fishp, lwp)
+fishp$mass<-fishp$biomass_constant_a * fishp$size2 ^ fishp$biomass_constant_b
+
+## estimate productivity of each fish
+fishp$size_nextday<-lplus(lmax = fishp$lmax, K = fishp$Kmax, age = fishp$age ) 
+
+fishp<-fishp %>% mutate(
+        prod_cm_day_perfish = size_nextday - size2,
+        prod_g_day_perfish = biomass_constant_a * size_nextday ^ biomass_constant_b - mass,
+        prod_g_day = prod_g_day * count)
+
+with(fishp, plot(prod_cm_day_perfish, prod_g_day_perfish))
+with(fishp, plot(log10(prod_cm_day_perfish), log10(prod_g_day_perfish)))
 
 
 #Calculate growth with von Bertalanffy growth function (VBGF), using ages:
@@ -144,7 +165,7 @@ for(u in 1:nrow(fishp)) {
 
 #Now have a matrix of lengths for each day of the year per fish
 range(VB_lngth)
-#  1.009271   101.314415
+# 5 - 303
 
 # 
 # #Convert lengths to weights using a & b coefficents:
