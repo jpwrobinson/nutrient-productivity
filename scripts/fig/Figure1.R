@@ -21,7 +21,15 @@ sp<-str_split_fixed(fish2$fish_taxon, '\\ ', 2)
 fish2$species.lab<-paste0(sp[,1],'\n', sp[,2])
 
 # long version
-fish2l <- fish2 %>% pivot_longer(calcium.mg:vitamin_a.mug, names_to = 'nutrient', values_to = 'conc')
+fish2l <- fish2 %>% pivot_longer(calcium.mg:vitamin_a.mug, names_to = 'nutrient', values_to = 'conc') %>% 
+      mutate(nutrient = factor(nutrient))
+levels(fish2l$nutrient)<-fct_recode(fish2l$nutrient,
+                                   'Calcium, mg' = 'calcium.mg',
+                                   'Iron, mg' = 'iron.mg',
+                                   'Selenium, mug' = 'selenium.mug',
+                                   'Zinc, mg' = 'zinc.mg',
+                                   'Omega-3, g' = 'omega3.g',
+                                   'Vitamin A, mug' = 'vitamin_a.mug')
 
 gg<-ggplot(fish2, aes(log10(Kmax), nscore, col=dietP_lab)) + 
   geom_point(size=3.5, pch=21, col='black', aes(fill=dietP_lab)) +
@@ -37,14 +45,14 @@ gg<-ggplot(fish2, aes(log10(Kmax), nscore, col=dietP_lab)) +
   scale_colour_manual(values = diet_cols.named)
 
 gpan<-ggplot(fish2l, aes(log10(Kmax), conc)) +
-  geom_point(size=3, pch=21, col='black', aes(fill=dietP)) +
-  labs(x = 'Derived growth coefficent (Kmax)', y = expression(paste0('Nutrient concentration 100g'^'-1'))) +
+  geom_point(size=2.5, pch=21, col='black', aes(fill=dietP_lab)) +
+  labs(x = 'Derived growth coefficent (Kmax)', y = conc_lab) +
   # scale_x_continuous(breaks=seq(0, 0.6, by = 0.1)) +
   th +
   facet_wrap(~nutrient, scales='free', nrow=5) +
   theme(legend.position = 'right') +
-  scale_fill_manual(values = trophic_cols.named) +
-  scale_colour_manual(values = trophic_cols.named) +
+  scale_fill_manual(values = diet_cols.named) +
+  scale_colour_manual(values = diet_cols.named) +
   geom_smooth(method = 'gam', col='black')
 
 
@@ -52,7 +60,7 @@ pdf(file = 'fig/Figure1.pdf', height=6, width=8)
 print(ggExtra::ggMarginal(gg, type='histogram', fill='grey50', col='white', bins=20))
 dev.off()
 
-pdf(file = 'fig/FigureS1.pdf', height=6, width=8)
+pdf(file = 'fig/FigureS1.pdf', height=8, width=11)
 print(gpan)
 dev.off()
 
