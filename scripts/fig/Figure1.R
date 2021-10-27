@@ -13,6 +13,7 @@ fish2<-fishp %>% group_by(fish_taxon, trophic_group, dietP, lmax, nscore,
     summarise(Kmax =mean(Kmax)) 
 
 fish2$trophic_lab<-trophic.cols$FG_lab[match(fish2$trophic_group, trophic.cols$FG)]
+fish2$dietP_lab<-diet.cols$dietP_lab[match(fish2$dietP, diet.cols$dietP)]
 
 ## species labs
 sp<-str_split_fixed(fish2$fish_taxon, '\\ ', 2)
@@ -22,23 +23,23 @@ fish2$species.lab<-paste0(sp[,1],'\n', sp[,2])
 # long version
 fish2l <- fish2 %>% pivot_longer(calcium.mg:vitamin_a.mug, names_to = 'nutrient', values_to = 'conc')
 
-gg<-ggplot(fish2, aes(Kmax, nscore, col=trophic_lab)) + 
-  geom_point(size=4, pch=21, col='black', aes(fill=trophic_lab)) +
+gg<-ggplot(fish2, aes(log10(Kmax), nscore, col=dietP_lab)) + 
+  geom_point(size=3.5, pch=21, col='black', aes(fill=dietP_lab)) +
   # geom_label_repel(data = fish2 %>% filter(nscore>400), aes(label = species.lab), fontface=1,size=2, show.legend=FALSE) +
   # geom_label_repel(data = fish2 %>% filter(Kmax>0.4), aes(label = species.lab), fontface=1,size=2, show.legend=FALSE) +
-  labs(x = 'Growth coefficent (Kmax)', y = 'Nutrient density, %') +
-  scale_x_continuous(breaks=seq(0, 0.6, by = 0.1)) +
+  labs(x = 'Derived growth coefficent (Kmax)', y = 'Nutrient density, %') +
+  # scale_x_continuous(breaks=seq(0, 0.6, by = 0.1)) +
   th +
-  theme(legend.position = c(0.75, 0.75), 
+  theme(legend.position = c(0.8, 0.88), 
         panel.border=element_rect(color='black'),
         axis.line = element_blank()) +
-  scale_fill_manual(values = trophic_cols.named) +
-  scale_colour_manual(values = trophic_cols.named)
+  scale_fill_manual(values = diet_cols.named) +
+  scale_colour_manual(values = diet_cols.named)
 
-gpan<-ggplot(fish2l, aes(Kmax, conc)) +
-  geom_point(size=3, pch=21, col='black', aes(fill=trophic_lab)) +
-  labs(x = 'Growth coefficent (Kmax)', y = expression(paste0('Nutrient concentration 100g'^'-1'))) +
-  scale_x_continuous(breaks=seq(0, 0.6, by = 0.1)) +
+gpan<-ggplot(fish2l, aes(log10(Kmax), conc)) +
+  geom_point(size=3, pch=21, col='black', aes(fill=dietP)) +
+  labs(x = 'Derived growth coefficent (Kmax)', y = expression(paste0('Nutrient concentration 100g'^'-1'))) +
+  # scale_x_continuous(breaks=seq(0, 0.6, by = 0.1)) +
   th +
   facet_wrap(~nutrient, scales='free', nrow=5) +
   theme(legend.position = 'right') +
@@ -54,3 +55,4 @@ dev.off()
 pdf(file = 'fig/FigureS1.pdf', height=6, width=8)
 print(gpan)
 dev.off()
+
