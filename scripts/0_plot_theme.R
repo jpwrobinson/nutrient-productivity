@@ -68,6 +68,7 @@ seascape_cols<-data.frame(seascape=c('Northwest', 'Southwest', 'Northeast'),
 nut.cols<-c('Calcium'='#de2d26', 'Iron'='#636363', 'Zinc'='#3182bd', 'Vitamin A'='#31a354',
             'Omega-3' = '#F77D29', 'Selenium' = '#776EB0', "\\" = 'black')
 
+conc_lab<-expression(paste('concentration 100 g'^-1))
 
 ## extract legends
 g_legend<-function(a.gplot){
