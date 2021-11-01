@@ -1,4 +1,4 @@
-pacman::p_load(here, funk, knitr, tidyverse, skimr, cowplot, readxl, gghighlight, ggrepel)
+pacman::p_load(here, funk, knitr, tidyverse, skimr, cowplot, readxl, gghighlight, ggrepel, disco)
 
 
 theme_set(theme_sleek())
@@ -15,10 +15,6 @@ th<-theme(axis.text.y=element_text(size=11, colour='black'),
 
 
 pd<-position_dodge(width=0.4)
-
-## colour vectors
-
-library(ggrepel)
 
 empty_margin<-theme(plot.margin=unit(c(0, 0, 0, 0), 'cm'))
 
