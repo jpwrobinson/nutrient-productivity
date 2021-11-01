@@ -13,10 +13,12 @@ fish<-read.csv('data/wcs/wcs_nutrients_individuals.csv') %>%
     mutate(dietP = diet) %>% 
     filter(!is.na(biomass_kgha)) %>%  ## 1 fish in Belize with no L-W conversion
     filter(!is.na(lmax)) %>%  ## 0.6% of biomass / 1.4% abundance dropped
-    filter(size >= 5 & lmax >= 6) ## 1.4% of biomass dropped
+    filter(size >= 10 & lmax >= 6) %>% ## 1.34% of biomass dropped
+    filter(!fish_family %in% c('Pomacentridae')) %>% ## 0.35% of biomass dropped [50 species]
+    filter(!fish_family %in% c('Ginglymostomatidae', 'Myliobatidae', 'Dasyatidae', 'Carcharhinidae')) ## 5.9% of biomass dropped [8 species]
     
 summary(fish$size)
-#min = 5 cm, max = 280 cm, median = 17.5cm
+#min = 10 cm, max = 280 cm, median = 17.5cm
 
 hist(fish$size)
 hist(log10(fish$size))
@@ -100,7 +102,7 @@ fmod <- formula (~ sstmean + lmax + dietP)
 fishp <- predKmax (fish,
                      dataset = db,
                      fmod = fmod,
-                     niter = 100,
+                     niter = 1000,
                      return = 'pred')
 
 # save Kmax predictions
