@@ -8,7 +8,7 @@ th<-theme(axis.text.y=element_text(size=11, colour='black'),
           axis.title=element_text(size=12, colour='black'),
           axis.line = element_line(colour = "black"), 
           panel.border = element_blank(),
-          strip.text = element_text(face="bold", colour='black', size=10),
+          strip.text.x = element_text(face="bold", colour='black', size=10),
           legend.position =c(0.8, 0.6), 
           legend.title=element_blank(),
           axis.ticks=element_blank())
