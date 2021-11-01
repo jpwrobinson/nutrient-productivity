@@ -8,16 +8,16 @@ load(file = 'results/wcs_productivity.rds')
 prod<-fishp %>% 
     pivot_longer(calcium.mg:vitamin_a.mug, names_to = 'nutrient', values_to = 'conc') %>% 
     mutate(nut_prod_day = conc / 100 * prod_g_day * 0.87,
-           nut_biomass = conc * 0.87 * mass)
+           nut_biomass_kgha = conc * 0.87 * biomass_kgha)
 
 ## reef level estimates of nutrient productivity metrics
-prod_reef<-prod %>% group_by(country, species, trophic_group, management, site, sample_date, transect_number, depth, nutrient) %>% 
+prod_reef<-prod %>% group_by(country, fish_taxon, trophic_group, management, site, sample_date, transect_number, depth, nutrient) %>% 
           summarise(
             nut_prod_day = sum(nut_prod_day), 
             nut_biomass = sum(nut_biomass),
-            prod_day = sum(prod_day),
+            prod_day = sum(prod_g_day),
             biomass_g = sum(mass)) %>% 
-          group_by(country, species, trophic_group, management, site, depth, nutrient) %>% 
+          group_by(country, fish_taxon, trophic_group, management, site, depth, nutrient) %>% 
           summarise(
             nut_prod_day = mean(nut_prod_day), 
             nut_biomass = mean(nut_biomass),
