@@ -100,7 +100,7 @@ fmod <- formula (~ sstmean + lmax + dietP)
 fishp <- predKmax (fish,
                      dataset = db,
                      fmod = fmod,
-                     niter = 1000,
+                     niter = 100,
                      return = 'pred')
 
 # save Kmax predictions
@@ -128,7 +128,7 @@ fishp$age<-age_est(lmax=fishp$lmax, lcensus=fishp$size2/fishp$lmax, K = fishp$Km
 
 # convert length to mass
 lwp<-read.csv('data/wcs/mermaid_length_weight_params.csv') 
-fishp<-left_join(fishp, lwp, by='fish_taxon')
+fishp<-left_join(fishp, lwp)
 fishp$mass<-fishp$biomass_constant_a * fishp$size2 ^ fishp$biomass_constant_b
 
 ## estimate productivity of each fish
