@@ -127,8 +127,8 @@ age_est<-function(lmax, lcensus, K, l0=0){(1/K)*log(lmax/((1-lcensus)*lmax))}
 fishp$age<-age_est(lmax=fishp$lmax, lcensus=fishp$size2/fishp$lmax, K = fishp$Kmax)
 
 # convert length to mass
-lwp<-read.csv('data/wcs/mermaid_length_weight_params.csv')
-fishp<-left_join(fishp, lwp)
+lwp<-read.csv('data/wcs/mermaid_length_weight_params.csv') 
+fishp<-left_join(fishp, lwp, by='fish_taxon')
 fishp$mass<-fishp$biomass_constant_a * fishp$size2 ^ fishp$biomass_constant_b
 
 ## estimate productivity of each fish
@@ -144,3 +144,4 @@ with(fishp, plot(prod_cm_day_perfish, prod_g_day_perfish))
 with(fishp, plot(log10(prod_cm_day_perfish), log10(prod_g_day_perfish)))
 
 save(fishp, file = 'results/wcs_productivity.rds')
+
