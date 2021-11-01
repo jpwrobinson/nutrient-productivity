@@ -136,8 +136,8 @@ fishp$size_nextday<-lplus(lmax = fishp$lmax, K = fishp$Kmax, age = fishp$age )
 
 fishp<-fishp %>% mutate(
         prod_cm_day_perfish = size_nextday - size2,
-        prod_g_day_perfish = biomass_constant_a * size_nextday ^ biomass_constant_b - mass,
-        prod_g_day = prod_g_day * count)
+        prod_g_day_perfish = (biomass_constant_a * size_nextday ^ biomass_constant_b) - mass,
+        prod_g_day = prod_g_day_perfish * count)
 
 with(fishp, plot(prod_cm_day_perfish, prod_g_day_perfish))
 with(fishp, plot(log10(prod_cm_day_perfish), log10(prod_g_day_perfish)))
