@@ -22,14 +22,9 @@ fish2$species.lab<-paste0(sp[,1],'\n', sp[,2])
 
 # long version
 fish2l <- fish2 %>% pivot_longer(calcium.mg:vitamin_a.mug, names_to = 'nutrient', values_to = 'conc') %>% 
-      mutate(nutrient = factor(nutrient))
-levels(fish2l$nutrient)<-fct_recode(fish2l$nutrient,
-                                   'Calcium, mg' = 'calcium.mg',
-                                   'Iron, mg' = 'iron.mg',
-                                   'Selenium, mug' = 'selenium.mug',
-                                   'Zinc, mg' = 'zinc.mg',
-                                   'Omega-3, g' = 'omega3.g',
-                                   'Vitamin A, mug' = 'vitamin_a.mug')
+  mutate(nutrient_lab = recode(nutrient, 'calcium.mg' = 'Calcium', 'iron.mg' = 'Iron', 'zinc.mg' = 'Zinc',
+                               'selenium.mug' = 'Selenium', 'vitamin_a.mug' = 'Vitamin A', 'omega3.g' = 'Omega-3\nfatty acids'))
+fish2l$nutrient_lab<-factor(fish2l$nutrient_lab, levels=(unique(fish2l$nutrient_lab)[c(1,2,4,6,3,5)])
 
 gg<-ggplot(fish2, aes(log10(Kmax), nscore, col=dietP_lab)) + 
   geom_point(size=3.5, pch=21, col='black', aes(fill=dietP_lab)) +
@@ -49,7 +44,7 @@ gpan<-ggplot(fish2l, aes(log10(Kmax), conc)) +
   labs(x = 'Derived growth coefficent (Kmax)', y = conc_lab) +
   # scale_x_continuous(breaks=seq(0, 0.6, by = 0.1)) +
   th +
-  facet_wrap(~nutrient, scales='free', nrow=5) +
+  facet_wrap(~nutrient_lab, scales='free', nrow=5) +
   theme(legend.position = 'right') +
   scale_fill_manual(values = diet_cols.named) +
   scale_colour_manual(values = diet_cols.named) +
