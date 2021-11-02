@@ -89,8 +89,13 @@ g2<-ggplot(prod_fg_co, aes(nutrient_lab, nutprop, fill=dietP_lab)) +
   facet_grid(~country, scales='free') + th +
   theme(legend.position = 'none') 
 
+## biom distributions
+g3<-ggplot(prod_reef %>% filter(nutrient == 'calcium.mg'), aes(biomass_kgha)) + 
+        geom_density(fill='grey90') +
+        facet_wrap(~country)
 
-g3<-ggplot(prod_sp, aes(log10(biomass_kgha), nutprop, col=dietP_lab)) + 
+## sup fig
+g4<-ggplot(prod_sp, aes(log10(biomass_kgha), nutprop, col=dietP_lab)) + 
   geom_point(alpha=0.8, size=1.5) + facet_wrap(~nutrient, scales='free') +
   scale_color_manual(values = diet_cols.named) +
   labs(x = 'Log10 biomass, kg ha-1', y = 'Proportion of total nutrient productivity, %') +
@@ -104,5 +109,5 @@ print(
 dev.off()
 
 pdf(file='fig/FigureS2.pdf', height=6, width=10)
-print(g3)
+print(g4)
 dev.off()
