@@ -1,4 +1,4 @@
-pacman::p_load(here, funk, knitr, tidyverse, skimr, cowplot, readxl, gghighlight, ggrepel, disco)
+pacman::p_load(here, funk, knitr, tidyverse, skimr, cowplot, readxl, gghighlight, ggrepel, disco, ggpubr)
 
 
 theme_set(theme_sleek())
