@@ -24,7 +24,7 @@ fish2$species.lab<-paste0(sp[,1],'\n', sp[,2])
 fish2l <- fish2 %>% pivot_longer(calcium.mg:vitamin_a.mug, names_to = 'nutrient', values_to = 'conc') %>% 
   mutate(nutrient_lab = recode(nutrient, 'calcium.mg' = 'Calcium', 'iron.mg' = 'Iron', 'zinc.mg' = 'Zinc',
                                'selenium.mug' = 'Selenium', 'vitamin_a.mug' = 'Vitamin A', 'omega3.g' = 'Omega-3\nfatty acids'))
-fish2l$nutrient_lab<-factor(fish2l$nutrient_lab, levels=(unique(fish2l$nutrient_lab)[c(1,2,4,6,3,5)])
+fish2l$nutrient_lab<-factor(fish2l$nutrient_lab, levels=(unique(fish2l$nutrient_lab)))
 
 gg<-ggplot(fish2, aes(log10(Kmax), nscore, col=dietP_lab)) + 
   geom_point(size=3.5, pch=21, col='black', aes(fill=dietP_lab)) +
