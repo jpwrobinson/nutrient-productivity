@@ -6,23 +6,28 @@ load(file = 'results/wcs_productivity.rds')
 load(file = 'results/wcs_nut_prod.rds')
 fishp$dietP_lab<-diet.cols$dietP_lab[match(fishp$dietP, diet.cols$dietP)]
 
-prod_sp<-prod_sp %>% group_by(nutrient) %>% 
-            arrange((nut_prod_day_ha))  %>% 
+prod_sp<-prod_sp %>% group_by(nutrient, country) %>% 
+            # arrange((nut_prod_day_ha))  %>% 
             mutate(tnut = sum(nut_prod_day_ha), nutprop = nut_prod_day_ha / tnut * 100) %>% 
             mutate(nutrient_lab = recode(nutrient, 'calcium.mg' = 'Calcium', 'iron.mg' = 'Iron', 'zinc.mg' = 'Zinc',
                                      'selenium.mug' = 'Selenium', 'vitamin_a.mug' = 'Vitamin A', 'omega3.g' = 'Omega-3\nfatty acids'))
 
-prod_fg<-prod_sp %>% group_by(dietP_lab, nutrient, nutrient_lab) %>% 
+prod_fg<-prod_sp %>% group_by(country, dietP_lab, nutrient, nutrient_lab) %>% 
                       summarise(
                         nut_prod_day_ha = sum(nut_prod_day_ha),
                         prod_day_ha = sum(prod_day_ha),
                         biomass_kgha = sum(biomass_kgha)) %>% 
-                  group_by(nutrient,nutrient_lab) %>% 
+                  group_by(country, nutrient,nutrient_lab) %>% 
                   mutate(nut_prod_day_ha_scaled = scale(nut_prod_day_ha)[,1]) %>% 
                   arrange((nut_prod_day_ha))  %>% 
-                  mutate(tnut = sum(nut_prod_day_ha), nutprop = nut_prod_day_ha / tnut * 100, id = paste(dietP_lab, nutrient))
+                  mutate(tnut = sum(nut_prod_day_ha), 
+                         nutprop = nut_prod_day_ha / tnut * 100) %>% 
+                  group_by(dietP_lab, nutrient, nutrient_lab) %>% 
+                  summarise(nutprop = mean(nutprop)) %>% 
+                  mutate(id = paste(dietP_lab, nutrient))
 
-prod_fg_country<-prod_sp %>% group_by(country, dietP_lab,nutrient,nutrient_lab) %>% 
+prod_fg_country<-prod_sp %>% 
+  group_by(country, dietP_lab,nutrient,nutrient_lab) %>% 
   summarise(
     nut_prod_day_ha = sum(nut_prod_day_ha),
     prod_day_ha = sum(prod_day_ha),
@@ -35,14 +40,6 @@ prod_fg_country<-prod_sp %>% group_by(country, dietP_lab,nutrient,nutrient_lab) 
 ## average across nutrients for panel A
 prod_fg2<-prod_fg %>% group_by(dietP_lab) %>% summarise(se = se(nutprop), nutprop = mean(nutprop)) %>% 
         mutate(lower = nutprop - 2*se, upper = nutprop + 2*se)
-
-ggplot(prod_fg, aes(nutrient, nut_prod_day_ha, fill=dietP_lab)) + 
-      geom_bar(stat='identity') +
-      coord_flip() +
-      theme(legend.position = 'none') +
-      scale_fill_manual(values = diet_cols.named) +
-      scale_color_manual(values = 'white') +
-      facet_wrap(~nutrient, scales='free', nrow=6)
 
 ## average nut contr by country + nutrient
 prod_fg_co<-prod_fg_country %>% group_by(nutrient,nutrient_lab, country, dietP_lab) %>% 
