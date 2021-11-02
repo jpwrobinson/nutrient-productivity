@@ -64,6 +64,7 @@ meds<-prod_reef %>% filter(nutrient == 'calcium.mg') %>% group_by(country) %>% s
         arrange(desc(med))
 
 prod_fg_co$country<-factor(prod_fg_co$country, levels = meds$country)
+prod_reef$country<-factor(prod_reef$country, levels = meds$country)
 
 # ggplot(prod_fg, aes(scale(prod_day_ha), 
 #                     nut_prod_day_ha_scaled, col=dietP_lab)) + 
@@ -93,7 +94,7 @@ g2<-ggplot(prod_fg_co, aes(nutrient_lab, nutprop, fill=dietP_lab)) +
   scale_color_manual(values = 'white') +
   scale_y_continuous(expand=c(0,0)) +
   facet_grid(~country, scales='free') + th +
-  theme(legend.position = 'none', strip.text.x = element_blank(), plot.margin=unit(c(0, 0.1, 0.1, 0.1), 'cm')) 
+  theme(legend.position = 'none', strip.text.x = element_blank(), plot.margin=unit(c(0, 0.5, 0.1, 0.1), 'cm')) 
 
 ## biom distributions
 g3<-ggplot(prod_reef %>% filter(nutrient == 'calcium.mg') %>% mutate(x = log10(biomass_kgha)),
