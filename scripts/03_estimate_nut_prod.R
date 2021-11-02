@@ -86,7 +86,6 @@ prod_top_nut<-prod_sp %>% ungroup() %>% group_by(nutrient) %>% slice_max(nut_pro
       summarise(nut_prod_day_ha = mean(nut_prod_day_ha))
   
 
-
 # scale nutrient productivity, estimate summed nutrient productivity across 6 nutriens
 prod_scale<-prod_sp %>% group_by(nutrient) %>% 
       mutate(nut_prod_day_ha_scale = scale(nut_prod_day_ha)) %>% 
