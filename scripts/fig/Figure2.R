@@ -59,6 +59,12 @@ prod_fg_co<-rbind(prod_fg_co, prod_fg_co_biom)
 prod_fg_co$dietP_lab<-factor(prod_fg_co$dietP_lab, levels=rev(unique(prod_fg_co$dietP_lab)[c(5,1,3,2,4)]))
 prod_fg_co$nutrient_lab<-factor(prod_fg_co$nutrient_lab, levels=rev(unique(prod_fg_co$nutrient_lab)[c(7,8,1,2,4,6,3,5)]))
 
+## rank country by median biomass
+meds<-prod_reef %>% filter(nutrient == 'calcium.mg') %>% group_by(country) %>% summarise(med = median(biomass_kgha)) %>% 
+        arrange(desc(med))
+
+prod_fg_co$country<-factor(prod_fg_co$country, levels = meds$country)
+
 # ggplot(prod_fg, aes(scale(prod_day_ha), 
 #                     nut_prod_day_ha_scaled, col=dietP_lab)) + 
 #           geom_point() + geom_abline(intercept=0, slope=1 ,col='grey', linetype=5) +
@@ -87,12 +93,19 @@ g2<-ggplot(prod_fg_co, aes(nutrient_lab, nutprop, fill=dietP_lab)) +
   scale_color_manual(values = 'white') +
   scale_y_continuous(expand=c(0,0)) +
   facet_grid(~country, scales='free') + th +
-  theme(legend.position = 'none') 
+  theme(legend.position = 'none', strip.text.x = element_blank(), plot.margin=unit(c(0, 0.1, 0.1, 0.1), 'cm')) 
 
 ## biom distributions
-g3<-ggplot(prod_reef %>% filter(nutrient == 'calcium.mg'), aes(biomass_kgha)) + 
-        geom_density(fill='grey90') +
-        facet_wrap(~country)
+g3<-ggplot(prod_reef %>% filter(nutrient == 'calcium.mg') %>% mutate(x = log10(biomass_kgha)),
+                aes(x = x)) +
+        geom_histogram(col = 'black', fill='grey60', bins = 10) +
+        facet_grid(~country) +
+        labs(x = 'Log10 biomass kgha', y = 'N sites') +
+        stat_summary(aes(x = 0.1, y = x, xintercept = stat(y), group = country), 
+               fun = median, geom = "vline", linetype = 5, col='#e31a1c',size = 0.8) +
+        scale_y_continuous(expand=c(0,0)) +
+        scale_x_continuous(expand=c(0,0)) +
+        th
 
 ## sup fig
 g4<-ggplot(prod_sp, aes(log10(biomass_kgha), nutprop, col=dietP_lab)) + 
@@ -102,9 +115,10 @@ g4<-ggplot(prod_sp, aes(log10(biomass_kgha), nutprop, col=dietP_lab)) +
   th + theme(legend.position = 'none')
 
 
-pdf(file='fig/Figure2.pdf', height=4, width=14)
+pdf(file='fig/Figure2.pdf', height=5, width=14)
+rp<-plot_grid(g3, g2, nrow =2, rel_heights=c(0.5, 1), align='v')
 print(
-  plot_grid(g1, g2, nrow=1, labels=c('A', 'B'), rel_widths=c(0.7, 1))
+  plot_grid(g1, rp, nrow=1, labels=c('A', 'B'), rel_widths=c(0.7, 1))
 )
 dev.off()
 
