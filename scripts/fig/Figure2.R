@@ -12,11 +12,9 @@ prod_sp<-prod_sp %>% group_by(nutrient, country) %>%
             mutate(nutrient_lab = recode(nutrient, 'calcium.mg' = 'Calcium', 'iron.mg' = 'Iron', 'zinc.mg' = 'Zinc',
                                      'selenium.mug' = 'Selenium', 'vitamin_a.mug' = 'Vitamin A', 'omega3.g' = 'Omega-3\nfatty acids'))
 
-prod_fg<-prod_sp %>% group_by(country, dietP_lab, nutrient, nutrient_lab) %>% 
-                      summarise(
-                        nut_prod_day_ha = sum(nut_prod_day_ha),
-                        prod_g_day_ha = sum(prod_g_day_ha),
-                        biomass_kgha = sum(biomass_kgha)) %>% 
+prod_fg<-prod_fg %>% 
+                  mutate(nutrient_lab = recode(nutrient, 'calcium.mg' = 'Calcium', 'iron.mg' = 'Iron', 'zinc.mg' = 'Zinc',
+                               'selenium.mug' = 'Selenium', 'vitamin_a.mug' = 'Vitamin A', 'omega3.g' = 'Omega-3\nfatty acids')) %>% 
                   group_by(country, nutrient,nutrient_lab) %>% 
                   mutate(nut_prod_day_ha_scaled = scale(nut_prod_day_ha)[,1]) %>% 
                   arrange((nut_prod_day_ha))  %>% 

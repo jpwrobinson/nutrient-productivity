@@ -60,8 +60,8 @@ prod_sp<-prod %>%
     biomass_kgha = sum(biomass_kgha)) %>% 
   ungroup() %>% 
   dplyr::select(country, site,transect_number,management,  fish_taxon, nutrient, dietP, trophic_group, nut_prod_day_ha:biomass_kgha) %>% 
-  group_by(nutrient) %>% 
-  complete(transect_number, nesting(fish_taxon, dietP, trophic_group, site, country),
+  group_by(nutrient, country, site) %>% 
+  complete(transect_number, nesting(fish_taxon, dietP, trophic_group, management),
            fill = list(nut_prod_day_ha = 0, nut_biomass_kgha = 0, prod_g_day_ha =0, biomass_kgha = 0)) %>% 
   group_by(country, management, site, fish_taxon, nutrient, dietP, trophic_group) %>% 
   summarise(
@@ -78,14 +78,44 @@ prod_sp<-prod %>%
             prod_g_day_ha = mean(prod_g_day_ha),
             biomass_kgha = mean(biomass_kgha))
 
+## FG level nutrient productivity
+prod_fg<-prod %>% 
+  mutate(id = paste(site, year, sep = '_')) %>% 
+  ## transect level: total metric by diet group
+  group_by(country, site, id, transect_number, nutrient, dietP) %>% 
+  summarise(
+    nut_prod_day_ha = sum(nut_prod_day_ha), 
+    nut_biomass_kgha = sum(nut_biomass_kgha),
+    prod_g_day_ha = sum(prod_g_day_ha),
+    biomass_kgha = sum(biomass_kgha)) %>% 
+  ungroup() %>% 
+  ## site level: complete missing transect obs by diet group, then average
+  dplyr::select(country, site,id, transect_number, nutrient, dietP, nut_prod_day_ha:biomass_kgha) %>% 
+  group_by(nutrient, country, id, site) %>% 
+  complete(transect_number,dietP,
+           fill = list(nut_prod_day_ha = 0, nut_biomass_kgha = 0, prod_g_day_ha =0, biomass_kgha = 0)) %>% 
+  group_by(country, site, nutrient, dietP) %>% 
+  summarise(
+    nut_prod_day_ha = mean(nut_prod_day_ha), 
+    nut_biomass_kgha = mean(nut_biomass_kgha),
+    prod_g_day_ha = mean(prod_g_day_ha),
+    biomass_kgha = mean(biomass_kgha)) %>% 
+  group_by(nutrient, country) %>% 
+  complete(site,dietP,
+           fill = list(nut_prod_day_ha = 0, nut_biomass_kgha = 0, prod_g_day_ha =0, biomass_kgha = 0)) 
+
+
+## labelling for plots
 prod_sp$trophic_lab<-trophic.cols$FG_lab[match(prod_sp$trophic_group, trophic.cols$FG)]
 prod_sp$dietP_lab<-diet.cols$dietP_lab[match(prod_sp$dietP, diet.cols$dietP)]
+prod_fg$dietP_lab<-diet.cols$dietP_lab[match(prod_fg$dietP, diet.cols$dietP)]
+
+
 
 # estimate top 20 nutrient productivity species, by nutrient
 prod_top_nut<-prod_sp %>% ungroup() %>% group_by(nutrient) %>% slice_max(nut_prod_day_ha, n=20) %>% 
       group_by(nutrient, fish_taxon, dietP, dietP_lab) %>% 
       summarise(nut_prod_day_ha = mean(nut_prod_day_ha))
-  
 
 # scale nutrient productivity, estimate summed nutrient productivity across 6 nutriens
 prod_scale<-prod_sp %>% group_by(nutrient) %>% 
@@ -117,4 +147,4 @@ ggplot(prod_scale, aes(fct_reorder(fish_taxon, nut_prod_score), nut_prod_score, 
 dev.off()
 
 
-save(prod, prod_reef, prod_sp, prod_scale, file = 'results/wcs_nut_prod.rds')
+save(prod, prod_reef, prod_sp, prod_fg, prod_scale, file = 'results/wcs_nut_prod.rds')
