@@ -15,7 +15,7 @@ prod_sp<-prod_sp %>% group_by(nutrient, country) %>%
 prod_fg<-prod_sp %>% group_by(country, dietP_lab, nutrient, nutrient_lab) %>% 
                       summarise(
                         nut_prod_day_ha = sum(nut_prod_day_ha),
-                        prod_day_ha = sum(prod_day_ha),
+                        prod_g_day_ha = sum(prod_g_day_ha),
                         biomass_kgha = sum(biomass_kgha)) %>% 
                   group_by(country, nutrient,nutrient_lab) %>% 
                   mutate(nut_prod_day_ha_scaled = scale(nut_prod_day_ha)[,1]) %>% 
@@ -30,7 +30,7 @@ prod_fg_country<-prod_sp %>%
   group_by(country, dietP_lab,nutrient,nutrient_lab) %>% 
   summarise(
     nut_prod_day_ha = sum(nut_prod_day_ha),
-    prod_day_ha = sum(prod_day_ha),
+    prod_g_day_ha = sum(prod_g_day_ha),
     biomass_kgha = sum(biomass_kgha)) %>% 
   group_by(nutrient, country) %>% 
   mutate(nut_prod_day_ha_scaled = scale(nut_prod_day_ha)) %>% 
@@ -47,9 +47,9 @@ prod_fg_co<-prod_fg_country %>% group_by(nutrient,nutrient_lab, country, dietP_l
   mutate(lower = nutprop - 2*se, upper = nutprop + 2*se)
 
 prod_fg_co_biom<-prod_fg_country %>% filter(nutrient=='calcium.mg') %>% 
-        group_by(country) %>% mutate(tb = sum(biomass_kgha), tp = sum(prod_day_ha)) %>% 
+        group_by(country) %>% mutate(tb = sum(biomass_kgha), tp = sum(prod_g_day_ha)) %>% 
         group_by(tb, tp, country, dietP_lab) %>% 
-        summarise(biomass = sum(biomass_kgha), prod = sum(prod_day_ha)) %>% 
+        summarise(biomass = sum(biomass_kgha), prod = sum(prod_g_day_ha)) %>% 
         mutate('Standing biomass' = biomass / tb * 100, 
                'Daily productivity' = prod / tp * 100) %>% 
         pivot_longer('Standing biomass':'Daily productivity', values_to = 'nutprop', names_to = 'nutrient') %>% 

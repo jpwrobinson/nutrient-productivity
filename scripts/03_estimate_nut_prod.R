@@ -44,9 +44,9 @@ ggplot(prod_reef, aes(biomass_kgha, nut_turnover)) + geom_point() + facet_wrap(~
 pdf(file = 'fig/explore/wcs_nutrient_prod_reef.pdf', height=7, width=12)
 ggplot(prod_reef, aes(biomass_kgha, nut_prod_day_ha)) + geom_point() + facet_wrap(~nutrient, scales='free')
 ggplot(prod_reef, aes(nut_biomass_kgha, nut_prod_day_ha)) + geom_point() + facet_wrap(~nutrient, scales='free')
-ggplot(prod_reef, aes(prod_day, nut_prod_day_ha)) + geom_point() + facet_wrap(~nutrient, scales='free')
+ggplot(prod_reef, aes(prod_day_ha, nut_prod_day_ha)) + geom_point() + facet_wrap(~nutrient, scales='free')
 ggplot(prod_reef, aes(biomass_kgha, nut_turnover)) + geom_point() + facet_wrap(~nutrient, scales='free')
-ggplot(prod_reef, aes(biomass_kgha, prod_day)) + geom_point() + facet_wrap(~nutrient, scales='free')
+ggplot(prod_reef, aes(biomass_kgha, prod_day_ha)) + geom_point() + facet_wrap(~nutrient, scales='free')
 ggplot(prod_reef, aes(biomass_turnover, nut_turnover)) + geom_point() + facet_wrap(~nutrient, scales='free')
 dev.off()
 
@@ -59,22 +59,23 @@ prod_sp<-prod %>%
     prod_g_day_ha = sum(prod_g_day_ha),
     biomass_kgha = sum(biomass_kgha)) %>% 
   ungroup() %>% 
+  dplyr::select(country, site,transect_number,management,  fish_taxon, nutrient, dietP, trophic_group, nut_prod_day_ha:biomass_kgha) %>% 
+  group_by(nutrient) %>% 
+  complete(transect_number, nesting(fish_taxon, dietP, trophic_group, site, country),
+           fill = list(nut_prod_day_ha = 0, nut_biomass_kgha = 0, prod_g_day_ha =0, biomass_kgha = 0)) %>% 
   group_by(country, management, site, fish_taxon, nutrient, dietP, trophic_group) %>% 
   summarise(
     nut_prod_day_ha = mean(nut_prod_day_ha), 
     nut_biomass_kgha = mean(nut_biomass_kgha),
-    prod_day_ha = mean(prod_g_day_ha),
+    prod_g_day_ha = mean(prod_g_day_ha),
     biomass_kgha = mean(biomass_kgha)) %>% 
   ungroup() %>% 
-  dplyr::select(country, site, fish_taxon, nutrient, dietP, trophic_group, nut_prod_day_ha:biomass_kgha) %>% 
-  complete(site, nutrient, nesting(fish_taxon, dietP, trophic_group, country),
-           fill = list(nut_prod_day_ha = 0, nut_biomass_kgha = 0, prod_day_ha =0, biomass_kgha = 0)) %>%
   # mutate(nut_turnover = nut_prod_day_ha / nut_biomass_kgha,
   #        biomass_turnover = prod_day / biomass_kg) %>% 
   group_by(country, fish_taxon, nutrient, dietP, trophic_group) %>% 
   summarise(nut_prod_day_ha = mean(nut_prod_day_ha), 
             nut_biomass_kgha = mean(nut_biomass_kgha),
-            prod_day_ha = mean(prod_day_ha),
+            prod_g_day_ha = mean(prod_g_day_ha),
             biomass_kgha = mean(biomass_kgha))
 
 prod_sp$trophic_lab<-trophic.cols$FG_lab[match(prod_sp$trophic_group, trophic.cols$FG)]
@@ -116,4 +117,4 @@ ggplot(prod_scale, aes(fct_reorder(fish_taxon, nut_prod_score), nut_prod_score, 
 dev.off()
 
 
-save(prod_reef, prod_sp, prod_scale, file = 'results/wcs_nut_prod.rds')
+save(prod, prod_reef, prod_sp, prod_scale, file = 'results/wcs_nut_prod.rds')
