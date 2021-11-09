@@ -1,4 +1,4 @@
-pacman::p_load(tidyverse, skimr, cowplot, here, funk,disco, patchwork, rethinking,  install=FALSE)
+pacman::p_load(tidyverse, skimr, cowplot, here, funk,disco, patchwork, rethinking, rstan,  install=FALSE)
 
 # Load reef pressure data
 # https://github.com/WCS-Marine/local-reef-pressures
@@ -26,18 +26,20 @@ focal<-left_join(prod_fg,
                 fish_avg %>% ungroup() %>%  select(site, reef_type, reef_zone, management_rules, hard_coral, macroalgae, turf_algae, bare_substrate, 
                                                    depth, fish_richness),
                 by='site') %>% 
-        filter(!is.na(depth)) %>%  # dropping 2 sites (NK02 in Madasgascar and WaiE1 in Fiji)
-        left_join(threat, by = 'site') %>% ungroup() 
+        filter(!is.na(depth)) #%>%  # dropping 2 sites (NK02 in Madasgascar and WaiE1 in Fiji)
+        # left_join(threat, by = 'site') %>% ungroup() ## lots of sites missing, incl. all of Belize
 
 ## convert data to list, characters to factors for rethinking
-focal<-droplevels(focal %>% mutate_if(is.character, as.factor)) %>% select(
-  nutprop, nutrient, nutrient_lab, country, site, dietP, hard_coral, macroalgae, turf_algae, bare_substrate, reef_type, reef_zone, depth,
-  grav_NC, management_rules, sediment, nutrient_load, pop_count) 
+focal<-focal %>% ungroup() %>% droplevels() %>%  mutate_if(is.character, as.factor) %>% 
+  select(
+  nutprop, nutrient, nutrient_lab, country, site, dietP, hard_coral, macroalgae, turf_algae, bare_substrate, reef_type, reef_zone, depth)
+  # grav_NC, management_rules, sediment, nutrient_load, pop_count) 
 
 ## scale numeric
-focal.list<-scaler(focal %>% filter(nutrient=='calcium.mg'), ID = c('nutprop', 'country', 'site', 'dietP', 'reef_type', 'reef_zone', 'management_rules'), cats = FALSE) %>% as.list()
+focal.list<-scaler(focal %>% filter(nutrient=='calcium.mg'), 
+                    ID = c('nutprop', 'country', 'site', 'dietP', 'reef_type', 'reef_zone', 'management_rules'), cats = FALSE) %>% as.list()
 
-str(focal.list)
+summary(focal.list)
 # add list of region ID for each country name
 focal.list$countryLookup<-focal %>% distinct(site, country) %>% pull(country) %>% as.factor()
 
@@ -55,36 +57,34 @@ m <- ulam(
     log(mu)<- site_X[site] + 
       coral*hard_coral + ma*macroalgae + turf*turf_algae +  ## benthic
       # reef_ex[reef_exposure] + reef_ty[reef_type] + reef_zo[reef_zone] + 
-      depth*depth + # wave*we + ## biophysical small-scale
-      nutr*nutrient_load + #productivity*npp +# temperature*temp + ## biophysical large-scale,
-      management[management_rules] + gravity*grav_NC , ## human
+      d*depth + # wave*we + ## biophysical small-scale
+      # nutr*nutrient_load + #productivity*npp +# temperature*temp + ## biophysical large-scale,
+      management[management_rules] + #gravity*grav_NC , ## human
     
     # ## ## now linking site to country
-    site_X[site] ~ dnorm(mu_country, sigma_country),
-    mu_country <- country_X[countryLookup],
+    # site_X[site] ~ dnorm(mu_country, sigma_country),
+    # mu_country <- country_X[countryLookup],
 
     # ## global intercept, plus country-level covariates [HDI / population size / ???]
-    country_X <- y ,
+    # country_X <- y ,
     
     # # weak prior on 0
-    y ~ dnorm(0,10),
+    # y ~ dnorm(0,10),
     
     site_X[site] ~ dnorm(0,1),
     
     ## weak prior on continuous
     c(coral,
       ma,
-      depth,
+      turf,
+      d
       # wave,
-      gravity,
+      # gravity,
       # sed,
-      nutr
+      # nutr
     ) ~ dnorm(0, 10),
     
     ## weak prior on categorical
-    # reef_ex[reef_exposure] ~ dnorm(0, 1),
-    # reef_ty[reef_type] ~ dnorm(0, 1),
-    # reef_zo[reef_zone] ~ dnorm(0, 1),
     management[management_rules] ~ dnorm(0, 1),
     
     ## hyper-priors
@@ -107,3 +107,12 @@ abline(0, 1)
 save(m, focal.list, file = 'results/mod.rds')
 
 
+
+
+m<-ulam(
+  alist(
+    nutprop ~ dnorm(mu, sigma), 
+        mu<-h*hard_coral, 
+        h ~ dnorm(0,1),
+        sigma ~ dexp(2)), 
+     data = focal.list, chains=3)
