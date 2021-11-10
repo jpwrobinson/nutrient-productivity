@@ -61,10 +61,14 @@ fit1 <-
       cores = 4, seed = 1234
     )
 
-plot(fitted(fit1), focal.scaled$nutprop)
+## pred vs. obs
+plot(predict(fit1)[,1], focal.scaled$nutprop, xlim=c(0,1))
+abline(0,1)
+
+# pareto diagnostic
+loo(fit1)
 
 ## PDF the posterior effects
-
 pdf(file = paste0('results/betam_posteriors/', nut,'/post_summary', dp, '.pdf'), height=7, width=12)
 tidy(fit1, effects = "fixed") %>% filter(component == 'cond' & !str_detect(term, 'phi')) %>% 
     ggplot(aes(term, estimate, ymin = conf.low, ymax = conf.high)) + 
