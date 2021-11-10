@@ -34,14 +34,14 @@ focal<-left_join(prod_fg,
         ## convert data to list, characters to factors for rethinking
         ungroup() %>% droplevels() %>%  mutate_if(is.character, as.factor) %>% 
   select(
-    nutprop, nutrient, nutrient_lab, country, site, dietP, 
+    nutprop, nutrient, nutrient_lab, country, site, year, dietP, 
     hard_coral, macroalgae, turf_algae, bare_substrate, reef_type, reef_zone, depth,
     management_rules) %>%  # grav_NC, management_rules, sediment, nutrient_load, pop_count) 
   filter(nutrient==nut & dietP==dp)
   
 ## scale numeric
 focal.scaled<-scaler(focal, 
-                   ID = c('nutprop', 'country', 'site', 'dietP', 'reef_type', 'reef_zone',
+                   ID = c('nutprop', 'country', 'site', 'dietP', 'reef_type', 'reef_zone','year',
                           'management_rules'), cats = FALSE) 
 
 ## check reponse hist, bounded 0 - 1
@@ -50,14 +50,18 @@ hist(focal.scaled$nutprop)
 ## testing multinomial model
 fit1 <-
      brm(
-      bf(nutprop ~ hard_coral + turf_algae + macroalgae + bare_substrate + depth + management_rules + (1 | country),
-         phi ~ hard_coral + turf_algae + macroalgae + bare_substrate + depth + management_rules + (1 | country),
+      bf(nutprop ~ hard_coral + turf_algae + macroalgae + bare_substrate + depth + management_rules + 
+           (1 | country) + (1 | year),
+         phi ~ hard_coral + turf_algae + macroalgae + bare_substrate + depth + management_rules + 
+           (1 | country) + (1 | year),
          zi ~ 1),
       data = focal.scaled,
       family = zero_inflated_beta(),
       chains = 4, iter = 3000, warmup = 1000,
       cores = 4, seed = 1234
     )
+
+plot(fitted(fit1), focal.scaled$nutprop)
 
 ## PDF the posterior effects
 
