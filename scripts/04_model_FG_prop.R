@@ -1,4 +1,4 @@
-pacman::p_load(tidyverse, skimr, cowplot, here, funk,disco, patchwork, rethinking, rstan,  install=FALSE)
+pacman::p_load(tidyverse, skimr, cowplot, here, funk,disco, patchwork, rethinking, rstan, brms,  install=FALSE)
 
 # Load reef pressure data
 # https://github.com/WCS-Marine/local-reef-pressures
@@ -32,14 +32,20 @@ focal<-left_join(prod_fg,
 ## convert data to list, characters to factors for rethinking
 focal<-focal %>% ungroup() %>% droplevels() %>%  mutate_if(is.character, as.factor) %>% 
   select(
-  nutprop, nutrient, nutrient_lab, country, site, dietP, hard_coral, macroalgae, turf_algae, bare_substrate, reef_type, reef_zone, depth)
+  nutprop, nutrient, nutrient_lab, country, site, dietP, 
+  hard_coral, macroalgae, turf_algae, bare_substrate, reef_type, reef_zone, depth,
+  management_rules)
   # grav_NC, management_rules, sediment, nutrient_load, pop_count) 
 
 ## scale numeric
 focal.list<-scaler(focal %>% filter(nutrient=='calcium.mg'), 
                     ID = c('nutprop', 'country', 'site', 'dietP', 'reef_type', 'reef_zone', 'management_rules'), cats = FALSE) %>% as.list()
-
 summary(focal.list)
+
+focal.scaled<-scaler(focal %>% filter(nutrient=='calcium.mg' & dietP=='Herbivores Microvores Detritivores'), 
+                   ID = c('nutprop', 'country', 'site', 'dietP', 'reef_type', 'reef_zone', 'management_rules'), cats = FALSE) %>% 
+  mutate(nutprop = nutprop/100)
+
 # add list of region ID for each country name
 focal.list$countryLookup<-focal %>% distinct(site, country) %>% pull(country) %>% as.factor()
 
@@ -48,71 +54,19 @@ hist(focal.list$nutprop)
 hist(log10(focal.list$nutprop))
 
 
-m <- ulam(
-  alist(
-    nutprop ~ dlnorm(mu, sigma) ,
-    # nutprop ~ dgamma2(mu, scale) ,
-    
-    ## mu (biomass) from seascape-level intercepts and site-level covariates
-    log(mu)<- site_X[site] + 
-      coral*hard_coral + ma*macroalgae + turf*turf_algae +  ## benthic
-      # reef_ex[reef_exposure] + reef_ty[reef_type] + reef_zo[reef_zone] + 
-      d*depth + # wave*we + ## biophysical small-scale
-      # nutr*nutrient_load + #productivity*npp +# temperature*temp + ## biophysical large-scale,
-      management[management_rules] + #gravity*grav_NC , ## human
-    
-    # ## ## now linking site to country
-    # site_X[site] ~ dnorm(mu_country, sigma_country),
-    # mu_country <- country_X[countryLookup],
-
-    # ## global intercept, plus country-level covariates [HDI / population size / ???]
-    # country_X <- y ,
-    
-    # # weak prior on 0
-    # y ~ dnorm(0,10),
-    
-    site_X[site] ~ dnorm(0,1),
-    
-    ## weak prior on continuous
-    c(coral,
-      ma,
-      turf,
-      d
-      # wave,
-      # gravity,
-      # sed,
-      # nutr
-    ) ~ dnorm(0, 10),
-    
-    ## weak prior on categorical
-    management[management_rules] ~ dnorm(0, 1),
-    
-    ## hyper-priors
-    sigma ~ dexp(2),
-    sigma_country ~ dexp(1) # Variation among sites
-  ) , 
-  data=focal.list , chains=3 , cores=6, control=list(adapt_delta=0.99), warmup=1500, iter=3000, log_lik=TRUE )
-
-dashboard(m)
-precis(m)
-plot(precis(m,2))
-
-## compare model predictions
-p.index<-link(m)$mu ## note this returns predictions for mu_small and mu_large too, so only taking $mu here
-index_mu<-apply( p.index , 2 , median )
-
-plot(log(focal.list$nutprop), index_mu)
-abline(0, 1)
-
-save(m, focal.list, file = 'results/mod.rds')
+## temp fix on zero nutprops
+focal.list$nutprop[focal.list$nutprop==0]<-0.1
 
 
+## testing multinomial model
+fit1 <-
+   brm(
+    bf(nutprop ~ hard_coral + turf_algae,
+       phi ~ hard_coral + turf_algae,
+       zi ~ 1),
+    data = focal.scaled,
+    family = zero_inflated_beta(),
+    chains = 4, iter = 2000, warmup = 1000,
+    cores = 4, seed = 1234
+  )
 
-
-m<-ulam(
-  alist(
-    nutprop ~ dnorm(mu, sigma), 
-        mu<-h*hard_coral, 
-        h ~ dnorm(0,1),
-        sigma ~ dexp(2)), 
-     data = focal.list, chains=3)
