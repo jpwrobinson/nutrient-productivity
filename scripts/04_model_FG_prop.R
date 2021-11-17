@@ -23,17 +23,29 @@ prod_fg<-prod_fg %>%
 # read benthic
 load('data/wcs/wcs_fish_benthic.rds')
 focal<-left_join(prod_fg, 
-                fish_avg %>% ungroup() %>%  select(site, reef_type, reef_zone, management_rules, hard_coral, macroalgae, turf_algae, bare_substrate, 
-                                                   depth, fish_richness),
+                fish_avg %>% ungroup() %>%  
+                  select(site, reef_type, reef_zone, management_rules, 
+                         hard_coral, macroalgae, turf_algae, bare_substrate, depth, fish_richness),
                 by='site') %>% 
+        # recode management_rules
+        mutate(management_rules = recode(management_rules, 'periodic closure' = 'access restriction',
+                                                            'gear restriction' = 'gear restriction',
+                                                            'periodic closure; access restriction' = 'access restriction',
+                                                            'open access' = 'open-access',
+                                                            'no take' = 'no-take',
+                                                            'access restriction' = 'access restriction')) %>% 
         filter(!is.na(depth)) #%>%  # dropping 2 sites (NK02 in Madasgascar and WaiE1 in Fiji)
         # left_join(threat, by = 'site') %>% ungroup() ## lots of sites missing, incl. all of Belize
+
+
+
 
 ## convert data to list, characters to factors for rethinking
 focal<-focal %>% ungroup() %>% droplevels() %>%  mutate_if(is.character, as.factor) %>% 
   select(
-  nutprop, nutrient, nutrient_lab, country, site, dietP, hard_coral, macroalgae, turf_algae, bare_substrate, reef_type, reef_zone, depth)
-  # grav_NC, management_rules, sediment, nutrient_load, pop_count) 
+  nutprop, nutrient, nutrient_lab, country, site, dietP, hard_coral, macroalgae, turf_algae, bare_substrate, 
+  reef_type, reef_zone, depth,management_rules)
+  # grav_NC, sediment, nutrient_load, pop_count)
 
 ## scale numeric
 focal.list<-scaler(focal %>% filter(nutrient=='calcium.mg'), 
