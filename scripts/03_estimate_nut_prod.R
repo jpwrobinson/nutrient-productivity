@@ -11,20 +11,20 @@ prod<-fishp %>%
            nut_biomass_kgha = conc * 0.87 * biomass_kgha)
   
 ## reef level estimates of nutrient productivity metrics
-prod_reef<-prod %>% group_by(country, fish_taxon, trophic_group, dietP, management, site, sample_date, transect_number, depth, nutrient) %>% 
+prod_reef<-prod %>% group_by(country, fish_taxon, trophic_group, dietP, management, site, year, sample_date, transect_number, depth, nutrient) %>% 
             summarise(
               nut_prod_day_ha = sum(nut_prod_day_ha), 
               nut_biomass_kgha = sum(nut_biomass_kgha),
               prod_day_ha = sum(prod_g_day_ha),
               biomass_kgha = sum(biomass_kgha)) %>% 
-            group_by(country, fish_taxon, trophic_group, management, site, depth, nutrient) %>% 
+            group_by(country, fish_taxon, trophic_group, management, site, year, depth, nutrient) %>% 
             summarise(
               nut_prod_day_ha = mean(nut_prod_day_ha), 
               nut_biomass_kgha = mean(nut_biomass_kgha),
               prod_day_ha = mean(prod_day_ha),
               biomass_kgha = mean(biomass_kgha)) %>% 
             ungroup() %>% 
-            group_by(country,site, nutrient) %>% 
+            group_by(country,site, year, nutrient) %>% 
             summarise(nut_prod_day_ha = sum(nut_prod_day_ha), 
                       nut_biomass_kgha = sum(nut_biomass_kgha),
                       prod_day_ha = sum(prod_day_ha),
@@ -52,18 +52,18 @@ dev.off()
 
 ## species level estimates of nut prod metrics
 prod_sp<-prod %>% 
-  group_by(country, management, site, sample_date, fish_taxon, transect_number, depth, nutrient, dietP, trophic_group) %>% 
+  group_by(country, management, site, year, sample_date, fish_taxon, transect_number, depth, nutrient, dietP, trophic_group) %>% 
   summarise(
     nut_prod_day_ha = sum(nut_prod_day_ha), 
     nut_biomass_kgha = sum(nut_biomass_kgha),
     prod_g_day_ha = sum(prod_g_day_ha),
     biomass_kgha = sum(biomass_kgha)) %>% 
   ungroup() %>% 
-  dplyr::select(country, site,transect_number,management,  fish_taxon, nutrient, dietP, trophic_group, nut_prod_day_ha:biomass_kgha) %>% 
-  group_by(nutrient, country, site) %>% 
+  dplyr::select(country, site,transect_number,year, management,  fish_taxon, nutrient, dietP, trophic_group, nut_prod_day_ha:biomass_kgha) %>% 
+  group_by(nutrient, country, site, year) %>% 
   complete(transect_number, nesting(fish_taxon, dietP, trophic_group, management),
            fill = list(nut_prod_day_ha = 0, nut_biomass_kgha = 0, prod_g_day_ha =0, biomass_kgha = 0)) %>% 
-  group_by(country, management, site, fish_taxon, nutrient, dietP, trophic_group) %>% 
+  group_by(country, management, site, year, fish_taxon, nutrient, dietP, trophic_group) %>% 
   summarise(
     nut_prod_day_ha = mean(nut_prod_day_ha), 
     nut_biomass_kgha = mean(nut_biomass_kgha),
@@ -82,7 +82,7 @@ prod_sp<-prod %>%
 prod_fg<-prod %>% 
   mutate(id = paste(site, year, sep = '_')) %>% 
   ## transect level: total metric by diet group
-  group_by(country, site, id, transect_number, nutrient, dietP) %>% 
+  group_by(country, site, year, id, transect_number, nutrient, dietP) %>% 
   summarise(
     nut_prod_day_ha = sum(nut_prod_day_ha), 
     nut_biomass_kgha = sum(nut_biomass_kgha),
@@ -90,17 +90,17 @@ prod_fg<-prod %>%
     biomass_kgha = sum(biomass_kgha)) %>% 
   ungroup() %>% 
   ## site level: complete missing transect obs by diet group, then average
-  dplyr::select(country, site,id, transect_number, nutrient, dietP, nut_prod_day_ha:biomass_kgha) %>% 
-  group_by(nutrient, country, id, site) %>% 
+  dplyr::select(country, site, year, id, transect_number, nutrient, dietP, nut_prod_day_ha:biomass_kgha) %>% 
+  group_by(nutrient, country, year, id, site) %>% 
   complete(transect_number,dietP,
            fill = list(nut_prod_day_ha = 0, nut_biomass_kgha = 0, prod_g_day_ha =0, biomass_kgha = 0)) %>% 
-  group_by(country, site, nutrient, dietP) %>% 
+  group_by(country, site,year, nutrient, dietP) %>% 
   summarise(
     nut_prod_day_ha = mean(nut_prod_day_ha), 
     nut_biomass_kgha = mean(nut_biomass_kgha),
     prod_g_day_ha = mean(prod_g_day_ha),
     biomass_kgha = mean(biomass_kgha)) %>% 
-  group_by(nutrient, country) %>% 
+  group_by(nutrient, country, year) %>% 
   complete(site,dietP,
            fill = list(nut_prod_day_ha = 0, nut_biomass_kgha = 0, prod_g_day_ha =0, biomass_kgha = 0)) 
 
