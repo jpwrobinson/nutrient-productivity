@@ -81,6 +81,7 @@ g1<-ggplot(prod_fg, aes(fct_reorder(dietP_lab, nutprop),nutprop, fill=dietP_lab)
   th + theme(legend.position = 'none') +
   scale_fill_manual(values = diet_cols.named)  +
   scale_color_manual(values = diet_cols.named) +
+  scale_y_continuous(breaks=seq(0, 0.8, by = 0.1), labels=seq(0, 80, by = 10)) +
   labs(x = '', y = "Mean proportion of nutrient productivity, %") 
 
 g2<-ggplot(prod_fg_co, aes(nutrient_lab, nutprop, fill=dietP_lab)) + 
