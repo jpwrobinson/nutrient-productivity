@@ -48,7 +48,8 @@ focal<-left_join(prod_fg,
 
 ## scale numeric
 focal.scaled<-scaler(focal, 
-                   ID = c('nutprop', 'country', 'site', 'dietP', 'reef_type', 'reef_zone','year',
+                   ID = c('nutprop','nutrient','nutrient_lab', 'country', 'site','year',
+                          'dietP', 'reef_type', 'reef_zone',
                           'management_rules'), cats = FALSE) 
 
 ## check reponse hist, bounded 0 - 1
