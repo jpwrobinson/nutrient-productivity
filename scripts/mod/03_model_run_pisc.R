@@ -2,6 +2,9 @@ pacman::p_load(tidyverse, skimr, cowplot, here, funk,disco, patchwork, bayesplot
                broom, broom.mixed, rethinking, rstan, brms, tidybayes,emmeans, install=FALSE)
 source('scripts/0_plot_theme.R')
 
+#### RUN ON 
+dp<-'Piscivore'
+
 # Load reef pressure data
 # https://github.com/WCS-Marine/local-reef-pressures
 # devtools::load_all('../local-reef-pressures') ## fails
@@ -23,8 +26,34 @@ prod_fg<-prod_fg %>%
 nut.vec<-unique(prod_fg$nutrient)
 
 # model data
+for(i in 1:length(nut.vec)){
+  nut<-nut.vec[i]
+  print(paste('Running model for', nut))
+  source('scripts/mod/00_model_FG_prop_template.R')
+}
 
-## FG herbivores
-dp<-'Herbivores Microvores Detritivores'
-nut<-nut.vec[1]
-source('scripts/mod/model_FG_prop_template.R')
+for(i in 1:length(nut.vec)){
+  nut<-nut.vec[i]
+  print(paste('Compiling diagnostic figures for', nut))
+  source('scripts/mod/00_model_diagnostic.R')
+}
+
+## master effect plot across nutrients
+tmast<-numeric()
+for(i in 1:length(nut.vec)){
+  load(file = paste0('results/mods/', nut.vec[i],'_', dp, '_model.Rdata'))
+  tt<-tidy(fit1, effects = "fixed") %>% filter(component == 'cond' & !str_detect(term, 'phi|Intercept')) %>%   
+    mutate(nut = nut.vec[i])
+  tmast<-rbind(tmast, tt)
+}
+
+pdf(file = paste0('results/betam_posteriors/post_summary_', dp, '.pdf'), height=7, width=12)
+tmast %>% 
+    ggplot(aes(term, estimate, ymin = conf.low, ymax = conf.high, col=nut)) + 
+    geom_hline(yintercept = 0, col='grey', linetype=5) +
+    geom_pointrange() + 
+    coord_flip() +
+  facet_wrap(~nut)+
+    labs(subtitle = dp)
+dev.off()
+
