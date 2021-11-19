@@ -1,29 +1,11 @@
-pacman::p_load(tidyverse, skimr, cowplot, here, funk,disco, patchwork, 
+pacman::p_load(tidyverse, skimr, cowplot, here, funk,disco, patchwork, bayesplot,
                broom, broom.mixed, rethinking, rstan, brms, tidybayes,emmeans, install=FALSE)
-source('scripts/0_plot_theme.R')
 
-# Load reef pressure data
-# https://github.com/WCS-Marine/local-reef-pressures
-# devtools::load_all('../local-reef-pressures') ## fails
-threat<-read.csv('data/wcs/wcs_threat_indicators.csv')  %>% mutate(nutrient_load = nutrient) %>%  select(-X, -country, -nutrient)
+# ## set up model data
+# dp<-'Herbivores Microvores Detritivores'
+# nut<-'calcium.mg'
 
-## load fish nut prod, estimate proportional by FG
-load(file = 'results/wcs_productivity.rds')
-load(file = 'results/wcs_nut_prod.rds')
-
-prod_fg<-prod_fg %>% 
-  mutate(nutrient_lab = recode(nutrient, 'calcium.mg' = 'Calcium', 'iron.mg' = 'Iron', 'zinc.mg' = 'Zinc',
-                               'selenium.mug' = 'Selenium', 'vitamin_a.mug' = 'Vitamin A', 'omega3.g' = 'Omega-3\nfatty acids')) %>% 
-  group_by(country, site, nutrient,nutrient_lab) %>% 
-  mutate(tnut = sum(nut_prod_day_ha), 
-         nutprop = nut_prod_day_ha / tnut) 
-
-## set up model data
-dp<-'Herbivores Microvores Detritivores'
-nut<-'calcium.mg'
-
-# read benthic
-load('data/wcs/wcs_fish_benthic.rds')
+# join prod estimates with benthic + fishing covariates
 focal<-left_join(prod_fg, 
                 fish_avg %>% ungroup() %>%  
                   select(site, reef_type, reef_zone, management_rules, 
@@ -47,13 +29,16 @@ focal<-left_join(prod_fg,
 
 
 ## scale numeric
+source('scripts/scaler.R')
 focal.scaled<-scaler(focal, 
                    ID = c('nutprop','nutrient','nutrient_lab', 'country', 'site','year',
                           'dietP', 'reef_type', 'reef_zone',
                           'management_rules'), cats = FALSE) 
 
 ## check reponse hist, bounded 0 - 1
-hist(focal.scaled$nutprop)
+print(
+    hist(focal.scaled$nutprop)
+    )
   
 ## testing multinomial model
 fit1 <-
@@ -66,18 +51,23 @@ fit1 <-
       data = focal.scaled,
       family = zero_inflated_beta(),
       chains = 4, iter = 3000, warmup = 1000,
-      cores = 4, seed = 1234
+      cores = 4, seed = 43
     )
 
 ## pred vs. obs
+pdf(file = paste0('results/betam_posteriors/', nut,'/post_obs_', dp, '.pdf'), height=7, width=12)
 plot(predict(fit1)[,1], focal.scaled$nutprop, xlim=c(0,1))
 abline(0,1)
+
+ppc_dens_overlay(y = focal.scaled$nutprop,
+                 yrep = posterior_predict(fit1, nsamples = 100))
+
 
 # pareto diagnostic
 loo(fit1)
 
 ## PDF the posterior effects
-pdf(file = paste0('results/betam_posteriors/', nut,'/post_summary', dp, '.pdf'), height=7, width=12)
+pdf(file = paste0('results/betam_posteriors/', nut,'/post_summary_', dp, '.pdf'), height=7, width=12)
 tidy(fit1, effects = "fixed") %>% filter(component == 'cond' & !str_detect(term, 'phi')) %>% 
     ggplot(aes(term, estimate, ymin = conf.low, ymax = conf.high)) + 
     geom_hline(yintercept = 0, col='grey', linetype=5) +
@@ -95,4 +85,4 @@ plot(fit1, pars = 'b_turf_algae|b_macroalgae|b_hard_coral|b_bare|b_depth')
 dev.off()
 
 
-save(focal, focal.scaled, fit1, file = paste0('results/mods/', nut,'_', dp, '_model_.Rdata'))
+save(focal, focal.scaled, fit1, file = paste0('results/mods/', nut,'_', dp, '_model.Rdata'))
