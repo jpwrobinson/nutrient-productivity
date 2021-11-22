@@ -5,12 +5,34 @@ pacman::p_load(tidyverse, skimr, cowplot, here, funk,disco, patchwork, bayesplot
 # dp<-'Herbivores Microvores Detritivores'
 # nut<-'calcium.mg'
 
+# Load reef pressure data
+# https://github.com/WCS-Marine/local-reef-pressures
+# devtools::load_all('../local-reef-pressures') ## fails
+threat<-read.csv('data/threat/sites-threats.csv')  %>% 
+  rename_at(vars(starts_with('andrello')), ~str_replace_all(., 'andrello_', '')) %>% 
+  mutate(nutrient_load = nutrient) 
+
+# get country averages for filling
+threat_co<-threat %>% group_by(country) %>% summarise_at(vars(grav_nc:nutrient_load), mean, na.rm=TRUE)
+
+summary(threat) ## 11 NAs in Fiji + Madagascar
+threat$grav_nc[is.na(threat$grav_nc)]<-threat_co$grav_nc[match(threat$country[is.na(threat$grav_nc)], threat_co$country)]
+threat$sediment[is.na(threat$sediment)]<-threat_co$sediment[match(threat$country[is.na(threat$sediment)], threat_co$country)]
+threat$nutrient_load[is.na(threat$nutrient_load)]<-threat_co$nutrient_load[match(threat$country[is.na(threat$nutrient_load)], threat_co$country)]
+threat$pop_count[is.na(threat$pop_count)]<-threat_co$pop_count[match(threat$country[is.na(threat$pop_count)], threat_co$country)]
+threat<-threat %>% select(-country, -nutrient)
+
+## transform skwewed predictors
+threat$grav_nc<-log10(threat$grav_nc+1)
+threat$pop_count<-log10(threat$pop_count+1)
+
 # join prod estimates with benthic + fishing covariates
 focal<-left_join(prod_fg, 
                 fish_avg %>% ungroup() %>%  
                   select(site, reef_type, reef_zone, management_rules, 
                          hard_coral, macroalgae, turf_algae, bare_substrate, depth, fish_richness),
                 by='site') %>% 
+        left_join(threat, by = 'site') %>% 
         # recode management_rules
         mutate(management_rules = recode(management_rules, 'periodic closure' = 'access restriction',
                                                             'gear restriction' = 'gear restriction',
@@ -24,7 +46,7 @@ focal<-left_join(prod_fg,
         select(
           nutprop, nutrient, nutrient_lab, country, site, year, dietP, 
           hard_coral, macroalgae, turf_algae, bare_substrate, reef_type, reef_zone, depth,
-          management_rules) %>%  # grav_NC, management_rules, sediment, nutrient_load, pop_count) 
+          management_rules, grav_nc, sediment, nutrient_load, pop_count) %>%  
         filter(nutrient==nut & dietP==dp) %>% 
         mutate(management_rules = fct_relevel(management_rules, 'open-access', after=0)) ## open-access is reference level
 
@@ -38,13 +60,17 @@ focal.scaled<-scaler(focal,
 ## check reponse hist, bounded 0 - 1
 hist(focal.scaled$nutprop)
 focal.scaled$nutprop[focal.scaled$nutprop==1]<-0.99
+
+pairs2(focal.scaled %>% ungroup() %>%  select_if(is.numeric))
   
 ## testing multinomial model
 fit1 <-
      brm(
-      bf(nutprop ~ hard_coral + turf_algae + macroalgae + bare_substrate + depth + management_rules + 
+      bf(nutprop ~ hard_coral + turf_algae + macroalgae + bare_substrate + depth + 
+          grav_nc + pop_count + management_rules + 
            (1 | country) + (1 | year),
-         phi ~ hard_coral + turf_algae + macroalgae + bare_substrate + depth + management_rules + 
+         phi ~ hard_coral + turf_algae + macroalgae + bare_substrate + depth + 
+          grav_nc + pop_count + management_rules + 
            (1 | country) + (1 | year),
          zi ~ 1),
       data = focal.scaled,

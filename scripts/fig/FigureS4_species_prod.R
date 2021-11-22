@@ -13,8 +13,8 @@ prod_sp<-prod_sp %>% group_by(nutrient, country) %>%
                                'selenium.mug' = 'Selenium', 'vitamin_a.mug' = 'Vitamin A', 'omega3.g' = 'Omega-3\nfatty acids'))
 
 spp<-prod_sp %>% ungroup() %>% 
-    distinct(fish_taxon, dietP, dietP_lab, country, prod_g_day_ha) %>% 
-    group_by(fish_taxon, dietP_lab) %>% 
+    # distinct(fish_taxon, dietP, dietP_lab, country, prod_g_day_ha) %>% 
+    group_by(fish_taxon, dietP_lab, country) %>% 
     summarise(prod_g_day_ha = mean(prod_g_day_ha)) %>% 
     ungroup() %>% 
     mutate(fish_taxon = fct_reorder(fish_taxon, prod_g_day_ha)) 
@@ -26,18 +26,30 @@ ggplot(spp %>%
       scale_color_manual(values = diet_cols.named) +
       labs('productivity, grams day hectare')
 
-ggplot(spp , aes(fish_taxon, prod_g_day_ha, col=dietP_lab)) + 
-  geom_point(size=4) +
-  coord_flip() +
-  scale_color_manual(values = diet_cols.named) +
-  labs('productivity, grams day hectare')
+# ggplot(spp , aes(fish_taxon, prod_g_day_ha, col=dietP_lab)) + 
+#   geom_point(size=4) +
+#   coord_flip() +
+#   scale_color_manual(values = diet_cols.named) +
+#   labs('productivity, grams day hectare')
 
-ggplot(prod_fg, aes((prod_g_day_ha), fill=dietP_lab)) + 
-  geom_density(alpha=0.7, col='transparent') +
-  # coord_flip() +
-  # facet_wrap(~country) +
-  scale_x_log10(labels=scales::comma) +
+g1<-ggplot(prod_fg %>% filter(nutrient=='calcium.mg'), aes((prod_g_day_ha), col=dietP_lab, fill=dietP_lab)) + 
+  geom_density(alpha=0.7) +
+  scale_x_log10(breaks=c(0.1, 1, 10, 100, 1000), labels=c(0.1, 1, 10, 100, '1,000'), expand=c(0,0)) +
+  scale_y_continuous(expand=c(0,0)) +
   scale_fill_manual(values = diet_cols.named) +
-  labs('productivity, grams day hectare') +
-  theme(legend.position = 'none')  
+  scale_color_manual(values = diet_cols.named) +
+  labs(x=expression(paste('daily biomass production (g day'^'-1',' ha'^'-1', ')')), y = 'density') +
+  th + theme(legend.position = 'none') 
 
+g2<-g1 + facet_wrap(~country, nrow=1, scales='free_y')
+
+pdf(file='fig/FigureS4.pdf', height=5, width=7)
+print(g1 +
+        theme(axis.text.x = element_text(size = 13), 
+              axis.text.y = element_text(size = 13),
+              axis.title = element_text(size = 14)))
+dev.off()
+
+pdf(file='fig/FigureS5.pdf', height=3, width=10)
+print(g2)
+dev.off()
