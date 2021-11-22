@@ -5,10 +5,6 @@ source('scripts/0_plot_theme.R')
 #### RUN ON 
 dp<-'Mobile invertivore'
 
-# Load reef pressure data
-# https://github.com/WCS-Marine/local-reef-pressures
-# devtools::load_all('../local-reef-pressures') ## fails
-threat<-read.csv('data/wcs/wcs_threat_indicators.csv')  %>% mutate(nutrient_load = nutrient) %>%  select(-X, -country, -nutrient)
 
 ## load datasets
 load(file = 'results/wcs_productivity.rds')

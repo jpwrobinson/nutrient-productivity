@@ -76,7 +76,7 @@ g1<-ggplot(prod_fg, aes(fct_reorder(dietP_lab, nutprop),nutprop, fill=dietP_lab)
   # geom_segment(aes(x = fct_reorder(dietP_lab, nut_prod_day_ha), xend =fct_reorder(dietP_lab, nut_prod_day_ha), y =-Inf, yend = nut_prod_day_ha), col='grey') +
   geom_jitter(size=2, pch=21, width = 0.25) +
   geom_pointrange(data = prod_fg2, aes(ymin = lower, ymax = upper), size=1.5, pch=21) +
-  geom_label_repel(data = prod_fg %>% filter(id %in% plabs), aes(label=nutrient_lab), fill='white', size=2) +
+  # geom_label_repel(data = prod_fg %>% filter(id %in% plabs), aes(label=nutrient_lab), fill='white', size=2) +
   coord_flip() +
   th + theme(legend.position = 'none') +
   scale_fill_manual(values = diet_cols.named)  +
