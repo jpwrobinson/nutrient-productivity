@@ -5,11 +5,6 @@ source('scripts/0_plot_theme.R')
 #### RUN ON 
 dp<-'Herbivores Microvores Detritivores'
 
-# Load reef pressure data
-# https://github.com/WCS-Marine/local-reef-pressures
-# devtools::load_all('../local-reef-pressures') ## fails
-threat<-read.csv('data/wcs/wcs_threat_indicators.csv')  %>% mutate(nutrient_load = nutrient) %>%  select(-X, -country, -nutrient)
-
 ## load datasets
 load(file = 'results/wcs_productivity.rds')
 load(file = 'results/wcs_nut_prod.rds')
@@ -29,13 +24,13 @@ nut.vec<-unique(prod_fg$nutrient)
 for(i in 1:length(nut.vec)){
   nut<-nut.vec[i]
   print(paste('Running model for', nut))
-  source('scripts/mod/model_FG_prop_template.R')
+  source('scripts/mod/00_model_FG_prop_template.R')
 }
 
 for(i in 1:length(nut.vec)){
   nut<-nut.vec[i]
   print(paste('Compiling diagnostic figures for', nut))
-  source('scripts/mod/model_diagnostic.R')
+  source('scripts/mod/00_model_diagnostic.R')
 }
 
 ## master effect plot across nutrients

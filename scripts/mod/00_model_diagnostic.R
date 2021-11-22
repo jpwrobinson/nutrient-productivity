@@ -25,7 +25,7 @@ print(
 dev.off()
 
 pdf(file = paste0('results/betam_posteriors/', nut,'/management_', dp, '.pdf'), height=7, width=12)
-print(plot(fit1, pars = 'b_management'))
+print(plot(fit1, pars = 'b_management|b_grav_nc|b_pop_count'))
 dev.off()
 
 pdf(file = paste0('results/betam_posteriors/', nut,'/benthic_', dp, '.pdf'), height=7, width=12)
