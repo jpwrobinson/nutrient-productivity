@@ -36,12 +36,12 @@ prod_fg_country<-prod_sp %>%
   mutate(tnut = sum(nut_prod_day_ha), nutprop = nut_prod_day_ha / tnut * 100)
 
 ## average across nutrients for panel A
-prod_fg2<-prod_fg %>% group_by(dietP_lab) %>% summarise(se = se(nutprop), nutprop = mean(nutprop)) %>% 
+prod_fg2<-prod_fg %>% group_by(dietP_lab) %>% summarise(se = funk::se(nutprop), nutprop = mean(nutprop)) %>% 
         mutate(lower = nutprop - 2*se, upper = nutprop + 2*se)
 
 ## average nut contr by country + nutrient
 prod_fg_co<-prod_fg_country %>% group_by(nutrient,nutrient_lab, country, dietP_lab) %>% 
-  summarise(se = se(nutprop), nutprop = mean(nutprop)) %>% 
+  summarise(se = funk::se(nutprop), nutprop = mean(nutprop)) %>% 
   mutate(lower = nutprop - 2*se, upper = nutprop + 2*se)
 
 prod_fg_co_biom<-prod_fg_country %>% filter(nutrient=='calcium.mg') %>% 
@@ -125,3 +125,4 @@ dev.off()
 pdf(file='fig/FigureS2.pdf', height=6, width=10)
 print(g4)
 dev.off()
+
