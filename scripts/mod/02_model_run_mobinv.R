@@ -3,7 +3,7 @@ pacman::p_load(tidyverse, skimr, cowplot, here, funk,disco, patchwork, bayesplot
 source('scripts/0_plot_theme.R')
 
 #### RUN ON 
-dp<-'Mobile invertivore'
+dp<-'invertivore-mobile'
 
 
 ## load datasets
