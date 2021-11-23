@@ -52,6 +52,20 @@ diet <- diet %>% mutate(dietP = recode(trophic_guild_predicted_text, 'microinver
                                    'piscivore' = 'Piscivore'))
 
 db$dietP<-diet$dietP[match(db$Species, diet$species)] ## 111 missing species
+db$fg<-fish$trophic_group[match(db$Species, fish$fish_taxon)] ## >300 missing species
+
+## ok big hack here but filling all Renato NA fg with their original Diet values
+db$fg[is.na(db$fg)]<-as.character(db$Diet[is.na(db$fg)])
+db$fg[db$fg == ' ']<-as.character(db$Diet[db$fg == ' '])
+
+db<-db %>% mutate(fg = recode(fg, 'InvMob' = 'invertivore-mobile',
+                                           'InvSes' = 'invertivore-sessile',
+                                           'Plnktiv' = 'planktivore',
+                                            'Omnivr' = 'omnivore',
+                                            'HerDet' = 'herbivore-detritivore',
+                                            'HerMac' = 'herbivore-macroalgae',
+                                           'FisCep' = 'piscivore'))
+
 
 ## check how Renato diets correspond with Vale diets
 cat_key<-db %>% filter(!is.na(dietP)) %>% distinct(Species, Diet, dietP) %>% 
@@ -96,7 +110,7 @@ db<-droplevels(db)
 fish<-droplevels(fish)
 
 # adapt formula from Morais & Bellwood 2018
-fmod <- formula (~ sstmean + lmax + dietP) 
+fmod <- formula (~ sstmean + lmax + fg) 
 
 # fit xgboost model to predict Kmax
 fishp <- predKmax (fish,
