@@ -65,19 +65,19 @@ prod_sp<-prod %>%
   # group_by(nutrient, country, site, year) %>% 
   # complete(transect_number, nesting(fish_taxon, dietP, trophic_group, management_rules),
   #          fill = list(nut_prod_day_ha = 0, nut_biomass_kgha = 0, prod_g_day_ha =0, biomass_kgha = 0)) #%>% 
-  group_by(country, management_rules, site, year, fish_taxon, nutrient, dietP, trophic_group) %>%
+  group_by(country, management_rules, site, year, fish_taxon, nutrient, trophic_group) %>%
   summarise(
     nut_prod_day_ha = mean(nut_prod_day_ha), 
     nut_biomass_kgha = mean(nut_biomass_kgha),
     prod_g_day_ha = mean(prod_g_day_ha),
     biomass_kgha = mean(biomass_kgha)) %>% 
   group_by(country, management_rules, nutrient, year) %>%
-  complete(site, nesting(fish_taxon, dietP, trophic_group),
+  complete(site, nesting(fish_taxon, trophic_group),
            fill = list(nut_prod_day_ha = 0, nut_biomass_kgha = 0, prod_g_day_ha = 0, biomass_kgha = 0)) %>% 
   ungroup() %>% 
   # mutate(nut_turnover = nut_prod_day_ha / nut_biomass_kgha,
   #        biomass_turnover = prod_day / biomass_kg) %>% 
-  group_by(country, fish_taxon, nutrient, dietP, trophic_group) %>% 
+  group_by(country, fish_taxon, nutrient, trophic_group) %>% 
   summarise(nut_prod_day_ha = mean(nut_prod_day_ha), 
             nut_biomass_kgha = mean(nut_biomass_kgha),
             prod_g_day_ha = mean(prod_g_day_ha),
@@ -90,14 +90,14 @@ prod_sp<-prod %>%
 prod_fg<-prod %>% 
   mutate(id = paste(site, year, sep = '_')) %>% 
   ## transect level: total metric by diet group
-  group_by(country, site, year, id, transect_number, nutrient, dietP) %>% 
+  group_by(country, site, year, id, transect_number, nutrient) %>% 
   summarise(
     nut_prod_day_ha = sum(nut_prod_day_ha), 
     nut_biomass_kgha = sum(nut_biomass_kgha),
     prod_g_day_ha = sum(prod_g_day_ha),
     biomass_kgha = sum(biomass_kgha)) %>% 
   ungroup() %>% 
-  group_by(country, site,year, nutrient, dietP) %>% 
+  group_by(country, site,year, nutrient) %>% 
   summarise(
     nut_prod_day_ha = mean(nut_prod_day_ha), 
     nut_biomass_kgha = mean(nut_biomass_kgha),
@@ -112,41 +112,41 @@ prod_fg %>% group_by(site, country, year) %>% summarise(n_distinct(dietP))
   
 ## labelling for plots
 prod_sp$trophic_lab<-trophic.cols$FG_lab[match(prod_sp$trophic_group, trophic.cols$FG)]
-prod_sp$dietP_lab<-diet.cols$dietP_lab[match(prod_sp$dietP, diet.cols$dietP)]
-prod_fg$dietP_lab<-diet.cols$dietP_lab[match(prod_fg$dietP, diet.cols$dietP)]
+# prod_sp$dietP_lab<-diet.cols$dietP_lab[match(prod_sp$dietP, diet.cols$dietP)]
+# prod_fg$dietP_lab<-diet.cols$dietP_lab[match(prod_fg$dietP, diet.cols$dietP)]
 
 
 
 # estimate top 20 nutrient productivity species, by nutrient
 prod_top_nut<-prod_sp %>% ungroup() %>% group_by(nutrient) %>% slice_max(nut_prod_day_ha, n=20) %>% 
-      group_by(nutrient, fish_taxon, dietP, dietP_lab) %>% 
+      group_by(nutrient, fish_taxon, trophic_group, trophic_lab) %>% 
       summarise(nut_prod_day_ha = mean(nut_prod_day_ha))
 
 # scale nutrient productivity, estimate summed nutrient productivity across 6 nutriens
 prod_scale<-prod_sp %>% group_by(nutrient) %>% 
       mutate(nut_prod_day_ha_scale = scale(nut_prod_day_ha)) %>% 
       ungroup() %>% 
-      group_by(fish_taxon, dietP_lab) %>% 
+      group_by(fish_taxon, trophic_lab) %>% 
       summarise(nut_prod_score = sum(nut_prod_day_ha_scale),
                 biomass_kgha = unique(biomass_kgha))
 
 pdf(file = 'fig/explore/wcs_nutrient_prod_species.pdf', height=18, width=20)
-ggplot(prod_top_nut, aes(fct_reorder(fish_taxon, nut_prod_day_ha), nut_prod_day_ha, fill=dietP_lab)) + 
+ggplot(prod_top_nut, aes(fct_reorder(fish_taxon, nut_prod_day_ha), nut_prod_day_ha, fill=trophic_lab)) + 
     geom_bar(stat='identity') + coord_flip() + 
     facet_wrap(~nutrient, scales='free') +
   labs(x = '', y = 'Nutrient productivity') +
-  scale_fill_manual(values = diet_cols.named) +
+  scale_fill_manual(values = trophic_cols.named) +
   theme(legend.position = c(0.9, 0.1)) +
   scale_y_continuous(expand=c(0,0))
 
 dev.off()
 
 pdf(file = 'fig/explore/wcs_nutrient_prod_species_score.pdf', height=14, width=8)
-ggplot(prod_scale, aes(fct_reorder(fish_taxon, nut_prod_score), nut_prod_score, fill=dietP_lab)) + 
+ggplot(prod_scale, aes(fct_reorder(fish_taxon, nut_prod_score), nut_prod_score, fill=trophic_lab)) + 
   geom_bar(stat='identity') +
   labs(x = '', y = 'Combined nutrient productivity score')+
   coord_flip() +
-  scale_fill_manual(values = diet_cols.named) +
+  scale_fill_manual(values = trophic_cols.named) +
   theme(legend.position = c(0.7, 0.1)) +
   scale_y_continuous(expand=c(0,0))
 dev.off()
