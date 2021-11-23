@@ -14,6 +14,7 @@ fish<-read.csv('data/wcs/wcs_nutrients_individuals.csv') %>%
     filter(!is.na(biomass_kgha)) %>%  ## 1 fish in Belize with no L-W conversion
     filter(!is.na(lmax)) %>%  ## 0.6% of biomass / 1.4% abundance dropped
     filter(size >= 10 & lmax >= 6) %>% ## 1.34% of biomass dropped
+    filter(!fish_taxon %in% c('Herklotsichthys quadrimaculatus', 'Gnathodentex aureolineatus', 'Lutjanus malabaricus')) %>% 
     filter(!fish_family %in% c('Pomacentridae')) %>% ## 0.35% of biomass dropped [50 species]
     filter(!fish_family %in% c('Ginglymostomatidae', 'Myliobatidae', 'Dasyatidae', 'Carcharhinidae')) ## 5.9% of biomass dropped [8 species]
     
@@ -52,15 +53,15 @@ diet <- diet %>% mutate(dietP = recode(trophic_guild_predicted_text, 'microinver
                                    'piscivore' = 'Piscivore'))
 
 db$dietP<-diet$dietP[match(db$Species, diet$species)] ## 111 missing species
-db$fg<-fish$trophic_group[match(db$Species, fish$fish_taxon)] ## >300 missing species
+db$trophic_group<-fish$trophic_group[match(db$Species, fish$fish_taxon)] ## >300 missing species
 
-## ok big hack here but filling all Renato NA fg with their original Diet values
-db$fg[is.na(db$fg)]<-as.character(db$Diet[is.na(db$fg)])
-db$fg[db$fg == ' ']<-as.character(db$Diet[db$fg == ' '])
+## ok big hack here but filling all Renato NA trophic_group with their original Diet values
+db$trophic_group[is.na(db$trophic_group)]<-as.character(db$Diet[is.na(db$trophic_group)])
+db$trophic_group[db$trophic_group == ' ']<-as.character(db$Diet[db$trophic_group == ' '])
 
-db<-db %>% mutate(fg = recode(fg, 'InvMob' = 'invertivore-mobile',
+db<-db %>% mutate(trophic_group = recode(trophic_group, 'InvMob' = 'invertivore-mobile',
                                            'InvSes' = 'invertivore-sessile',
-                                           'Plnktiv' = 'planktivore',
+                                           'Plktiv' = 'planktivore',
                                             'Omnivr' = 'omnivore',
                                             'HerDet' = 'herbivore-detritivore',
                                             'HerMac' = 'herbivore-macroalgae',
@@ -110,7 +111,7 @@ db<-droplevels(db)
 fish<-droplevels(fish)
 
 # adapt formula from Morais & Bellwood 2018
-fmod <- formula (~ sstmean + lmax + fg) 
+fmod <- formula (~ sstmean + lmax + trophic_group) 
 
 # fit xgboost model to predict Kmax
 fishp <- predKmax (fish,
