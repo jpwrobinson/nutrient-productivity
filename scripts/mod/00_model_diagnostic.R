@@ -10,7 +10,7 @@ print(ppc_dens_overlay(y = focal.scaled$nutprop,
 dev.off()
 
 # pareto diagnostic
-loo(fit1)
+# loo(fit1)
 
 ## PDF the posterior effects
 pdf(file = paste0('results/betam_posteriors/', nut,'/post_summary_', dp, '.pdf'), height=7, width=12)
@@ -25,7 +25,7 @@ print(
 dev.off()
 
 pdf(file = paste0('results/betam_posteriors/', nut,'/management_', dp, '.pdf'), height=7, width=12)
-print(plot(fit1, pars = 'b_management|b_grav_nc|b_pop_count'))
+print(plot(fit1, pars = 'b_management'))
 dev.off()
 
 pdf(file = paste0('results/betam_posteriors/', nut,'/benthic_', dp, '.pdf'), height=7, width=12)
