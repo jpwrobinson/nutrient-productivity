@@ -3,7 +3,7 @@ pacman::p_load(tidyverse, skimr, cowplot, here, funk,disco, patchwork, bayesplot
 source('scripts/0_plot_theme.R')
 
 #### RUN ON 
-dp<-'Herbivores Microvores Detritivores'
+dp<-'herbivore-detritivore'
 
 ## load datasets
 load(file = 'results/wcs_productivity.rds')
