@@ -90,25 +90,25 @@ prod_sp<-prod %>%
 prod_fg<-prod %>% 
   mutate(id = paste(site, year, sep = '_')) %>% 
   ## transect level: total metric by diet group
-  group_by(country, site, year, id, transect_number, nutrient) %>% 
+  group_by(country, site, year, id, transect_number,trophic_group, nutrient) %>% 
   summarise(
     nut_prod_day_ha = sum(nut_prod_day_ha), 
     nut_biomass_kgha = sum(nut_biomass_kgha),
     prod_g_day_ha = sum(prod_g_day_ha),
     biomass_kgha = sum(biomass_kgha)) %>% 
   ungroup() %>% 
-  group_by(country, site,year, nutrient) %>% 
+  group_by(country, site,year,trophic_group, nutrient) %>% 
   summarise(
     nut_prod_day_ha = mean(nut_prod_day_ha), 
     nut_biomass_kgha = mean(nut_biomass_kgha),
     prod_g_day_ha = mean(prod_g_day_ha),
     biomass_kgha = mean(biomass_kgha)) %>% 
   group_by(nutrient, country, year) %>%
-  complete(site,dietP,
+  complete(site,trophic_group,
            fill = list(nut_prod_day_ha = 0, nut_biomass_kgha = 0, prod_g_day_ha =0, biomass_kgha = 0))  
 
 ## Rows are filled with zeroes if FG were not observed at a site
-prod_fg %>% group_by(site, country, year) %>% summarise(n_distinct(dietP))
+prod_fg %>% group_by(site, country, year) %>% summarise(n_distinct(trophic_group))
   
 ## labelling for plots
 prod_sp$trophic_lab<-trophic.cols$FG_lab[match(prod_sp$trophic_group, trophic.cols$FG)]
