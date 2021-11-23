@@ -26,6 +26,9 @@ threat<-threat %>% select(-country, -nutrient)
 threat$grav_nc<-log10(threat$grav_nc+1)
 threat$pop_count<-log10(threat$pop_count+1)
 
+# management
+manage<-read.csv(file = 'data/wcs/mermaid_management_clean.csv') %>% select(-country)
+
 # join prod estimates with benthic + fishing covariates
 focal<-left_join(prod_fg, 
                 fish_avg %>% ungroup() %>%  
@@ -33,22 +36,25 @@ focal<-left_join(prod_fg,
                          hard_coral, macroalgae, turf_algae, bare_substrate, depth, fish_richness),
                 by='site') %>% 
         left_join(threat, by = 'site') %>% 
+        left_join(manage, by = 'site') %>% 
         # recode management_rules
-        mutate(management_rules = recode(management_rules, 'periodic closure' = 'access restriction',
-                                                            'gear restriction' = 'gear restriction',
-                                                            'periodic closure; access restriction' = 'access restriction',
-                                                            'open access' = 'open-access',
-                                                            'no take' = 'no-take',
-                                                            'access restriction' = 'access restriction')) %>% 
+        # mutate(management_rules = recode(management_rules, 'periodic closure' = 'access restriction',
+        #                                                     'gear restriction' = 'gear restriction',
+        #                                                     'periodic closure; access restriction' = 'access restriction',
+        #                                                     'open access' = 'open-access',
+        #                                                     'no take' = 'no-take',
+        #                                                     'access restriction' = 'access restriction')) %>% 
         filter(!is.na(depth)) %>%  # dropping 2 sites (NK02 in Madasgascar and WaiE1 in Fiji)
         # left_join(threat, by = 'site') %>% ungroup() ## lots of sites missing, incl. all of Belize
         mutate_if(is.character, as.factor) %>% 
         select(
           nutprop, nutrient, nutrient_lab, country, site, year, dietP, 
           hard_coral, macroalgae, turf_algae, bare_substrate, reef_type, reef_zone, depth,
-          management_rules, grav_nc, sediment, nutrient_load, pop_count) %>%  
+          management_rules,gears_category, times_category, grav_nc, sediment, nutrient_load, pop_count) %>%  
         filter(nutrient==nut & dietP==dp) %>% 
-        mutate(management_rules = fct_relevel(management_rules, 'open-access', after=0)) ## open-access is reference level
+        mutate(management_rules = fct_relevel(management_rules, 'open-access', after=0),
+               gears_category = fct_relevel(gears_category, 'None', after=0),
+               times_category = fct_relevel(times_category, 'None', after=0)) ## open-access is reference level
 
 ## scale numeric
 source('scripts/scaler.R')
