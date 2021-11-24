@@ -116,7 +116,8 @@ mm<-rbind(meds_open_degraded, meds_managed_degraded, meds_managed_intact, meds_r
 # ggplot(mm, aes(type, med, fill=fg)) + geom_bar(stat='identity')
 
 ggplot(mm %>% filter(type %in% c('Managed, degraded', 'Open, degraded')), 
-        aes(.epred, fill=fg)) + stat_sample_slabinterval(alpha=0.5, .width=0.5) + facet_wrap(~type)
+        aes(.epred, fill=fg)) + 
+  stat_sample_slabinterval(alpha=0.5, .width=0.5) + facet_wrap(~type)
  
 
 meds<-mm %>% filter(type %in% c('Managed, degraded', 'Open, degraded')) %>% 
