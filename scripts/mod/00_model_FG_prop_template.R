@@ -50,11 +50,11 @@ focal<-left_join(data.frame(prod_fg),
         select(
           nutprop, nutrient, nutrient_lab, country, site, year, trophic_group, 
           hard_coral, macroalgae, turf_algae, bare_substrate, reef_type, reef_zone, depth,
-          management_rules,gears_category, times_category, grav_nc, sediment, nutrient_load, pop_count) %>%  
+          management_rules, grav_nc, sediment, nutrient_load, pop_count) %>%  
         filter(nutrient==nut & trophic_group==dp) %>% 
-        mutate(management_rules = fct_relevel(management_rules, 'open-access', after=0),
-               gears_category = fct_relevel(gears_category, 'None', after=0),
-               times_category = fct_relevel(times_category, 'None', after=0)) ## open-access is reference level
+        mutate(management_rules = fct_relevel(management_rules, 'open-access', after=0))
+               # gears_category = fct_relevel(gears_category, 'None', after=0),
+               # times_category = fct_relevel(times_category, 'None', after=0)) ## open-access is reference level
 
 ## scale numeric
 source('scripts/scaler.R')
@@ -73,11 +73,11 @@ pairs2(focal.scaled %>% ungroup() %>%  select_if(is.numeric))
 fit1 <-
      brm(
       bf(nutprop ~ hard_coral + turf_algae + macroalgae + bare_substrate + depth + 
-          grav_nc + pop_count + management_rules + 
-           (1 | country) + (1 | year),
+          grav_nc + pop_count + #management_rules + 
+           (1 + management_rules | country) + (1 | year),
          phi ~ hard_coral + turf_algae + macroalgae + bare_substrate + depth + 
           grav_nc + pop_count + management_rules + 
-           (1 | country) + (1 | year),
+           (1 + management_rules | country) + (1 | year),
          zi ~ 1),
       data = focal.scaled,
       family = zero_inflated_beta(),
