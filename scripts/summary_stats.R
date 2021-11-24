@@ -31,3 +31,18 @@ prod_fg %>% filter(nutrient!='vitamin_a.mug') %>%
   group_by(dietP_lab) %>% summarise(se = se(nutprop), nutprop = mean(nutprop)) %>% 
   mutate(lower = nutprop - 2*se, upper = nutprop + 2*se) %>% 
   mutate_if(is.numeric, function(x) round(x*100, 0))
+
+## benthic + threats
+threat<-read.csv('data/threat/sites-threats.csv')  %>% 
+  rename_at(vars(starts_with('andrello')), ~str_replace_all(., 'andrello_', '')) %>% 
+  mutate(nutrient_load = nutrient) 
+
+fish_avg %>% select(hard_coral, turf_algae, macroalgae, bare_substrate) %>% 
+      ungroup() %>% 
+      summarise(across(hard_coral:bare_substrate, ~range(.x, na.rm=TRUE)))
+
+threat %>% select(pop_count, grav_nc) %>% 
+  ungroup() %>% 
+  summarise(across(pop_count:grav_nc, ~range(.x, na.rm=TRUE)))
+
+focal %>% group_by(management_rules) %>% summarise(n_distinct(site))
