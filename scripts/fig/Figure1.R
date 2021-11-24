@@ -26,8 +26,8 @@ fish2l <- fish2 %>% pivot_longer(calcium.mg:vitamin_a.mug, names_to = 'nutrient'
                                'selenium.mug' = 'Selenium', 'vitamin_a.mug' = 'Vitamin A', 'omega3.g' = 'Omega-3\nfatty acids'))
 fish2l$nutrient_lab<-factor(fish2l$nutrient_lab, levels=(unique(fish2l$nutrient_lab)))
 
-gg<-ggplot(fish2, aes(log10(Kmax), nscore, col=dietP_lab)) + 
-  geom_point(size=3.5, pch=21, col='black', aes(fill=dietP_lab)) +
+gg<-ggplot(fish2, aes(log10(Kmax), nscore, col=trophic_lab)) + 
+  geom_point(size=3.5, pch=21, col='black', aes(fill=trophic_lab)) +
   # geom_label_repel(data = fish2 %>% filter(nscore>400), aes(label = species.lab), fontface=1,size=2, show.legend=FALSE) +
   # geom_label_repel(data = fish2 %>% filter(Kmax>0.4), aes(label = species.lab), fontface=1,size=2, show.legend=FALSE) +
   labs(x = 'Derived growth coefficent (Kmax)', y = 'Nutrient density, %') +
@@ -36,18 +36,18 @@ gg<-ggplot(fish2, aes(log10(Kmax), nscore, col=dietP_lab)) +
   theme(legend.position = c(0.8, 0.88), 
         panel.border=element_rect(color='black'),
         axis.line = element_blank()) +
-  scale_fill_manual(values = diet_cols.named) +
-  scale_colour_manual(values = diet_cols.named)
+  scale_fill_manual(values = trophic_cols.named) +
+  scale_colour_manual(values = trophic_cols.named)
 
 gpan<-ggplot(fish2l, aes(log10(Kmax), conc)) +
-  geom_point(size=2.5, pch=21, col='black', aes(fill=dietP_lab)) +
+  geom_point(size=2.5, pch=21, col='black', aes(fill=trophic_lab)) +
   labs(x = 'Derived growth coefficent (Kmax)', y = conc_lab) +
   # scale_x_continuous(breaks=seq(0, 0.6, by = 0.1)) +
   th +
   facet_wrap(~nutrient_lab, scales='free', nrow=5) +
   theme(legend.position = 'right') +
-  scale_fill_manual(values = diet_cols.named) +
-  scale_colour_manual(values = diet_cols.named) +
+  scale_fill_manual(values = trophic_cols.named) +
+  scale_colour_manual(values = trophic_cols.named) +
   geom_smooth(method = 'gam', col='black')
 
 
@@ -58,4 +58,6 @@ dev.off()
 pdf(file = 'fig/FigureS1.pdf', height=8, width=11)
 print(gpan)
 dev.off()
+
+
 
