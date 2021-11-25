@@ -33,7 +33,7 @@ for(i in 1:length(dps)){
                                            hard_coral = min(hard_coral),
                                            turf_algae = max(turf_algae),
                                            macroalgae = 0,
-                                           bare_substrate = 0,
+                                           bare_substrate = max(bare_substrate),
                                            depth = 0,
                                            grav_nc = max(grav_nc),
                                            pop_count = max(pop_count)) %>% 
@@ -48,13 +48,13 @@ meds_open_degraded<-pp %>% #group_by(fg) %>%
 pp<-numeric()
 for(i in 1:length(dps)){
   load(file = paste0('results/mods/', nut.vec[6],'_', dps[i], '_model.Rdata'))
-  pred<-focal.scaled %>% modelr::data_grid(management_rules = 'gear restriction',
+  pred<-focal.scaled %>% modelr::data_grid(management_rules = 'time restriction',
                                            year=2016,
                                            country = 'Fiji',
                                            hard_coral = min(hard_coral),
                                            turf_algae = max(turf_algae),
                                            macroalgae = 0,
-                                           bare_substrate = 0,
+                                           bare_substrate = max(bare_substrate),
                                            depth = 0,
                                            grav_nc = max(grav_nc),
                                            pop_count = max(pop_count)) %>% 
@@ -71,10 +71,10 @@ meds_managed_degraded<-pp %>% #group_by(fg) %>%
 pp<-numeric()
 for(i in 1:length(dps)){
   load(file = paste0('results/mods/', nut.vec[6],'_', dps[i], '_model.Rdata'))
-  pred<-focal.scaled %>% modelr::data_grid(management_rules = 'gear restriction',
+  pred<-focal.scaled %>% modelr::data_grid(management_rules = 'time restriction',
                                            year=2016,
                                            country = 'Fiji',
-                                           hard_coral = max(hard_coral),
+                                           hard_coral = mean(hard_coral),
                                            turf_algae = 0,
                                            macroalgae = min(macroalgae),
                                            bare_substrate = 0,
@@ -96,7 +96,7 @@ for(i in 1:length(dps)){
   pred<-focal.scaled %>% modelr::data_grid(management_rules = 'no-take',
                                            year=2016,
                                            country = 'Fiji',
-                                           hard_coral = max(hard_coral),
+                                           hard_coral = mean(hard_coral),
                                            turf_algae = 0,
                                            macroalgae = min(macroalgae),
                                            bare_substrate = 0,
@@ -113,14 +113,70 @@ meds_remote_intact<-pp %>% #group_by(fg) %>%
 
 mm<-rbind(meds_open_degraded, meds_managed_degraded, meds_managed_intact, meds_remote_intact)
 
-# ggplot(mm, aes(type, med, fill=fg)) + geom_bar(stat='identity')
+trophic.cols<-trophic.cols %>% mutate(fg = FG, FG_lab2 = str_replace_all(FG_lab, '\\ ', '\n'))
+mm<-mm %>% left_join(trophic.cols, by = 'fg') 
+trophic_cols.named2<-setNames(as.character(trophic.cols$col), trophic.cols$FG_lab2)
 
-ggplot(mm %>% filter(type %in% c('Managed, degraded', 'Open, degraded')), 
-        aes(.epred, fill=fg)) + 
-  stat_sample_slabinterval(alpha=0.5, .width=0.5) + facet_wrap(~type)
- 
+pdf(file = 'fig/temp/figure_temp.pdf', height=5, width=5)
+ggplot(mm %>% filter(type %in% c('Managed, intact')), 
+        aes(FG_lab2, .epred, col=FG_lab2, fill=FG_lab2, shape=type)) + 
+  stat_pointinterval(.width=0.95, show_slab=FALSE, scale=0.9, stroke=3, side='left', position = position_dodge(width=0.2)) +
+  scale_colour_manual(values = trophic_cols.named2) +
+  scale_fill_manual(values = trophic_cols.named2) +
+  th + theme(legend.position = 'none') +
+  labs(x = '', y = 'Proportion of nutrient production, %')
 
-meds<-mm %>% filter(type %in% c('Managed, degraded', 'Open, degraded')) %>% 
+ggplot(mm %>% filter(type %in% c('Managed, degraded', 'Managed, intact')), 
+       aes(FG_lab2, .epred, col=FG_lab2, fill=FG_lab2, shape=type)) + 
+  stat_pointinterval(.width=0.95, show_slab=FALSE, scale=0.9, stroke=3, side='left', position = position_dodge(width=0.2)) +
+  scale_colour_manual(values = trophic_cols.named2) +
+  scale_fill_manual(values = trophic_cols.named2) +
+  th + theme(legend.position = 'none') +
+  labs(x = '', y = 'Proportion of nutrient production, %')
+
+dev.off()
+
+## benthic scenario
+ben<-with(fish_avg, data.frame(hard_coral = 40,
+                turf_algae = mean(turf_algae, na.rm=TRUE),
+                macroalgae = 5,
+                bare_substrate = 20,
+                other_benthos = 100 - 40 - 12 - 5 - 20,
+                type = 'Managed, intact'))
+
+
+ben2<-with(fish_avg, data.frame(hard_coral = 5,
+                               turf_algae = 40,
+                               macroalgae = 15,
+                               bare_substrate = 35,
+                               other_benthos = 100-40-35-15 - 5,
+                               type = 'Managed, degraded'))
+
+bens<-rbind(ben,ben2) %>% pivot_longer(-type, names_to = 'benthic', values_to = 'cover') %>% 
+  mutate(benthic=factor(benthic, levels=unique(benthic))) %>% 
+  group_by(type) %>% 
+  arrange(desc(benthic), .by_group=TRUE) %>%
+  mutate(lab.ypos = cumsum(cover) - 0.5*cover)
+
+pdf(file = 'fig/temp/ben_donuts.pdf', height=5, width=6)
+ggplot(bens, aes(x=2, y = cover, fill = benthic)) + geom_bar(stat='identity') + 
+  coord_polar(theta='y', start=0) + facet_wrap(~type) + 
+  theme_void() +
+  geom_text(aes(y = lab.ypos, label = paste0(round(cover,0), "%")), color = "black", fontface='bold', size=3.5)+
+  scale_fill_manual(values = ben_cols.named) +
+  theme(legend.position = 'none') +
+  xlim(0.5, 2.5)
+
+ggplot(bens, aes(x=2, y = cover, fill = benthic)) + geom_bar(stat='identity') + 
+  coord_polar(theta='y', start=0) + facet_wrap(~type) + 
+  theme_void() +
+  # geom_text(aes(y = lab.ypos, label = paste0(round(cover,0), "%")), color = "black", fontface='bold', size=3.5)+
+  scale_fill_manual(values = ben_cols.named) +
+  theme(legend.position = 'none') +
+  xlim(0.5, 2.5)
+dev.off()
+
+meds<-mm %>% 
   group_by(type, fg) %>% 
   summarise(med = median(.epred))
 
@@ -138,12 +194,14 @@ fish2<-fishp %>% group_by(fish_taxon, trophic_group) %>%
 md<-fish2 %>% left_join(meds %>% filter(type=='Managed, degraded'),  by ='fg') %>% 
   filter(!is.na(med)) %>% 
   group_by(nutrient) %>% 
-  summarise(weighted.mean(conc, w = med))
+  summarise(conc = weighted.mean(conc, w = med))
 
-od<-fish2 %>% left_join(meds %>% filter(type=='Open, degraded'),  by ='fg') %>% 
+od<-fish2 %>% left_join(meds %>% filter(type=='Managed, intact'),  by ='fg') %>% 
   filter(!is.na(med)) %>% 
   group_by(nutrient) %>% 
-  summarise(weighted.mean(conc, w = med))
+  summarise(conc = weighted.mean(conc, w = med))
 
 
-pivot_wider(names_from = 'nutrient', values_from ='conc') 
+nuts<-rbind(md, od) %>% left_join(rda %>% mutate(nutrient=nutrient2), by='nutrient') %>% 
+        mutate(rda = conc  / rda_kids * 100)
+

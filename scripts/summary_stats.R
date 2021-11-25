@@ -25,6 +25,9 @@ fish2 %>% filter(Kmax > 1) %>% distinct(fish_taxon,  fish_family, dietP) %>% dat
 source('scripts/fig/Figure2.R')
 prod_fg2 %>% mutate_if(is.numeric, function(x) round(x*100, 0))
 prod_fg %>% mutate_if(is.numeric, function(x) round(x*100, 0)) %>% filter(nutrient=='vitamin_a.mug')
+prod_fg %>% group_by(nutrient) %>% summarise(trophic_lab[which.max(nutprop)])
+prod_fg %>% filter(trophic_lab %in% c('Herbivore (detritivore)', 'Invertivore (mobile)', 'Piscivore')) %>% 
+  group_by(nutrient) %>% summarise(trophic_lab[which.max(nutprop)])
 
 ## excluding vitA
 prod_fg %>% filter(nutrient!='vitamin_a.mug') %>%  
