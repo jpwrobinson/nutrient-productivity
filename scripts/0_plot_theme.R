@@ -24,6 +24,7 @@ trophic.cols<-data.frame(col=c('#fdae61', '#377eb8', '#4d9221', '#d9ef8b', '#beb
                          FG_lab=c("Invertivore (mobile)", 'Piscivore', 'Herbivore (macroalgae)', 'Herbivore (detritivore)', 'Planktivore', 'Omnivore', 'Invertivore (sessile)'))
 
 trophic_cols.named<-setNames(as.character(trophic.cols$col), trophic.cols$FG_lab)
+trophic_cols.named2<-setNames(as.character(trophic.cols$col), trophic.cols$FG)
 
 diet.cols<-data.frame(col=c('#fdae61', '#377eb8',  '#4d9221', '#bebada', '#ffd92f'),
                          dietP=c('Mobile invertivore', 'Piscivore','Herbivores Microvores Detritivores','Planktivore',  'Sessile invertivore'),
@@ -57,6 +58,8 @@ ben.cols<-data.frame(col = c('#498FC9','#9CE5FA','#B6B400','#DEF4AC','#870E00','
                      benthic_lab = c('Hard coral', 'Soft coral', 'Macroalgae', 'Turf algae', 
                                      'Cyanobacteria', 'Crustose coralline algae', 'Rubble', 'Bare substrate', 'Sand', 'Other invertebrates', 
                                      'Seagrass', 'Other'))
+
+ben_cols.named<-setNames(as.character(ben.cols$col), ben.cols$benthic)
 
 seascape_cols<-data.frame(seascape=c('Northwest', 'Southwest', 'Northeast'), 
                           s_col = c('#1b9e77','#d95f02','#7570b3'))

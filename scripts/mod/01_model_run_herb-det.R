@@ -43,7 +43,7 @@ for(i in 1:length(nut.vec)){
 }
 
 pdf(file = paste0('results/betam_posteriors/post_summary_', dp, '.pdf'), height=7, width=12)
-tmast %>% 
+tt %>% 
     ggplot(aes(term, estimate, ymin = conf.low, ymax = conf.high, col=nut)) + 
     geom_hline(yintercept = 0, col='grey', linetype=5) +
     geom_pointrange() + 
