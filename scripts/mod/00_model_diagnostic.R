@@ -5,8 +5,27 @@ pdf(file = paste0('results/betam_posteriors/', nut,'/post_obs_', dp, '.pdf'), he
 print(plot(predict(fit1)[,1], focal.scaled$nutprop, xlim=c(0,1)))
 abline(0,1)
 
-print(ppc_dens_overlay(y = focal.scaled$nutprop,
-                       yrep = posterior_predict(fit1, nsamples = 100)))
+## check posterior predictive with observed
+yrep1 <- posterior_predict(fit1, nsamples = 100)
+yrep2 <- posterior_predict(fit1)
+
+print(
+  ppc_dens_overlay(y = focal.scaled$nutprop,
+                       yrep = yrep1) + th + theme(axis.text.x = element_text(size=14), axis.text.y = element_text(size=14))
+  )
+
+# check accuracy of median posterior prediction
+
+print(
+  ppc_stat(focal.scaled$nutprop, yrep1, stat = 'median')
+  )
+
+## check LOO - where does each y fall in its predictive distribution
+loo1 <- loo(log_lik(fit1), save_psis = TRUE)
+print(
+  ppc_loo_pit_overlay(yrep = yrep2, y = focal.scaled$nutprop, lw = weights(loo1$psis_object, 100)) + ggtitle("LOO-PIT Model 1")
+)
+
 dev.off()
 
 # pareto diagnostic
