@@ -2,7 +2,7 @@ pacman::p_load(tidyverse, skimr, cowplot, here, funk,disco, patchwork, bayesplot
                broom, broom.mixed, rethinking, rstan, brms, tidybayes,emmeans, install=FALSE)
 
 # ## set up model data
-# dp<-'Herbivores Microvores Detritivores'
+# dp<-'herbivore-detritivore'
 # nut<-'calcium.mg'
 
 # Load reef pressure data
@@ -73,12 +73,17 @@ pairs2(focal.scaled %>% ungroup() %>%  select_if(is.numeric))
 fit1 <-
      brm(
       bf(nutprop ~ hard_coral + turf_algae + macroalgae + bare_substrate + depth + 
-          grav_nc + pop_count + #management_rules + 
-           (1 + management_rules | country) + (1 | year),
+          grav_nc + pop_count + (1 + management_rules) + 
+           (1 | country) + (1 | year),
          phi ~ hard_coral + turf_algae + macroalgae + bare_substrate + depth + 
-          grav_nc + pop_count + management_rules + 
-           (1 + management_rules | country) + (1 | year),
+          grav_nc + pop_count + (1 + management_rules) + 
+           (1 | country) + (1 | year),
          zi ~ 1),
+      # prior = c(
+      #   prior(normal(0, 0.5), class = sd, coef = "Intercept", group = "management_rules"),
+      #   prior(normal(0, 0.5), class = sd, coef = "Intercept", group = "country"),
+      #   prior(normal(0, 0.5), class = sd, coef = "Intercept", group = "year")
+      # ),
       data = focal.scaled,
       family = zero_inflated_beta(),
       chains = 4, iter = 5000, warmup = 1000,
