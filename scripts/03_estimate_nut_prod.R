@@ -118,7 +118,8 @@ prod_sp$trophic_lab<-trophic.cols$FG_lab[match(prod_sp$trophic_group, trophic.co
 
 
 # estimate top 20 nutrient productivity species, by nutrient
-prod_top_nut<-prod_sp %>% ungroup() %>% group_by(nutrient) %>% slice_max(nut_prod_day_ha, n=20) %>% 
+prod_top_nut<-prod_sp %>% ungroup() %>% 
+      group_by(nutrient) %>% slice_max(nut_prod_day_ha, n=20) %>% 
       group_by(nutrient, fish_taxon, trophic_group, trophic_lab) %>% 
       summarise(nut_prod_day_ha = mean(nut_prod_day_ha))
 

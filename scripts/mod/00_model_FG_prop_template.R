@@ -1,6 +1,9 @@
 pacman::p_load(tidyverse, skimr, cowplot, here, funk,disco, patchwork, bayesplot,
                broom, broom.mixed, rethinking, rstan, brms, tidybayes,emmeans, install=FALSE)
 
+## Fitting zero-inflated beta bayesian models in brms
+# https://www.andrewheiss.com/blog/2021/11/08/beta-regression-guide/#beta-distributions-and-shape-parameters
+
 # ## set up model data
 # dp<-'herbivore-detritivore'
 # nut<-'calcium.mg'
@@ -72,13 +75,15 @@ pairs2(focal.scaled %>% ungroup() %>%  select_if(is.numeric))
 ## testing multinomial model
 fit1 <-
      brm(
-      bf(nutprop ~ hard_coral + turf_algae + macroalgae + bare_substrate + depth + 
-          grav_nc + pop_count + (1 + management_rules) + 
+      bf(nutprop ~ 0  + hard_coral + turf_algae + macroalgae + bare_substrate + depth + 
+          grav_nc + pop_count + (1 | management_rules) + 
            (1 | country) + (1 | year),
-         phi ~ hard_coral + turf_algae + macroalgae + bare_substrate + depth + 
-          grav_nc + pop_count + (1 + management_rules) + 
+         phi ~ 0  + hard_coral + turf_algae + macroalgae + bare_substrate + depth + 
+          grav_nc + pop_count + (1 | management_rules) + 
            (1 | country) + (1 | year),
-         zi ~ 1),
+         zi ~ 0  + hard_coral + turf_algae + macroalgae + bare_substrate + depth + 
+           grav_nc + pop_count + (1 | management_rules) + 
+           (1 | country) + (1 | year)),
       # prior = c(
       #   prior(normal(0, 0.5), class = sd, coef = "Intercept", group = "management_rules"),
       #   prior(normal(0, 0.5), class = sd, coef = "Intercept", group = "country"),
@@ -86,7 +91,7 @@ fit1 <-
       # ),
       data = focal.scaled,
       family = zero_inflated_beta(),
-      chains = 4, iter = 5000, warmup = 1000,
+      chains = 3, iter = 5000, warmup = 1000,
       cores = 4, seed = 43
     )
 
