@@ -201,7 +201,7 @@ od<-fish2 %>% left_join(meds %>% filter(type=='Managed, intact'),  by ='fg') %>%
   group_by(nutrient) %>% 
   summarise(conc = weighted.mean(conc, w = med))
 
-
+source('scripts/rda_reader.R')
 nuts<-rbind(md, od) %>% left_join(rda %>% mutate(nutrient=nutrient2), by='nutrient') %>% 
         mutate(rda = conc  / rda_kids * 100)
 
