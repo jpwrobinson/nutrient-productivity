@@ -35,8 +35,8 @@ for(i in 1:length(dps)){
                                            macroalgae = 0,
                                            bare_substrate = max(bare_substrate),
                                            depth = 0,
-                                           grav_nc = max(grav_nc),
-                                           pop_count = max(pop_count)) %>% 
+                                           grav_nc = 0,
+                                           pop_count = 0) %>% 
     add_epred_draws(fit1, ndraws=1000, re_formula = NA) %>% 
     mutate(fg = dps[i])
   pp<-rbind(pp, data.frame(pred))
@@ -56,8 +56,8 @@ for(i in 1:length(dps)){
                                            macroalgae = 0,
                                            bare_substrate = max(bare_substrate),
                                            depth = 0,
-                                           grav_nc = max(grav_nc),
-                                           pop_count = max(pop_count)) %>% 
+                                           grav_nc = 0,
+                                           pop_count = 0) %>% 
     add_epred_draws(fit1, ndraws=1000, re_formula = NA) %>% 
     mutate(fg = dps[i])
   pp<-rbind(pp, data.frame(pred))
@@ -74,13 +74,13 @@ for(i in 1:length(dps)){
   pred<-focal.scaled %>% modelr::data_grid(management_rules = 'time restriction',
                                            year=2016,
                                            country = 'Fiji',
-                                           hard_coral = mean(hard_coral),
-                                           turf_algae = 0,
+                                           hard_coral = max(hard_coral),
+                                           turf_algae = min(turf_algae),
                                            macroalgae = min(macroalgae),
-                                           bare_substrate = 0,
+                                           bare_substrate = 1,
                                            depth = 0,
-                                           grav_nc = min(grav_nc),
-                                           pop_count = min(pop_count)) %>% 
+                                           grav_nc = 0,
+                                           pop_count = 0) %>% 
     add_epred_draws(fit1, ndraws=1000, re_formula = NA) %>% 
     mutate(fg = dps[i])
   pp<-rbind(pp, data.frame(pred))
@@ -201,7 +201,7 @@ od<-fish2 %>% left_join(meds %>% filter(type=='Managed, intact'),  by ='fg') %>%
   group_by(nutrient) %>% 
   summarise(conc = weighted.mean(conc, w = med))
 
-
+source('scripts/rda_reader.R')
 nuts<-rbind(md, od) %>% left_join(rda %>% mutate(nutrient=nutrient2), by='nutrient') %>% 
         mutate(rda = conc  / rda_kids * 100)
 
