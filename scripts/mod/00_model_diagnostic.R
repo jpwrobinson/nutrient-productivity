@@ -6,7 +6,7 @@ print(plot(predict(fit1)[,1], focal.scaled$nutprop, xlim=c(0,1)))
 abline(0,1)
 
 ## check posterior predictive with observed
-yrep1 <- posterior_predict(fit1, nsamples = 100)
+yrep1 <- posterior_predict(fit1, ndraws = 100)
 yrep2 <- posterior_predict(fit1)
 
 print(
@@ -43,9 +43,9 @@ print(
 )
 dev.off()
 
-pdf(file = paste0('results/betam_posteriors/', nut,'/management_', dp, '.pdf'), height=7, width=12)
-print(plot(fit1, pars = 'b_management'))
-dev.off()
+# pdf(file = paste0('results/betam_posteriors/', nut,'/management_', dp, '.pdf'), height=7, width=12)
+# print(plot(ranef(fit1, groups='management_rules', prob=0.95)))
+# dev.off()
 
 pdf(file = paste0('results/betam_posteriors/', nut,'/benthic_', dp, '.pdf'), height=7, width=12)
 print(plot(fit1, pars = 'b_turf_algae|b_macroalgae|b_hard_coral|b_bare|b_depth'))
