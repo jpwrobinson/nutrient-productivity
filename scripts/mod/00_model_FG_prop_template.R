@@ -81,9 +81,7 @@ fit1 <-
          phi ~ 0  + hard_coral + turf_algae + macroalgae + bare_substrate + depth + 
           grav_nc + pop_count + (1 | management_rules) + 
            (1 | country) + (1 | year),
-         zi ~ 0  + hard_coral + turf_algae + macroalgae + bare_substrate + depth + 
-           grav_nc + pop_count + (1 | management_rules) + 
-           (1 | country) + (1 | year)),
+         zi ~ 0 + depth + (1 | reef_zone)),
       # prior = c(
       #   prior(normal(0, 0.5), class = sd, coef = "Intercept", group = "management_rules"),
       #   prior(normal(0, 0.5), class = sd, coef = "Intercept", group = "country"),

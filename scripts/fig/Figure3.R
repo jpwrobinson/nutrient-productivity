@@ -53,7 +53,7 @@ for(i in 1:length(dps)){
                                            country = 'Fiji',
                                            hard_coral = min(hard_coral),
                                            turf_algae = max(turf_algae),
-                                           macroalgae = 0,
+                                           macroalgae = max(macroalgae),
                                            bare_substrate = max(bare_substrate),
                                            depth = 0,
                                            grav_nc = 0,
@@ -127,7 +127,7 @@ ggplot(mm %>% filter(type %in% c('Managed, intact')),
   labs(x = '', y = 'Proportion of nutrient production, %')
 
 ggplot(mm %>% filter(type %in% c('Managed, degraded', 'Managed, intact')), 
-       aes(FG_lab2, .epred, col=FG_lab2, fill=FG_lab2, shape=type)) + 
+       aes(FG_lab2, .epred, col=FG_lab2, fill=FG_lab2, shape=fct_rev(type))) + 
   stat_pointinterval(.width=0.95, show_slab=FALSE, scale=0.9, stroke=3, side='left', position = position_dodge(width=0.2)) +
   scale_colour_manual(values = trophic_cols.named2) +
   scale_fill_manual(values = trophic_cols.named2) +

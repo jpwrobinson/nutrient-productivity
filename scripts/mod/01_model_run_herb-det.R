@@ -18,7 +18,7 @@ prod_fg<-prod_fg %>%
   mutate(tnut = sum(nut_prod_day_ha), 
          nutprop = nut_prod_day_ha / tnut) 
 
-nut.vec<-unique(prod_fg$nutrient)
+nut.vec<-unique(prod_fg$nutrient)[6]
 
 # model data
 for(i in 1:length(nut.vec)){
