@@ -12,14 +12,20 @@ fishp %>% group_by(country, site) %>% summarise(n=n_distinct(year)) %>%
 
 
 ## Figure 1 metadata
-fish2<-fishp %>% group_by(fish_taxon, fish_family, dietP, lmax, nscore,
+fish2<-fishp %>% group_by(fish_taxon, fish_family, trophic_group, lmax, nscore,
                           calcium.mg, iron.mg, selenium.mug, zinc.mg, omega3.g, vitamin_a.mug) %>% 
   summarise(Kmax =mean(Kmax)) %>% ungroup() 
 
 cor(fish2$Kmax, fish2$nscore)
 fish2 %>% filter(nscore > 350) %>% summarise(mean(Kmax))
 fish2 %>% filter(nscore < 200 & nscore > 90) %>% summarise(range(Kmax))
-fish2 %>% filter(Kmax > 1) %>% distinct(fish_taxon,  fish_family, dietP) %>% data.frame()
+fish2 %>% filter(log10(Kmax) > 0) %>% distinct(fish_taxon,  fish_family, trophic_group) %>% data.frame()
+
+## top nutrient productivity species
+tops<-c('Pterocaesio tile', 'Caesio teres', 'Chlorurus sordidus', 
+        'Lutjanus gibbus', 'Sparisoma viride')
+
+fish2 %>% filter(fish_taxon %in% tops) %>% mutate(Kmax = log10(Kmax)) %>% data.frame()
 
 ## Figure 2 metadata
 source('scripts/fig/Figure2.R')
