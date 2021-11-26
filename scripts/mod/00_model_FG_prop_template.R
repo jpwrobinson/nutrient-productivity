@@ -91,7 +91,7 @@ fit1 <-
       # ),
       data = focal.scaled,
       family = zero_inflated_beta(),
-      chains = 4, iter = 5000, warmup = 1000,
+      chains = 3, iter = 5000, warmup = 1000,
       cores = 4, seed = 43
     )
 
