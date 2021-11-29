@@ -27,27 +27,6 @@ nut.vec<-unique(prod_fg$nutrient)
 pp<-numeric()
 for(i in 1:length(dps)){
   load(file = paste0('results/mods/', nut.vec[6],'_', dps[i], '_model.Rdata'))
-  pred<-focal.scaled %>% modelr::data_grid(management_rules = 'open-access',
-                                           year=2016,
-                                           country = 'Fiji',
-                                           hard_coral = min(hard_coral),
-                                           turf_algae = max(turf_algae),
-                                           macroalgae = 0,
-                                           bare_substrate = max(bare_substrate),
-                                           depth = 0,
-                                           grav_nc = 0,
-                                           pop_count = 0) %>% 
-    add_epred_draws(fit1, ndraws=1000, re_formula = NA) %>% 
-    mutate(fg = dps[i])
-  pp<-rbind(pp, data.frame(pred))
-}
-meds_open_degraded<-pp %>% #group_by(fg) %>% 
-      # summarise(med = median(.epred)) %>% 
-      mutate(type = 'Open, degraded')
-
-pp<-numeric()
-for(i in 1:length(dps)){
-  load(file = paste0('results/mods/', nut.vec[6],'_', dps[i], '_model.Rdata'))
   pred<-focal.scaled %>% modelr::data_grid(management_rules = 'time restriction',
                                            year=2016,
                                            country = 'Fiji',
@@ -90,28 +69,7 @@ meds_managed_intact<-pp %>% group_by(fg) %>%
       mutate(type = 'Managed, intact')
 
 
-pp<-numeric()
-for(i in 1:length(dps)){
-  load(file = paste0('results/mods/', nut.vec[6],'_', dps[i], '_model.Rdata'))
-  pred<-focal.scaled %>% modelr::data_grid(management_rules = 'no-take',
-                                           year=2016,
-                                           country = 'Fiji',
-                                           hard_coral = mean(hard_coral),
-                                           turf_algae = 0,
-                                           macroalgae = min(macroalgae),
-                                           bare_substrate = 0,
-                                           depth = 0,
-                                           grav_nc = 0,
-                                           pop_count = 0) %>% 
-    add_epred_draws(fit1, ndraws=1000, re_formula = NA) %>% 
-    mutate(fg = dps[i])
-  pp<-rbind(pp, data.frame(pred))
-}
-meds_remote_intact<-pp %>% #group_by(fg) %>% 
-      # summarise(med = median(.epred)) %>% 
-      mutate(type = 'Remote, intact')
-
-mm<-rbind(meds_open_degraded, meds_managed_degraded, meds_managed_intact, meds_remote_intact)
+mm<-rbind(meds_managed_degraded, meds_managed_intact)
 
 trophic.cols<-trophic.cols %>% mutate(fg = FG, FG_lab2 = str_replace_all(FG_lab, '\\ ', '\n'))
 mm<-mm %>% left_join(trophic.cols, by = 'fg') 
@@ -123,6 +81,7 @@ ggplot(mm %>% filter(type %in% c('Managed, intact')),
   stat_pointinterval(.width=0.95, show_slab=FALSE, scale=0.9, stroke=3, side='left', position = position_dodge(width=0.2)) +
   scale_colour_manual(values = trophic_cols.named2) +
   scale_fill_manual(values = trophic_cols.named2) +
+  scale_y_continuous(limits=c(0.1, 0.5)) +
   th + theme(legend.position = 'none') +
   labs(x = '', y = 'Proportion of nutrient production, %')
 
@@ -131,6 +90,7 @@ ggplot(mm %>% filter(type %in% c('Managed, degraded', 'Managed, intact')),
   stat_pointinterval(.width=0.95, show_slab=FALSE, scale=0.9, stroke=3, side='left', position = position_dodge(width=0.2)) +
   scale_colour_manual(values = trophic_cols.named2) +
   scale_fill_manual(values = trophic_cols.named2) +
+  scale_y_continuous(limits=c(0.1, 0.5)) +
   th + theme(legend.position = 'none') +
   labs(x = '', y = 'Proportion of nutrient production, %')
 
