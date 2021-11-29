@@ -1,0 +1,11 @@
+load("/Users/robins64/Documents/git_repos/nut-prod/results/mods/iron.mg_herbivore-detritivore_model.Rdata")
+library(brms)
+fit1
+load("/Users/robins64/Documents/git_repos/nut-prod/results/mods/iron.mg_herbivore-macroalgae_model.Rdata")
+fit1
+head(focal.scaled)
+unique(focal.scaled$reef_type)
+unique(focal.scaled$reef_zone)
+load("/Users/robins64/Documents/git_repos/nut-prod/results/mods/iron.mg_herbivore-detritivore_model.Rdata")
+load("/Users/robins64/Documents/git_repos/nut-prod/results/mods/zinc.mg_herbivore-detritivore_model.Rdata")
+fit1
