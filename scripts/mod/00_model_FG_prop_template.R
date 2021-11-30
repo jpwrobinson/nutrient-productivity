@@ -39,7 +39,7 @@ focal<-left_join(data.frame(prod_fg),
                          hard_coral, macroalgae, turf_algae, bare_substrate, depth, fish_richness),
                 by='site') %>% 
         left_join(threat, by = 'site') %>% 
-        left_join(manage, by = 'site') %>% 
+        # left_join(manage, by = 'site') %>% 
         # recode management_rules
         mutate(management_rules = recode(management_rules, 'periodic closure' = 'time restriction',
                                                             'gear restriction' = 'gear restriction',
@@ -94,3 +94,78 @@ fit1 <-
     )
 
 save(focal, focal.scaled, fit1, file = paste0('results/mods/', nut,'_', dp, '_model.Rdata'))
+
+
+# 
+# focal.scaled<-scaler(focal, 
+#                      ID = c('nutprop','nutrient','nutrient_lab', 'country', 'site','year',
+#                             'trophic_group', 'reef_type', 'reef_zone',
+#                             'management_rules'), cats = FALSE) 
+# 
+# focal2<-focal.scaled %>% 
+#       filter(nutprop>0) %>% 
+#       mutate(trophic_group=str_replace_all(trophic_group, '-', '_')) %>% 
+#       pivot_wider(names_from = 'trophic_group', values_from = 'nutprop') 
+# 
+# Y<-cbind(focal2$herbivore_detritivore, focal2$herbivore_macroalgae, focal2$invertivore_mobile, focal2$invertivore_sessile, 
+#          focal2$piscivore, focal2$omnivore, focal2$planktivore)
+# focal2$Y<-Y
+# 
+# tls<-data.frame(.category = 1:7, trophic_group = unique(focal.scaled$trophic_group))
+# 
+# ## testing multinomial model
+# fit1 <-
+#   brm(
+#     Y ~ hard_coral + turf_algae + macroalgae + bare_substrate + depth + 
+#          grav_nc + pop_count + (1 | management_rules) + 
+#          (1 | country) + (1 | year),
+#     data = focal2,
+#     family = dirichlet(),
+#     chains = 3, iter = 5000, warmup = 1000,
+#     cores = 4, seed = 43
+#   )
+# 
+# pred<-focal2 %>% modelr::data_grid(
+#                                          management_rules,
+#                                          year=2016,
+#                                          country = 'Fiji',
+#                                          hard_coral = 0,
+#                                          turf_algae = 0,
+#                                          macroalgae = 0,
+#                                          bare_substrate = 0,
+#                                          depth = 0,
+#                                          grav_nc = 0,
+#                                          pop_count = 0) %>% 
+#   add_epred_draws(fit1, ndraws=1000, re_formula = NA) 
+# 
+# pred$trophic_group<-tls$trophic_group[match(pred$.category, tls$.category)]
+# 
+# 
+# ggplot(pred,
+#        aes(management_rules, .epred, col=trophic_group, fill=trophic_group)) + 
+#   stat_pointinterval(.width=0.95, show_slab=FALSE, scale=0.9, stroke=3, side='left', position = position_dodge(width=0.2)) +
+#   # scale_y_continuous(limits=c(0.1, 0.5)) +
+#   theme(legend.position = 'none') +
+#   labs(x = '', y = 'Proportion of nutrient production, %')
+# 
+# 
+# pred2<-focal2 %>% modelr::data_grid(
+#                                    management_rules = 'time restriction',
+#                                    year=2016,
+#                                    country = 'Fiji',
+#                                    hard_coral = seq(min(focal2$hard_coral), max(focal2$hard_coral), length.out=30),
+#                                    turf_algae = 0,
+#                                    macroalgae = 0,
+#                                    bare_substrate = 0,
+#                                    depth = 0,
+#                                    grav_nc = 0,
+#                                    pop_count = 0) %>% 
+#   add_epred_draws(fit1, ndraws=1000, re_formula = NA)
+# pred2$trophic_group<-tls$trophic_group[match(pred2$.category, tls$.category)]
+# 
+# ggplot(pred2,
+#        aes(hard_coral, .epred, col=trophic_group, fill=trophic_group)) + 
+#   stat_lineribbon(.width=0.95) +
+#   # scale_y_continuous(limits=c(0.1, 0.5)) +
+#   theme(legend.position = 'none') +
+#   labs(x = '', y = 'Proportion of nutrient production, %')
