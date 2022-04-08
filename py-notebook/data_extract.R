@@ -9,7 +9,7 @@
 # devtools::load_all('../local-reef-pressures') ## fails
 threat<-read.csv('data/threat/sites-threats.csv')  %>% 
   rename_at(vars(starts_with('andrello')), ~str_replace_all(., 'andrello_', '')) %>% 
-  mutate(nutrient_load = nutrient) 
+  mutate(nutrient_load = nutrient, id2=paste(site, country, sep='_')) 
 
 # get country averages for filling
 threat_co<-threat %>% group_by(country) %>% summarise_at(vars(grav_nc:nutrient_load), mean, na.rm=TRUE)
@@ -29,12 +29,12 @@ threat$pop_count<-log10(threat$pop_count+1)
 manage<-read.csv(file = 'data/wcs/mermaid_management_clean.csv') %>% select(-country)
 
 # join prod estimates with benthic + fishing covariates
-focal<-left_join(data.frame(prod_fg), 
+focal<-left_join(data.frame(prod_fg) %>% mutate(id2=paste(site, country, sep='_')), 
                  fish_avg %>% ungroup() %>%  
                    select(site, reef_type, reef_zone, management_rules, 
-                          hard_coral, macroalgae, turf_algae, bare_substrate, depth, fish_richness),
-                 by='site') %>% 
-  left_join(threat, by = 'site') %>% 
+                          hard_coral, macroalgae, turf_algae, bare_substrate, depth, fish_richness, id2),
+                 by='id2') %>% 
+  left_join(threat, by = 'id2') %>% 
   # left_join(manage, by = 'site') %>% 
   # recode management_rules
   mutate(management_rules = recode(management_rules, 'periodic closure' = 'time restriction',
@@ -62,7 +62,7 @@ focal$nutprop[focal$nutprop==1]<-0.99
 ## scale numeric, pivot wider
 source('scripts/scaler.R')
 focal.scaled<-scaler(focal, 
-                     ID = c('nutprop','nutrient','nutrient_lab', 'country', 'site','year',
+                     ID = c('nutprop','nutrient','nutrient_lab', 'country', 'site','year','id2',
                             'trophic_group', 'reef_type', 'reef_zone',
                             'management_rules'), cats = FALSE) %>% 
               pivot_wider(names_from = trophic_group, values_from = nutprop)
