@@ -35,6 +35,7 @@ for(i in 1:length(nut.vec)){
 
 test<-read.csv('py-notebook/zinc.mg_unscaled.csv')
 hist(test$depth)
+pairs2(test[,c(6:9, 12, 14:17)])
 
 
 
