@@ -58,11 +58,13 @@ for(i in 1:length(covs)){
   post$hi<-hi$mu
   
   g<-ggplot(post, aes(X_raw, mu)) + 
-    geom_ribbon(aes(ymin = lo, ymax = hi, group=fg), alpha=0.5, fill='grey90') +
-    geom_line(aes(col=fg)) +
     labs(x = covs[i], y = 'Proportion zinc production', subtitle = covs[i]) +
     facet_wrap(~fg)
-  print(g)
+  
+  if(covs[i]!='manage'){print(g + geom_ribbon(aes(ymin = lo, ymax = hi, group=fg), alpha=0.5, fill='grey90') +
+          geom_line(aes(col=fg)))} else {
+            print(g + geom_pointrange(aes(ymin = lo, ymax = hi, col=fg)))
+          }
 }
 
 dev.off()
