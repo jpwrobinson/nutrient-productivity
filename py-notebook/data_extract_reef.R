@@ -31,7 +31,7 @@ threat$nutrient_load<-log10(threat$nutrient_load+1)
 manage<-read.csv(file = 'data/wcs/mermaid_management_clean.csv') %>% select(-country)
 
 # join prod estimates with benthic + fishing covariates
-focal<-left_join(data.frame(prod_fg) %>% mutate(id2=paste(site, country, sep='_')), 
+focal<-left_join(data.frame(prod_reef) %>% mutate(id2=paste(site, country, sep='_')), 
                  fish_avg %>% ungroup() %>%  
                    select(site, reef_type, reef_zone, management_rules, 
                           hard_coral, macroalgae, turf_algae, bare_substrate, depth, fish_richness, id2),
@@ -49,7 +49,7 @@ focal<-left_join(data.frame(prod_fg) %>% mutate(id2=paste(site, country, sep='_'
   # left_join(threat, by = 'site') %>% ungroup() ## lots of sites missing, incl. all of Belize
   mutate_if(is.character, as.factor) %>% 
   select(
-    nutprop, nutrient, nutrient_lab, country, site, year, fg, 
+    nut_turnover, biomass_kgha, nutrient, nutrient_lab, country, site, year, 
     hard_coral, macroalgae, turf_algae, bare_substrate, reef_type, reef_zone, depth,
     management_rules, grav_nc, sediment, nutrient_load, pop_count) %>%  
   filter(nutrient==nut) %>% 
@@ -57,18 +57,16 @@ focal<-left_join(data.frame(prod_fg) %>% mutate(id2=paste(site, country, sep='_'
 # gears_category = fct_relevel(gears_category, 'None', after=0),
 # times_category = fct_relevel(times_category, 'None', after=0)) ## open-access is reference level
 
-## check reponse hist, bounded 0 - 1
-hist(focal$nutprop, main = nut, xlab = 'Proportion of productivity')
-focal$nutprop[focal$nutprop==1]<-0.99
+## check reponse hist
+hist(focal$nut_turnover, main = nut, xlab = 'Nutrient turnover, %')
 
 ## scale numeric, pivot wider
 source('scripts/scaler.R')
 focal.scaled<-scaler(focal, 
-                     ID = c('nutprop','nutrient','nutrient_lab', 'country', 'site','year','id2',
-                            'fg', 'reef_type', 'reef_zone',
-                            'management_rules'), cats = FALSE) %>% 
-              pivot_wider(names_from = fg, values_from = nutprop)
+                     ID = c('biomass_kgha','nut_turnover', 'nutrient','nutrient_lab',
+                            'country', 'site','year','id2',
+                             'reef_type', 'reef_zone',
+                            'management_rules'), cats = FALSE) 
 
-write.csv(focal %>% pivot_wider(names_from = fg, values_from = nutprop), 
-          file = paste0('py-notebook/', nut, '_unscaled.csv'))
-write.csv(focal.scaled, file = paste0('py-notebook/', nut, '_scaled.csv'))
+write.csv(focal, file = paste0('py-notebook/', nut, '_reef_unscaled.csv'))
+write.csv(focal.scaled, file = paste0('py-notebook/', nut, '_reef_scaled.csv'))
