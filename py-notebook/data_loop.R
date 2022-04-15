@@ -19,10 +19,10 @@ prod_fg<-prod_fg %>%
 focal<-read.csv('py-notebook/zinc.mg_scaled.csv') %>% 
     pivot_longer(herbivore.detritivore:planktivore, names_to = 'fg', values_to = 'nutprop')
 ggplot(focal, aes(nutprop)) + geom_histogram() + facet_wrap(~fg)
-ggplot(focal, aes(depth, nutprop, col=fg)) + geom_point() + geom_smooth()
-ggplot(focal, aes(grav_nc, nutprop, col=fg)) + geom_point() + geom_smooth()
-ggplot(focal, aes(fg, nutprop, fill=fg)) + geom_boxplot() + facet_wrap(~country)
-focal %>% group_by(fg) %>% summarise(median(nutprop), min(nutprop), max(nutprop))
+# ggplot(focal, aes(depth, nutprop, col=fg)) + geom_point() + geom_smooth()
+# ggplot(focal, aes(grav_nc, nutprop, col=fg)) + geom_point() + geom_smooth()
+# ggplot(focal, aes(fg, nutprop, fill=fg)) + geom_boxplot() + facet_wrap(~country)
+# focal %>% group_by(fg) %>% summarise(median(nutprop), min(nutprop), max(nutprop))
 
 nut.vec<-unique(prod_fg$nutrient)
 
@@ -36,15 +36,3 @@ for(i in 1:length(nut.vec)){
 test<-read.csv('py-notebook/zinc.mg_unscaled.csv')
 hist(test$depth)
 pairs2(test[,c(6:9, 12, 14:17)])
-
-
-
-unique(rowSums(focal.scaled[,c(18:23)]))
-
-pairs2(focal.scaled[,c(18:23)])
-
-tt<-prod_fg %>% filter(trophic_group=='planktivore') %>% 
-  ungroup() %>% 
-  select(site, year, country, nutrient, nutprop, prod_g_day_ha) %>% 
-  pivot_wider(names_from = nutrient, values_from = nutprop)
-pairs2(tt[,-c(1:3)])
