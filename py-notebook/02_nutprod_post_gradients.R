@@ -17,14 +17,20 @@ covs<-c('gravity',
         'macroalgae',
         'bare_substrate',
         'turf',
-        'manage')
+        'manage',
+        'pop',
+        'sediment',
+        'nut_load')
 
 covs2<-c('grav_nc',
         'hard_coral',
         'macroalgae',
         'bare_substrate',
         'turf_algae',
-        'management_rules')
+        'management_rules',
+        'pop_count', 
+        'sediment', 
+        'nutrient_load')
 
 pdf(file = 'fig/model/posterior_predicted.pdf', height=7, width=12)
 
