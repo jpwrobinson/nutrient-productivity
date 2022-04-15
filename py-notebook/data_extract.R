@@ -22,8 +22,10 @@ threat$pop_count[is.na(threat$pop_count)]<-threat_co$pop_count[match(threat$coun
 threat<-threat %>% select(-country, -nutrient)
 
 ## transform skwewed predictors
-threat$grav_nc<-log10(threat$grav_nc+1)
+threat$grav_nc<-log10(threat$grav_nc)
 threat$pop_count<-log10(threat$pop_count+1)
+threat$sediment<-log10(threat$sediment+1)
+threat$nutrient_load<-log10(threat$nutrient_load+1)
 
 # management
 manage<-read.csv(file = 'data/wcs/mermaid_management_clean.csv') %>% select(-country)
