@@ -7,6 +7,11 @@ load(file = 'results/wcs_productivity.rds')
 
 fishp$trophic_group[fishp$fish_taxon=='Herklotsichthys quadrimaculatus']<-'Planktivore'
 
+fishp$fg<-fishp$functional_group
+fishp$fg[fishp$fg %in% c('corallivore', 'spongivore')]<-'invertivore-sessile'
+fishp$fg[fishp$fg %in% c('scraper', 'excavator')]<-'scraper-excavator'
+fishp$fg[fishp$fg %in% c('pisci-invertivore', 'macro-invertivore', 'micro-invertivore')]<-'invertivore-mobile'
+
 prod<-fishp %>% 
     pivot_longer(calcium.mg:vitamin_a.mug, names_to = 'nutrient', values_to = 'conc') %>% 
     mutate(nut_prod_day_ha = conc / 100 * prod_g_day_ha * 0.87,
@@ -34,13 +39,13 @@ prod_reef<-prod %>% group_by(country, fish_taxon, trophic_group, dietP, manageme
       mutate(nut_turnover = nut_prod_day_ha / nut_biomass_kgha,
          biomass_turnover = prod_day_ha / biomass_kgha) 
 
-ggplot(prod_reef, aes(nut_prod_day_ha, nut_turnover)) + geom_point() + facet_wrap(~nutrient, scales='free') +
-      stat_smooth(method='gam')
-ggplot(prod_reef, aes(prod_day_ha, biomass_turnover)) + geom_point() + facet_wrap(~nutrient, scales='free') +
-  stat_smooth(method='gam')
-ggplot(prod_reef, aes(biomass_kgha, biomass_turnover)) + geom_point() + facet_wrap(~nutrient, scales='free') +
-  stat_smooth(method='gam')
-ggplot(prod_reef, aes(biomass_kgha, nut_turnover)) + geom_point() + facet_wrap(~nutrient, scales='free')
+# ggplot(prod_reef, aes(nut_prod_day_ha, nut_turnover)) + geom_point() + facet_wrap(~nutrient, scales='free') +
+#       stat_smooth(method='gam')
+# ggplot(prod_reef, aes(prod_day_ha, biomass_turnover)) + geom_point() + facet_wrap(~nutrient, scales='free') +
+#   stat_smooth(method='gam')
+# ggplot(prod_reef, aes(biomass_kgha, biomass_turnover)) + geom_point() + facet_wrap(~nutrient, scales='free') +
+#   stat_smooth(method='gam')
+# ggplot(prod_reef, aes(biomass_kgha, nut_turnover)) + geom_point() + facet_wrap(~nutrient, scales='free')
 
 
 pdf(file = 'fig/explore/wcs_nutrient_prod_reef.pdf', height=7, width=12)
@@ -90,25 +95,25 @@ prod_sp<-prod %>%
 prod_fg<-prod %>% 
   mutate(id = paste(site, year, sep = '_')) %>% 
   ## transect level: total metric by diet group
-  group_by(country, site, year, id, transect_number,trophic_group, nutrient) %>% 
+  group_by(country, site, year, id, transect_number,fg, nutrient) %>% 
   summarise(
     nut_prod_day_ha = sum(nut_prod_day_ha), 
     nut_biomass_kgha = sum(nut_biomass_kgha),
     prod_g_day_ha = sum(prod_g_day_ha),
     biomass_kgha = sum(biomass_kgha)) %>% 
   ungroup() %>% 
-  group_by(country, site,year,trophic_group, nutrient) %>% 
+  group_by(country, site,year,fg, nutrient) %>% 
   summarise(
     nut_prod_day_ha = mean(nut_prod_day_ha), 
     nut_biomass_kgha = mean(nut_biomass_kgha),
     prod_g_day_ha = mean(prod_g_day_ha),
     biomass_kgha = mean(biomass_kgha)) %>% 
   group_by(nutrient, country, year) %>%
-  complete(site,trophic_group,
+  complete(site,fg,
            fill = list(nut_prod_day_ha = 0, nut_biomass_kgha = 0, prod_g_day_ha =0, biomass_kgha = 0))  
 
 ## Rows are filled with zeroes if FG were not observed at a site
-prod_fg %>% group_by(site, country, year) %>% summarise(n_distinct(trophic_group))
+prod_fg %>% group_by(site, country, year) %>% summarise(n_distinct(fg))
   
 ## labelling for plots
 prod_sp$trophic_lab<-trophic.cols$FG_lab[match(prod_sp$trophic_group, trophic.cols$FG)]
