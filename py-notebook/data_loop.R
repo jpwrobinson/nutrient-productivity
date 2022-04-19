@@ -14,7 +14,9 @@ prod_fg<-prod_fg %>%
   filter(!fg %in% c('invertivore-sessile', 'detritivore')) %>% 
   group_by(country, site, year, nutrient,nutrient_lab) %>% 
   mutate(tnut = sum(nut_prod_day_ha), 
-         nutprop = nut_prod_day_ha / tnut) 
+         nutprop = nut_prod_day_ha / tnut,
+         tprod = sum(prod_g_day_ha),
+         prodprop = prod_g_day_ha / tprod) 
 
 prod_reef<-prod_reef %>% 
   mutate(nutrient_lab = recode(nutrient, 'calcium.mg' = 'Calcium', 'iron.mg' = 'Iron', 'zinc.mg' = 'Zinc',
@@ -29,6 +31,10 @@ for(i in 1:length(nut.vec)){
   print(paste('Data mangle + scale for', nut))
   source('py-notebook/data_extract.R')
 }
+
+## productivity only
+nut = 'productivity'
+source('py-notebook/data_extract.R')
 
 # model data - extract for reef
 for(i in 1:length(nut.vec)){
