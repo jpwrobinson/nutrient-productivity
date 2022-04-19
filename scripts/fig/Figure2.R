@@ -4,15 +4,20 @@ source('scripts/0_plot_theme.R')
 
 load(file = 'results/wcs_productivity.rds')
 load(file = 'results/wcs_nut_prod.rds')
-fishp$dietP_lab<-diet.cols$dietP_lab[match(fishp$dietP, diet.cols$dietP)]
-fishp$trophic_lab<-trophic.cols$FG_lab[match(fishp$trophic_group, trophic.cols$FG)]
-prod_fg$trophic_lab<-trophic.cols$FG_lab[match(prod_fg$trophic_group, trophic.cols$FG)]
+
+# fishp$trophic_lab<-trophic.cols$FG_lab[match(fishp$trophic_group, trophic.cols$FG)]
+# prod_fg$trophic_lab<-trophic.cols$FG_lab[match(prod_fg$trophic_group, trophic.cols$FG)]
+
+fishp$fg_lab<-fg.cols$FG_lab[match(fishp$fg, fg.cols$FG)]
+prod_sp$fg_lab<-fg.cols$FG_lab[match(prod_sp$fg, fg.cols$FG)]
+prod_fg$fg_lab<-fg.cols$FG_lab[match(prod_fg$fg, fg.cols$FG)]
 
 prod_sp<-prod_sp %>% group_by(nutrient, country) %>% 
             # arrange((nut_prod_day_ha))  %>% 
             mutate(tnut = sum(nut_prod_day_ha), nutprop = nut_prod_day_ha / tnut * 100) %>% 
             mutate(nutrient_lab = recode(nutrient, 'calcium.mg' = 'Calcium', 'iron.mg' = 'Iron', 'zinc.mg' = 'Zinc',
                                      'selenium.mug' = 'Selenium', 'vitamin_a.mug' = 'Vitamin A', 'omega3.g' = 'Omega-3\nfatty acids'))
+
 
 prod_fg<-prod_fg %>% 
                   mutate(nutrient_lab = recode(nutrient, 'calcium.mg' = 'Calcium', 'iron.mg' = 'Iron', 'zinc.mg' = 'Zinc',
@@ -22,12 +27,12 @@ prod_fg<-prod_fg %>%
                   arrange((nut_prod_day_ha))  %>% 
                   mutate(tnut = sum(nut_prod_day_ha), 
                          nutprop = nut_prod_day_ha / tnut * 100) %>% 
-                  group_by(trophic_lab, nutrient, nutrient_lab) %>% 
+                  group_by(fg_lab, nutrient, nutrient_lab) %>% 
                   summarise(nutprop = mean(nutprop)) %>% 
-                  mutate(id = paste(trophic_lab, nutrient))
+                  mutate(id = paste(fg_lab, nutrient))
 
 prod_fg_country<-prod_sp %>% 
-  group_by(country, trophic_lab,nutrient,nutrient_lab) %>% 
+  group_by(country, fg_lab,nutrient,nutrient_lab) %>% 
   summarise(
     nut_prod_day_ha = sum(nut_prod_day_ha),
     prod_g_day_ha = sum(prod_g_day_ha),
@@ -38,17 +43,17 @@ prod_fg_country<-prod_sp %>%
   mutate(tnut = sum(nut_prod_day_ha), nutprop = nut_prod_day_ha / tnut * 100)
 
 ## average across nutrients for panel A
-prod_fg2<-prod_fg %>% group_by(trophic_lab) %>% summarise(se = funk::se(nutprop), nutprop = mean(nutprop)) %>% 
+prod_fg2<-prod_fg %>% group_by(fg_lab) %>% summarise(se = funk::se(nutprop), nutprop = mean(nutprop)) %>% 
         mutate(lower = nutprop - 2*se, upper = nutprop + 2*se)
 
 ## average nut contr by country + nutrient
-prod_fg_co<-prod_fg_country %>% group_by(nutrient,nutrient_lab, country, trophic_lab) %>% 
+prod_fg_co<-prod_fg_country %>% group_by(nutrient,nutrient_lab, country, fg_lab) %>% 
   summarise(se = funk::se(nutprop), nutprop = mean(nutprop)) %>% 
   mutate(lower = nutprop - 2*se, upper = nutprop + 2*se)
 
 prod_fg_co_biom<-prod_fg_country %>% filter(nutrient=='calcium.mg') %>% 
         group_by(country) %>% mutate(tb = sum(biomass_kgha), tp = sum(prod_g_day_ha)) %>% 
-        group_by(tb, tp, country, trophic_lab) %>% 
+        group_by(tb, tp, country, fg_lab) %>% 
         summarise(biomass = sum(biomass_kgha), prod = sum(prod_g_day_ha)) %>% 
         mutate('Standing biomass' = biomass / tb * 100, 
                'Daily productivity' = prod / tp * 100) %>% 
@@ -75,8 +80,8 @@ prod_reef$country<-factor(prod_reef$country, levels = meds$country)
 # 
 
 # plabs<-c('Herbivore/detritivore zinc.mg', 'Herbivore/detritivore vitamin_a.mug', 'Invertivore (mobile) vitamin_a.mug')
-g1<-ggplot(prod_fg, aes(fct_reorder(trophic_lab, nutprop),nutprop, fill=trophic_lab),col='black') + 
-  # geom_segment(aes(x = fct_reorder(trophic_lab, nut_prod_day_ha), xend =fct_reorder(trophic_lab, nut_prod_day_ha), y =-Inf, yend = nut_prod_day_ha), col='grey') +
+g1<-ggplot(prod_fg, aes(fct_reorder(fg_lab, nutprop),nutprop, fill=fg_lab),col='black') + 
+  # geom_segment(aes(x = fct_reorder(fg_lab, nut_prod_day_ha), xend =fct_reorder(fg_lab, nut_prod_day_ha), y =-Inf, yend = nut_prod_day_ha), col='grey') +
   geom_jitter(size=2, pch=21, width = 0.25) +
   geom_pointrange(data = prod_fg2, aes(ymin = lower, ymax = upper), size=1.5, pch=21) +
   # geom_label_repel(data = prod_fg %>% filter(id %in% plabs), aes(label=nutrient_lab), fill='white', size=2) +
@@ -87,7 +92,7 @@ g1<-ggplot(prod_fg, aes(fct_reorder(trophic_lab, nutprop),nutprop, fill=trophic_
   scale_y_continuous(breaks=seq(0, 0.8, by = 0.1), labels=seq(0, 80, by = 10)) +
   labs(x = '', y = "Mean proportion of nutrient productivity, %") 
 
-g2<-ggplot(prod_fg_co, aes(nutrient_lab, nutprop, fill=trophic_lab)) + 
+g2<-ggplot(prod_fg_co, aes(nutrient_lab, nutprop, fill=fg_lab)) + 
   geom_bar(stat='identity') +
   coord_flip() +
   theme(legend.position = 'none') +
@@ -111,7 +116,7 @@ g3<-ggplot(prod_reef %>% filter(nutrient == 'calcium.mg') %>% mutate(x = log10(b
         th
 
 ## sup fig
-g4<-ggplot(prod_sp, aes(log10(biomass_kgha), nutprop, col=trophic_lab)) + 
+g4<-ggplot(prod_sp, aes(log10(biomass_kgha), nutprop, col=fg_lab)) + 
   geom_point(alpha=0.8, size=1.5) + facet_wrap(~nutrient, scales='free') +
   scale_color_manual(values = trophic_cols.named) +
   labs(x = 'Log10 biomass, kg ha-1', y = 'Proportion of total nutrient productivity, %') +

@@ -13,13 +13,13 @@ fish<-read.csv('data/wcs/wcs_nutrients_individuals.csv') %>%
     mutate(dietP = diet) %>% 
     filter(!is.na(biomass_kgha)) %>%  ## 1 fish in Belize with no L-W conversion
     filter(!is.na(lmax)) %>%  ## 0.6% of biomass / 1.4% abundance dropped
-    filter(size >= 10 & lmax >= 6) %>% ## 1.34% of biomass dropped
+    filter(size >= 5) %>% ## 0.01% of biomass dropped
     filter(!fish_taxon %in% c('Herklotsichthys quadrimaculatus', 'Gnathodentex aureolineatus', 'Lutjanus malabaricus')) %>% 
     filter(!fish_family %in% c('Pomacentridae')) %>% ## 0.35% of biomass dropped [50 species]
     filter(!fish_family %in% c('Ginglymostomatidae', 'Myliobatidae', 'Dasyatidae', 'Carcharhinidae')) ## 5.9% of biomass dropped [8 species]
     
 summary(fish$size)
-#min = 10 cm, max = 280 cm, median = 17.5cm
+#min = 5 cm, max = 280 cm, median = 18.0cm
 
 hist(fish$size)
 hist(log10(fish$size))
@@ -27,8 +27,8 @@ hist(log10(fish$size))
 ##--------------------------------------------------##
 # 1. Check if any individuals are larger than species max size:
 ##--------------------------------------------------##
-fish %>% filter(size >= lmax) %>% dim() ## 913 observations
-fish %>% filter(size >= lmax) %>% summarise(sum(count)) ## 2700 fishes
+fish %>% filter(size >= lmax) %>% dim() ## 757 observations
+fish %>% filter(size >= lmax) %>% summarise(sum(count)) ## 1714 fishes
 
 # These need to be reduced to equal lmax (prod= exactly 0) 
 # OR 0.1cm below lmax (tiny prod values)
@@ -159,6 +159,13 @@ fishp<-fishp %>% mutate(
 
 with(fishp, plot(prod_cm_day_perfish, prod_g_day_perfish))
 with(fishp, plot(log10(prod_cm_day_perfish), log10(prod_g_day_perfish)))
+
+fishp$trophic_group[fishp$fish_taxon=='Herklotsichthys quadrimaculatus']<-'planktivore'
+
+fishp$fg<-fishp$functional_group
+fishp$fg[fishp$fg %in% c('corallivore', 'spongivore')]<-'invertivore-sessile'
+fishp$fg[fishp$fg %in% c('scraper', 'excavator')]<-'scraper-excavator'
+fishp$fg[fishp$fg %in% c('pisci-invertivore', 'macro-invertivore', 'micro-invertivore')]<-'invertivore-mobile'
 
 save(fishp, file = 'results/wcs_productivity.rds')
 
