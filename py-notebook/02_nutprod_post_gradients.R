@@ -32,7 +32,19 @@ covs2<-c('grav_nc',
         'sediment', 
         'nutrient_load')
 
-pdf(file = 'fig/model/posterior_predicted.pdf', height=7, width=12)
+managecovs<-c('access restrictionFiji',
+               'access restrictionSolomon Islands',
+               'gear restrictionBelize',
+               'gear restrictionMadagascar',
+               'no-takeBelize',
+               'no-takeFiji',
+               'no-takeMadagascar',
+               'no-takeSolomon Islands',
+               'open-accessMadagascar',
+               'time restrictionFiji',
+               'time restrictionSolomon Islands')
+
+pdf(file = 'fig/model/posterior_predicted.pdf', height=5, width=12)
 
 for(i in 1:length(covs)){
   post<-read.csv(paste0('py-notebook/zinc_posterior_', covs[i],'.csv'))
@@ -42,11 +54,7 @@ for(i in 1:length(covs)){
     post$X<-seq(min(S), max(S), length.out=100)
     post$X_raw<-seq(min(focal[,covs2[i]]), max(focal[,covs2[i]]), length.out=100)
   } else {
-    post$X<-c('access restriction',
-              'gear restriction',
-              'no-take',
-              'open-access',
-              'time restriction')
+    post$X<-managecovs
     post$X_raw<-post$X
     }
   
@@ -65,11 +73,11 @@ for(i in 1:length(covs)){
   
   g<-ggplot(post, aes(X_raw, mu)) + 
     labs(x = covs[i], y = 'Proportion zinc production', subtitle = covs[i]) +
-    facet_wrap(~fg)
+    facet_grid(~fg)
   
   if(covs[i]!='manage'){print(g + geom_ribbon(aes(ymin = lo, ymax = hi, group=fg), alpha=0.5, fill='grey90') +
           geom_line(aes(col=fg)))} else {
-            print(g + geom_pointrange(aes(ymin = lo, ymax = hi, col=fg)))
+            print(g + geom_pointrange(aes(ymin = lo, ymax = hi, col=X)))
           }
 }
 
