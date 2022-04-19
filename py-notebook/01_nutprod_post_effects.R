@@ -2,7 +2,7 @@
 
 posts<-read.csv('py-notebook/zinc_posterior_summary.csv') %>% 
       mutate(var = str_split_fixed(X, '\\[', 2)[,1]) %>% 
-      filter(!var %in% c('intercept', 'alpha', 'β0_c')) %>% 
+      filter(!var %in% c('intercept', 'alpha', 'β0_cnc', 'β0_managenc')) %>% 
       mutate(varname = str_split_fixed(varname, '\\[', 2)[,1],
              varnum=as.numeric(factor(var)))
 
