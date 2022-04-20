@@ -61,7 +61,8 @@ prod_fg_co_biom<-prod_fg_country %>% filter(nutrient=='calcium.mg') %>%
         mutate(nutrient_lab = nutrient)
 
 prod_fg_co<-rbind(prod_fg_co, prod_fg_co_biom) 
-prod_fg_co$trophic_lab<-factor(prod_fg_co$trophic_lab, levels=rev(unique(prod_fg_co$trophic_lab)[c(7,2,1,4,3,5,6)]))
+# prod_fg_co$trophic_lab<-factor(prod_fg_co$trophic_lab,levels=rev(unique(prod_fg_co$trophic_lab)[c(7,2,1,4,3,5,6)]))
+prod_fg_co$fg_lab<-factor(prod_fg_co$fg_lab,levels=rev(unique(prod_fg_co$fg_lab)[c(8,3,4,6,2,1,5,7,9)]))
 prod_fg_co$nutrient_lab<-factor(prod_fg_co$nutrient_lab, levels=rev(unique(prod_fg_co$nutrient_lab)[c(7,8,1,2,4,6,3,5)]))
 
 ## rank country by median biomass
@@ -87,8 +88,8 @@ g1<-ggplot(prod_fg, aes(fct_reorder(fg_lab, nutprop),nutprop, fill=fg_lab),col='
   # geom_label_repel(data = prod_fg %>% filter(id %in% plabs), aes(label=nutrient_lab), fill='white', size=2) +
   coord_flip() +
   th + theme(legend.position = 'none') +
-  scale_fill_manual(values = trophic_cols.named)  +
-  scale_color_manual(values = trophic_cols.named) +
+  scale_fill_manual(values = fg_cols.named2)  +
+  scale_color_manual(values = fg_cols.named2) +
   scale_y_continuous(breaks=seq(0, 0.8, by = 0.1), labels=seq(0, 80, by = 10)) +
   labs(x = '', y = "Mean proportion of nutrient productivity, %") 
 
@@ -97,7 +98,7 @@ g2<-ggplot(prod_fg_co, aes(nutrient_lab, nutprop, fill=fg_lab)) +
   coord_flip() +
   theme(legend.position = 'none') +
   labs(x = '', y = 'Proportion of assemblage biomass, productivity or nutrient production, %') +
-  scale_fill_manual(values = trophic_cols.named) +
+  scale_fill_manual(values = fg_cols.named2) +
   scale_color_manual(values = 'white') +
   scale_y_continuous(expand=c(0,0)) +
   facet_grid(~country, scales='free') + th +
@@ -118,7 +119,7 @@ g3<-ggplot(prod_reef %>% filter(nutrient == 'calcium.mg') %>% mutate(x = log10(b
 ## sup fig
 g4<-ggplot(prod_sp, aes(log10(biomass_kgha), nutprop, col=fg_lab)) + 
   geom_point(alpha=0.8, size=1.5) + facet_wrap(~nutrient, scales='free') +
-  scale_color_manual(values = trophic_cols.named) +
+  scale_color_manual(values = fg_cols.named2) +
   labs(x = 'Log10 biomass, kg ha-1', y = 'Proportion of total nutrient productivity, %') +
   th + theme(legend.position = 'none')
 
