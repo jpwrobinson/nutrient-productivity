@@ -1,5 +1,6 @@
 library(tidyverse)
 library(brms)
+source('scripts/0_plot_theme.R')
 
 ben.cols<-data.frame(col = c('#498FC9','#9CE5FA','#B6B400','#a1d99b'),
                      benthic = c('hard_coral', 'bare_substrate', 'macroalgae', 'turf_algae'),
@@ -42,8 +43,6 @@ for(i in 1:length(subs)){
   intercepts<-rbind(intercepts, intercept)
 }
 
-coef(brm_glm_reg)
-## 
 colnames(slopes)<-str_replace_all(colnames(slopes), '.hard_coral_scale', '')
 colnames(intercepts)<-str_replace_all(colnames(intercepts), '.hard_coral_scale', '')
 
