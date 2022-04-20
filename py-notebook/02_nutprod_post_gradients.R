@@ -5,12 +5,13 @@ stdize<-function(x){(x-mean(x))/(2*sd(x))}
 focal<-read.csv('py-notebook/zinc.mg_unscaled.csv')
 
 
-fgnames<-data.frame(nfg = 0:5, fg = c('browser',
+fgnames<-data.frame(nfg = 0:6, fg = c('browser',
                                       'cropper/grazer',
                                       'invertivore-mobile',
                                       'scraper-excavator',
                                       'piscivore',
-                                      'planktivore'))
+                                      'planktivore',
+                                      'mixed-diet feeder'))
 
 covs<-c('gravity',
         'hard_coral',
