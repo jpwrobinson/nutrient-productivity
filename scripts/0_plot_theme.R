@@ -23,18 +23,19 @@ trophic.cols<-data.frame(col=c('#fdae61', '#377eb8', '#4d9221', '#d9ef8b', '#beb
                          FG=c('invertivore-mobile', 'piscivore','herbivore-macroalgae', 'herbivore-detritivore','planktivore', 'omnivore', 'invertivore-sessile'),
                          FG_lab=c("Invertivore (mobile)", 'Piscivore', 'Herbivore (macroalgae)', 'Herbivore (detritivore)', 'Planktivore', 'Omnivore', 'Invertivore (sessile)'))
 
-trophic_cols.named<-setNames(as.character(trophic.cols$col), trophic.cols$FG_lab)
-trophic_cols.named2<-setNames(as.character(trophic.cols$col), trophic.cols$FG)
-
-fg.cols<-data.frame(col=c('#fdae61', '#377eb8', '#4d9221','green', '#d9ef8b', '#bebada', '#80cdc1', '#ffd92f'),
-                    FG=c('invertivore-mobile', 'piscivore','browser','cropper/graver', 'scraper-excavator','planktivore', 'detritivore', 'invertivore-sessile'),
-                    FG_lab=c("Invertivore (mobile)", 'Piscivore', 'Herbivore (browser)','Herbivore (grazer)', 'Herbivore (scraper/excavator)', 'Planktivore', 'Detritivore', 'Invertivore (sessile)'))
+fg.cols<-data.frame(col=c('#fdae61', '#377eb8','#80cdc1', '#4d9221','#f7fcb9', '#d9ef8b', '#bebada', '#a6761d', '#ffd92f'),
+                    FG=c('invertivore-mobile', 'piscivore','mixed-diet feeder', 'browser','cropper/grazer', 'scraper-excavator','planktivore', 'detritivore', 'invertivore-sessile'),
+                    FG_lab=c("Invertivore (mobile)", 'Piscivore','Mixed-diet feeder', 'Herbivore (browser)','Herbivore (grazer)', 'Herbivore (scraper/excavator)', 'Planktivore', 'Detritivore', 'Invertivore (sessile)'))
 
 diet.cols<-data.frame(col=c('#fdae61', '#377eb8',  '#4d9221', '#bebada', '#ffd92f'),
                          dietP=c('Mobile invertivore', 'Piscivore','Herbivores Microvores Detritivores','Planktivore',  'Sessile invertivore'),
                          dietP_lab=c("Invertivore (mobile)", 'Piscivore', 'Herbivore/detritivore', 'Planktivore',  'Invertivore (sessile)'))
 
+trophic_cols.named<-setNames(as.character(trophic.cols$col), trophic.cols$FG_lab)
+trophic_cols.named2<-setNames(as.character(trophic.cols$col), trophic.cols$FG)
 diet_cols.named<-setNames(as.character(diet.cols$col), diet.cols$dietP_lab)
+fg_cols.named<-setNames(as.character(fg.cols$col), fg.cols$FG)
+fg_cols.named2<-setNames(as.character(fg.cols$col), fg.cols$FG_lab)
 
 # fg.cols<-data.frame(col=c('#1b9e77', '#bebada',),
 #                     FG = c("detritivore","planktivore",

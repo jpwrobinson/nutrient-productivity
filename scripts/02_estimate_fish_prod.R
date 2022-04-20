@@ -165,7 +165,8 @@ fishp$trophic_group[fishp$fish_taxon=='Herklotsichthys quadrimaculatus']<-'plank
 fishp$fg<-fishp$functional_group
 fishp$fg[fishp$fg %in% c('corallivore', 'spongivore')]<-'invertivore-sessile'
 fishp$fg[fishp$fg %in% c('scraper', 'excavator')]<-'scraper-excavator'
-fishp$fg[fishp$fg %in% c('pisci-invertivore', 'macro-invertivore', 'micro-invertivore')]<-'invertivore-mobile'
+fishp$fg[fishp$fg %in% c('macro-invertivore', 'micro-invertivore')]<-'invertivore-mobile'
+fishp$fg[fishp$fg %in% c('pisci-invertivore')]<-'mixed-diet feeder'
 
 save(fishp, file = 'results/wcs_productivity.rds')
 
