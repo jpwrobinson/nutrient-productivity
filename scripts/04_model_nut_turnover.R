@@ -6,4 +6,5 @@ dat$type<-with(dat, paste(country, management_rules, sep = '_'))
 
 ggplot(dat, aes(log(biomass_kgha), nut_prod_day_ha, col=management_rules))  + 
   geom_point() + 
+  geom_smooth() + 
   facet_wrap(~country, scales='free')
