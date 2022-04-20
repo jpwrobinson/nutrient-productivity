@@ -34,7 +34,7 @@ manage<-read.csv(file = 'data/wcs/mermaid_management_clean.csv') %>% dplyr::sele
 focal<-left_join(data.frame(prod_fg) %>% mutate(id2=paste(site, country, sep='_')), 
                  fish_avg %>% ungroup() %>%  
                    dplyr::select(site, reef_type, reef_zone, management_rules, 
-                          hard_coral, macroalgae, turf_algae, bare_substrate, depth, fish_richness, id2),
+                          hard_coral, macroalgae, turf_algae, bare_substrate, rubble, depth, fish_richness, id2),
                  by='id2') %>% 
   left_join(threat, by = 'id2') %>% 
   # left_join(manage, by = 'site') %>% 
@@ -50,7 +50,7 @@ focal<-left_join(data.frame(prod_fg) %>% mutate(id2=paste(site, country, sep='_'
   mutate_if(is.character, as.factor) %>% 
   dplyr::select(
     nutprop, prodprop, nutrient, nutrient_lab, country, site, year, fg, 
-    hard_coral, macroalgae, turf_algae, bare_substrate, reef_type, reef_zone, depth,
+    hard_coral, macroalgae, turf_algae, bare_substrate, rubble, reef_type, reef_zone, depth,
     management_rules, grav_nc, sediment, nutrient_load, pop_count) %>%  
   mutate(management_rules = fct_relevel(management_rules, 'open-access', after=0))
 # gears_category = fct_relevel(gears_category, 'None', after=0),
