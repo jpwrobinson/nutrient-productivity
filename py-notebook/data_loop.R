@@ -51,9 +51,13 @@ ggplot(focal, aes(nutprop)) + geom_histogram() + facet_wrap(~fg)
 # ggplot(focal, aes(depth, nutprop, col=fg)) + geom_point() + geom_smooth()
 # ggplot(focal, aes(grav_nc, nutprop, col=fg)) + geom_point() + geom_smooth()
 # ggplot(focal, aes(fg, nutprop, fill=fg)) + geom_boxplot() + facet_wrap(~country)
+ggplot(focal, aes(management_rules, nutprop, fill=fg)) + geom_boxplot() + facet_wrap(~country)
 # focal %>% group_by(fg) %>% summarise(median(nutprop), min(nutprop), max(nutprop))
 
 
 test<-read.csv('py-notebook/zinc.mg_unscaled.csv')
 hist(test$depth)
-pairs2(test[,c(6:9, 12, 14:17)])
+pairs2(test[,c(6:10, 13, 15:18)])
+
+test<-read.csv('py-notebook/zinc.mg_reef_unscaled.csv')
+hist(log(test$nut_turnover))
