@@ -39,17 +39,23 @@ focal<-left_join(data.frame(prod_reef) %>% mutate(id2=paste(site, country, sep='
   left_join(threat, by = 'id2') %>% 
   # left_join(manage, by = 'site') %>% 
   # recode management_rules
-  mutate(management_rules = recode(management_rules, 'periodic closure' = 'time restriction',
-                                   'gear restriction' = 'gear restriction',
-                                   'periodic closure; access restriction' = 'time restriction',
+  # mutate(management_rules = recode(management_rules, 'periodic closure' = 'time restriction',
+  #                                  'gear restriction' = 'gear restriction',
+  #                                  'periodic closure; access restriction' = 'time restriction',
+  #                                  'open access' = 'open-access',
+  #                                  'no take' = 'no-take',
+  #                                  'access restriction' = 'access restriction')) %>%
+  mutate(management_rules = recode(management_rules, 'periodic closure' = 'restriction',
+                                   'gear restriction' = 'restriction',
+                                   'periodic closure; access restriction' = 'restriction',
                                    'open access' = 'open-access',
                                    'no take' = 'no-take',
-                                   'access restriction' = 'access restriction')) %>%
+                                   'access restriction' = 'restriction')) %>% 
   filter(!is.na(depth)) %>%  # dropping 2 sites (NK02 in Madasgascar and WaiE1 in Fiji)
   # left_join(threat, by = 'site') %>% ungroup() ## lots of sites missing, incl. all of Belize
   mutate_if(is.character, as.factor) %>% 
   dplyr::select(
-    nut_turnover, nut_prod_day_ha, biomass_kgha, nutrient, nutrient_lab, country, site, year, 
+    nut_turnover, nut_prod_day_ha, prod_day_ha, biomass_kgha, nutrient, nutrient_lab, country, site, year, 
     hard_coral, macroalgae, turf_algae, bare_substrate,rubble, reef_type, reef_zone, depth,
     management_rules, grav_nc, sediment, nutrient_load, pop_count) %>%  
   filter(nutrient==nut) %>% 
@@ -63,7 +69,7 @@ hist(focal$nut_turnover, main = nut, xlab = 'Nutrient turnover, %')
 ## scale numeric, pivot wider
 source('scripts/scaler.R')
 focal.scaled<-scaler(focal, 
-                     ID = c('biomass_kgha','nut_turnover','nut_prod_day_ha', 'nutrient','nutrient_lab',
+                     ID = c('biomass_kgha','nut_turnover','nut_prod_day_ha','prod_day_ha', 'nutrient','nutrient_lab',
                             'country', 'site','year','id2',
                              'reef_type', 'reef_zone',
                             'management_rules'), cats = FALSE) 
