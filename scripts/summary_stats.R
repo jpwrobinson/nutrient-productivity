@@ -55,3 +55,11 @@ threat %>% select(pop_count, grav_nc) %>%
   summarise(across(pop_count:grav_nc, ~range(.x, na.rm=TRUE)))
 
 focal %>% group_by(management_rules) %>% summarise(n_distinct(site))
+
+
+### productivity metrics
+load(file = 'results/wcs_productivity.rds')
+load(file = 'results/wcs_nut_prod.rds')
+ggplot(prod_reef, aes(prod_day_ha, nut_prod_day_ha, col=country)) + geom_point() + facet_wrap(~nutrient, scales='free')
+ggplot(prod_reef, aes(biomass_kgha, nut_prod_day_ha, col=country)) + geom_point() + facet_wrap(~nutrient, scales='free')
+ggplot(prod_reef, aes(biomass_kgha, nut_turnover, col=country)) + geom_point() + facet_wrap(~nutrient, scales='free')
