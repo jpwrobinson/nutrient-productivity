@@ -33,17 +33,27 @@ covs2<-c('grav_nc',
         'sediment', 
         'nutrient_load')
 
-managecovs<-c('Belizegear restriction',
+# managecovs<-c('Belizegear restriction',
+#               'Belizeno-take',
+#               'Fijiaccess restriction',
+#               'Fijino-take',
+#               'Fijitime restriction',
+#               'Madagascargear restriction',
+#               'Madagascarno-take',
+#               'Madagascaropen-access',
+#               'Solomon Islandsaccess restriction',
+#               'Solomon Islandsno-take',
+#               'Solomon Islandstime restriction')
+
+managecovs<-c('Belizerestriction',
               'Belizeno-take',
-              'Fijiaccess restriction',
+              'Fijirestriction',
               'Fijino-take',
-              'Fijitime restriction',
-              'Madagascargear restriction',
+              'Madagascarrestriction',
               'Madagascarno-take',
               'Madagascaropen-access',
-              'Solomon Islandsaccess restriction',
-              'Solomon Islandsno-take',
-              'Solomon Islandstime restriction')
+              'Solomon Islandsrestriction',
+              'Solomon Islandsno-take')
 
 pdf(file = 'fig/model/posterior_predicted.pdf', height=5, width=12)
 
