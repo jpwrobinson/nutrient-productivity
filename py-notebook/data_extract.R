@@ -39,12 +39,18 @@ focal<-left_join(data.frame(prod_fg) %>% mutate(id2=paste(site, country, sep='_'
   left_join(threat, by = 'id2') %>% 
   # left_join(manage, by = 'site') %>% 
   # recode management_rules
-  mutate(management_rules = recode(management_rules, 'periodic closure' = 'time restriction',
-                                   'gear restriction' = 'gear restriction',
-                                   'periodic closure; access restriction' = 'time restriction',
+  # mutate(management_rules = recode(management_rules, 'periodic closure' = 'time restriction',
+  #                                  'gear restriction' = 'gear restriction',
+  #                                  'periodic closure; access restriction' = 'time restriction',
+  #                                  'open access' = 'open-access',
+  #                                  'no take' = 'no-take',
+  #                                  'access restriction' = 'access restriction')) %>%
+  mutate(management_rules = recode(management_rules, 'periodic closure' = 'restriction',
+                                   'gear restriction' = 'restriction',
+                                   'periodic closure; access restriction' = 'restriction',
                                    'open access' = 'open-access',
                                    'no take' = 'no-take',
-                                   'access restriction' = 'access restriction')) %>%
+                                   'access restriction' = 'restriction')) %>%
   filter(!is.na(depth)) %>%  # dropping 2 sites (NK02 in Madasgascar and WaiE1 in Fiji)
   # left_join(threat, by = 'site') %>% ungroup() ## lots of sites missing, incl. all of Belize
   mutate_if(is.character, as.factor) %>% 
