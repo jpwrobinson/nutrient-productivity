@@ -54,6 +54,9 @@ ggplot(focal, aes(nutprop)) + geom_histogram() + facet_wrap(~fg)
 ggplot(focal, aes(management_rules, nutprop, fill=fg)) + geom_boxplot() + facet_wrap(~country)
 # focal %>% group_by(fg) %>% summarise(median(nutprop), min(nutprop), max(nutprop))
 
+focal<-read.csv('py-notebook/zinc.mg_reef_unscaled.csv') 
+ggplot(focal, aes(country, biomass_kgha, fill=management_rules)) + geom_boxplot()
+
 
 test<-read.csv('py-notebook/zinc.mg_unscaled.csv')
 hist(test$depth)
