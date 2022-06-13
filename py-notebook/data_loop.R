@@ -58,9 +58,8 @@ focal<-read.csv('py-notebook/zinc.mg_reef_unscaled.csv')
 ggplot(focal, aes(country, biomass_kgha, fill=management_rules)) + geom_boxplot()
 
 
-test<-read.csv('py-notebook/zinc.mg_unscaled.csv')
-hist(test$depth)
-pairs2(test[,c(6:10, 13, 15:18)])
+test<-read.csv('py-notebook/zinc.mg_reef_unscaled.csv')
+pairs2(test[,c(10:14,17, 19:22)])
 
 test<-read.csv('py-notebook/zinc.mg_reef_unscaled.csv')
 hist(log(test$nut_turnover))
