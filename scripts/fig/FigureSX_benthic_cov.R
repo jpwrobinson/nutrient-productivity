@@ -13,7 +13,7 @@ load('data/wcs/wcs_fish_benthic.rds')
 ben<-fish_avg %>% filter(country %in% c('Belize', 'Fiji', 'Madagascar', 'Solomon Islands')) %>% 
       ungroup() %>% 
       mutate(algae = macroalgae + turf_algae) %>% 
-      select(site, country, hard_coral, macroalgae, bare_substrate, turf_algae, algae) %>% 
+      select(site, country, hard_coral, macroalgae, bare_substrate, rubble, turf_algae, algae) %>% 
       pivot_longer(-c(site, country, hard_coral), names_to = 'sub', values_to = 'cover') %>% 
       mutate(id = paste0(country, sub)) %>% 
       filter(site != 'NK02') %>% 
