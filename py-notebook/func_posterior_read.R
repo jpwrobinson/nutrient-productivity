@@ -49,15 +49,24 @@ foc_seq_raw<-rep(seq(min(focal$hard_coral), max(focal$hard_coral), length.out=10
 scaled_avg<-scaled %>% filter(management_rules == 'restriction') %>% 
     group_by(country, management_rules) %>% 
   summarise(across(hard_coral:pop_count, ~ mean(.x)))
+scaled_max<-scaled %>% filter(management_rules == 'restriction') %>% 
+  group_by(country, management_rules) %>% 
+  summarise(across(hard_coral:pop_count, ~ max(.x)))
 country_ints = c(colMeans(post[c(21,23,26,28)]))
 int = mean(post$intercept)
+
+## setup counterfacs
+# Belize = max macroalgae
+# Fiji = max macroalgae
+# Madagascar = max macroalgae
+# Solomon = max rubble
 mu<-with(post,
          rep(mean(intercept), times=400) + 
            mean(hard_coral)*foc_seq + 
-           mean(macroalgae)*rep(scaled_avg$macroalgae, times=100) +
+           mean(macroalgae)*rep(c(scaled_max$macroalgae[1:3], scaled_avg$macroalgae[4]), times=100) +
            mean(bare_sub)*rep(scaled_avg$bare_substrate, times=100) +
            mean(turf)*rep(scaled_avg$turf_algae, times=100) +
-           mean(rubble)*rep(scaled_avg$rubble, times=100) +
+           mean(rubble)*rep(c(scaled_avg$rubble[1:3], scaled_max$rubble[4]), times=100) +
            mean(population)*rep(scaled_avg$pop_count, times=100) +
            mean(gravity)*rep(scaled_avg$grav_nc, times=100) +
            mean(sediment)*rep(scaled_avg$sediment, times=100) +
@@ -67,10 +76,18 @@ mu<-with(post,
 pred<-data.frame(mu=exp(mu))
 pred$manage<-names(mu)
 pred$country<-str_replace_all(pred$manage, 'restriction', '')
+pred$country<-str_replace_all(pred$country, '\\.', '\\ ')
 pred$X<-foc_seq
 pred$X_raw<-foc_seq_raw
 
-g<-ggplot(pred, aes(X_raw, mu)) + 
+# filter unobserved benthic
+cc<-unique(focal$country)
+for(i in 1:4){
+  maxer<-max(focal$hard_coral[focal$country==cc[i]])
+  pred$X_raw[pred$X_raw > maxer & pred$country==cc[i]]<-NA
+}
+
+g<-ggplot(pred %>% filter(!is.na(X_raw)), aes(X_raw, mu)) + 
   labs(x = covs, y = var_name, subtitle = covs) +
   # geom_ribbon(aes(ymin = lo, ymax = hi, group=fg), alpha=0.5, fill='grey90') +
   geom_line(aes(col=country))
