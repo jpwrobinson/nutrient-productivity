@@ -2,9 +2,9 @@ library(tidyverse)
 library(brms)
 source('scripts/0_plot_theme.R')
 
-ben.cols<-data.frame(col = c('#498FC9','#9CE5FA','#B6B400','#a1d99b'),
-                     benthic = c('hard_coral', 'bare_substrate', 'macroalgae', 'turf_algae'),
-                     benthic_lab = c('Hard coral', 'Bare substrate', 'Macroalgae', 'Turf algae'))
+ben.cols<-data.frame(col = c('#498FC9','#9CE5FA','#B6B400','#a1d99b', '#FAFBB2', 'grey'),
+                     benthic = c('hard_coral', 'bare_substrate', 'macroalgae', 'turf_algae', 'rubble', 'algae'),
+                     benthic_lab = c('Hard coral', 'Bare substrate', 'Macroalgae', 'Turf algae', 'Rubble', 'Total algae'))
 
 ben_cols.named<-setNames(as.character(ben.cols$col), ben.cols$benthic)
 
@@ -52,19 +52,25 @@ g1<-ggplot(slopes, aes(fct_rev(country), Estimate, ymin = Q2.5, ymax = Q97.5)) +
           geom_pointrange(fatten=0, aes(colour=sub), position = position_dodge(width=0.5)) + 
           geom_point(size = 2.5, pch=21, colour='black', aes( fill=sub), position = position_dodge(width=0.5)) +
           coord_flip() + 
-          theme(legend.position = 'none') +
+          facet_wrap(~1) +
+          theme(legend.position = 'none', axis.text.y=element_blank(),
+                strip.text.x = element_text(colour='white'),
+                axis.ticks.y = element_blank(),
+                plot.margin = unit(c(.1,.5,.1,-.75), 'cm')) +
           scale_fill_manual(values = ben_cols.named)  +
           scale_color_manual(values = ben_cols.named)  +
-          labs(y = 'Slope with hard coral cover', x = '') 
+          labs(y = 'slope with hard coral cover', x = '') 
+
+ben$cover_lab<-ben.cols$benthic_lab[match(ben$sub, ben.cols$benthic)]
 
 g2<-ggplot(ben, aes(hard_coral, cover)) + 
-  geom_point(alpha=0.8, size=1.5, aes(col=sub)) + 
-  facet_grid(country~sub, scales='free') +
+  geom_point(alpha=0.5, size=1.5, pch=21, col='black', aes(fill=sub)) + 
+  facet_grid(country~cover_lab, scales='free') +
   scale_y_continuous(limits=c(0, NA)) +
-  scale_colour_manual(values = ben_cols.named) +
-  theme(legend.position = 'none') +
+  scale_fill_manual(values = ben_cols.named) +
+  theme(legend.position = 'none', strip.text.y = element_text(angle=360)) +
   labs(x = 'hard coral cover, %', y = 'benthic cover, %')
 
 pdf(file = 'fig/FigureSX_benthic_cov.pdf', height=5, width=9)
-print(cowplot::plot_grid(g2, g1, nrow=1, rel_widths=c(1,0.6), labels=c('a', 'b')))
+print(cowplot::plot_grid(g2, g1, nrow=1, rel_widths=c(1,0.3), labels=c('a', 'b')))
 dev.off()
