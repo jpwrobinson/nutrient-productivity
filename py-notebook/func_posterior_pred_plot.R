@@ -2,13 +2,6 @@ library(tidyverse)
 
 stdize<-function(x){(x-mean(x))/(2*sd(x))}
 
-# fgnames<-data.frame(nfg = 0:6, fg = c('browser',
-#                                       'cropper/grazer',
-#                                       'invertivore-mobile',
-#                                       'scraper-excavator',
-#                                       'piscivore',
-#                                       'planktivore',
-#                                       'mixed-diet feeder'))
 
 covs<-c('gravity',
         'hard_coral',
@@ -35,15 +28,15 @@ covs2<-c('grav_nc',
          'rubble')
 
 
-managecovs<-c('Belizerestriction',
-              'Belizeno-take',
-              'Fijirestriction',
+managecovs<-c('Belizeno-take',
+              'Belizerestriction',
               'Fijino-take',
-              'Madagascarrestriction',
+              'Fijirestriction',
               'Madagascarno-take',
               'Madagascaropen-access',
-              'Solomon Islandsrestriction',
-              'Solomon Islandsno-take')
+              'Madagascarrestriction',
+              'Solomon Islandsno-take',
+              'Solomon Islandsrestriction')
 
 countrycovs<-c('Belize','Fiji', 'Madgascar', 'Solomon Islands')
 
@@ -51,7 +44,6 @@ pdf(file = figname, height=5, width=12)
 
 for(i in 1:length(covs)){
   post<-read.csv(paste0(filename, 'posterior_', covs[i],'.csv'))
-  # names(post)<-fgnames$fg
   names(post) = 'mu'
   post$mu <- post$mu
   
