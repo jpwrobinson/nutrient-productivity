@@ -1,3 +1,6 @@
+library(tidyverse)
+theme_set(funk::theme_sleek())
+
 ## Plot predicted covariate values
 
 ## prod
@@ -25,7 +28,7 @@ var_name = 'biomass, kg ha'
 source('py-notebook/func_posterior_futures.R')
 
 figname='fig/model/future_productivity.pdf'
-filename='/prod'
+filename='py-notebook/prod/'
 var_name = 'productivity, g day ha'
 source('py-notebook/func_posterior_futures.R')
 
