@@ -2,7 +2,7 @@ library(tidyverse)
 library(brms)
 source('scripts/0_plot_theme.R')
 
-ben.cols<-data.frame(col = c('#498FC9','#9CE5FA','#B6B400','#a1d99b', '#FAFBB2', 'grey'),
+ben.cols<-data.frame(col = c('#498FC9','#9CE5FA','#B6B400','#a1d99b', 'grey', 'grey'),
                      benthic = c('hard_coral', 'bare_substrate', 'macroalgae', 'turf_algae', 'rubble', 'algae'),
                      benthic_lab = c('Hard coral', 'Bare substrate', 'Macroalgae', 'Turf algae', 'Rubble', 'Total algae'))
 
@@ -46,6 +46,8 @@ for(i in 1:length(subs)){
 
 colnames(slopes)<-str_replace_all(colnames(slopes), '.hard_coral_scale', '')
 colnames(intercepts)<-str_replace_all(colnames(intercepts), '.hard_coral_scale', '')
+slopes$Intercept<-intercepts$Estimate.Intercept
+slopes$cover_lab<-ben.cols$benthic_lab[match(slopes$sub, ben.cols$benthic)]
 
 g1<-ggplot(slopes, aes(fct_rev(country), Estimate, ymin = Q2.5, ymax = Q97.5)) +
           geom_hline(yintercept=0, col='grey', linetype=5) +
@@ -64,7 +66,7 @@ g1<-ggplot(slopes, aes(fct_rev(country), Estimate, ymin = Q2.5, ymax = Q97.5)) +
 ben$cover_lab<-ben.cols$benthic_lab[match(ben$sub, ben.cols$benthic)]
 
 g2<-ggplot(ben, aes(hard_coral, cover)) + 
-  geom_point(alpha=0.5, size=1.5, pch=21, col='black', aes(fill=sub)) + 
+  geom_point(alpha=0.8, size=1.5, pch=21, col='black', aes(fill=sub)) + 
   facet_grid(country~cover_lab, scales='free') +
   scale_y_continuous(limits=c(0, NA)) +
   scale_fill_manual(values = ben_cols.named) +
@@ -73,4 +75,25 @@ g2<-ggplot(ben, aes(hard_coral, cover)) +
 
 pdf(file = 'fig/FigureSX_benthic_cov.pdf', height=5, width=9)
 print(cowplot::plot_grid(g2, g1, nrow=1, rel_widths=c(1,0.3), labels=c('a', 'b')))
+dev.off()
+
+
+## hard coral distributions by country
+focal<-read.csv('py-notebook/zinc.mg_reef_unscaled.csv')
+# 
+# ggplot(focal, aes(hard_coral)) + 
+#     geom_histogram(breaks=seq(0, 80, 5)) +
+#     facet_grid(country ~., scales='free_y') 
+
+pdf(file = 'fig/FigureSX_hard_coral_range.pdf', height=2, width=7)
+ggplot(focal %>% group_by(country) %>% summarise(mi =min(hard_coral), ma = max(hard_coral)) %>% 
+         mutate(yy = 1:4)) + 
+  geom_segment(aes(x = mi, xend = ma, y = yy, yend =yy))  +
+  geom_label(aes(ma, yy+0.4, label=country)) +
+  scale_y_continuous(limits=c(0.5,4.5)) +
+  labs(x = 'hard coral, %') +
+  theme_void() +
+  theme(axis.line.x = element_line(colour='black'), 
+        axis.text.x = element_text(colour='black'),
+        axis.title.x = element_text(colour='black'))
 dev.off()

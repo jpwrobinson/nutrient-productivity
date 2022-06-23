@@ -22,15 +22,15 @@ figname='fig/model/posterior_predicted_turnover.pdf'
 source('py-notebook/func_posterior_pred_plot.R')
 
 ### Future scenarios
-figname='fig/model/future_biomass.pdf'
-filename='py-notebook/biomass/'
-var_name = 'biomass, kg ha'
-source('py-notebook/func_posterior_futures.R')
-
-figname='fig/model/future_productivity.pdf'
-filename='py-notebook/prod/'
-var_name = 'productivity, g day ha'
-source('py-notebook/func_posterior_futures.R')
+# figname='fig/model/future_biomass.pdf'
+# filename='py-notebook/biomass/'
+# var_name = 'biomass, kg ha'
+# source('py-notebook/func_posterior_futures.R')
+# 
+# figname='fig/model/future_productivity.pdf'
+# filename='py-notebook/prod/'
+# var_name = 'productivity, g day ha'
+# source('py-notebook/func_posterior_futures.R')
 
 
 ## Future scenarios holding regimes conditions
@@ -48,7 +48,6 @@ figname='fig/model/future_nutrient_regimes.pdf'
 filename='/turnover'
 var_name = 'nutrient turnover, mg day ha'
 source('py-notebook/func_posterior_read.R')
-
 
 figname='fig/model/future_nutrient_density.pdf'
 filename='/density'
