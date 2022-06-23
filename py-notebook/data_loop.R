@@ -56,6 +56,8 @@ ggplot(focal, aes(management_rules, nutprop, fill=fg)) + geom_boxplot() + facet_
 
 focal<-read.csv('py-notebook/zinc.mg_reef_unscaled.csv') 
 ggplot(focal, aes(country, biomass_kgha, fill=management_rules)) + geom_boxplot()
+ggplot(focal, aes(hard_coral, nscore3)) + geom_point()
+ggplot(focal, aes(management_rules, nscore3, fill=country)) + geom_boxplot()
 
 
 test<-read.csv('py-notebook/zinc.mg_reef_unscaled.csv')
