@@ -31,11 +31,12 @@ threat$nutrient_load<-log10(threat$nutrient_load+1)
 manage<-read.csv(file = 'data/wcs/mermaid_management_clean.csv') %>% dplyr::select(-country)
 
 # join prod estimates with benthic + fishing covariates
-focal<-left_join(data.frame(prod_reef) %>% mutate(id2=paste(site, country, sep='_')), 
+focal<-left_join(data.frame(prod_reef) %>% mutate(id=paste(site, year, country, sep='_'), 
+                                                  id2=paste(site, country, sep='_')), 
                  fish_avg %>% ungroup() %>%  
                    dplyr::select(site, reef_type, reef_zone, management_rules, 
-                          hard_coral, macroalgae, turf_algae, bare_substrate, rubble, depth, fish_richness, id2),
-                 by='id2') %>% 
+                          hard_coral, macroalgae, turf_algae, bare_substrate, rubble, depth, fish_richness,id, id2),
+                 by=c('id', 'id2')) %>% 
   left_join(threat, by = 'id2') %>% 
   # left_join(manage, by = 'site') %>% 
   # recode management_rules
