@@ -33,18 +33,27 @@ var_name = 'productivity, g day ha'
 source('py-notebook/func_posterior_futures.R')
 
 
-## Future scenarios holding background conditions
-figname='fig/model/future_biomass_background.pdf'
+## Future scenarios holding regimes conditions
+figname='fig/model/future_biomass_regimes.pdf'
 filename='/biomass'
 var_name = 'biomass, kg ha'
 source('py-notebook/func_posterior_read.R')
 
-figname='fig/model/future_productivity_background.pdf'
+figname='fig/model/future_productivity_regimes.pdf'
 filename='/prod'
 var_name = 'productivity, g day ha'
 source('py-notebook/func_posterior_read.R')
 
+figname='fig/model/future_nutrient_regimes.pdf'
+filename='/turnover'
+var_name = 'nutrient turnover, mg day ha'
+source('py-notebook/func_posterior_read.R')
 
+
+figname='fig/model/future_nutrient_density.pdf'
+filename='/density'
+var_name = 'nutrient density, %'
+source('py-notebook/func_posterior_read.R')
 
 
 ## testing brms alt
