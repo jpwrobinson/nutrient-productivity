@@ -26,15 +26,15 @@ prod_reef<-prod_reef %>%
 nut.vec<-unique(prod_fg$nutrient)
 
 # model data - extract for fg
-for(i in 1:length(nut.vec)){
-  nut<-nut.vec[i]
-  print(paste('Data mangle + scale for', nut))
-  source('py-notebook/data_extract.R')
-}
-
-## productivity only
-nut = 'productivity'
-source('py-notebook/data_extract.R')
+# for(i in 1:length(nut.vec)){
+#   nut<-nut.vec[i]
+#   print(paste('Data mangle + scale for', nut))
+#   source('py-notebook/data_extract.R')
+# }
+# 
+# ## productivity only
+# nut = 'productivity'
+# source('py-notebook/data_extract.R')
 
 # model data - extract for reef
 for(i in 1:length(nut.vec)){
