@@ -25,3 +25,9 @@ p1<-read.csv('py-notebook/biomass/posterior_summary.csv')
 p2<-read.csv('py-notebook/biomass/posterior_summary_50.csv') 
 filename = 'posterior_params_biomass'
 source('py-notebook/func_posterior_plot.R')
+
+## Density
+p1<-read.csv('py-notebook/density/posterior_summary.csv') 
+p2<-read.csv('py-notebook/density/posterior_summary_50.csv') 
+filename = 'posterior_params_density'
+source('py-notebook/func_posterior_plot.R')

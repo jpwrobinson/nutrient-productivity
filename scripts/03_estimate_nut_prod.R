@@ -34,14 +34,6 @@ prod_reef<-prod %>% group_by(country, fish_taxon, trophic_group, dietP,
       mutate(nut_turnover = nut_prod_day_ha / nut_biomass_kgha,
          biomass_turnover = prod_day_ha / biomass_kgha) 
 
-# ggplot(prod_reef, aes(nut_prod_day_ha, nut_turnover)) + geom_point() + facet_wrap(~nutrient, scales='free') +
-#       stat_smooth(method='gam')
-# ggplot(prod_reef, aes(prod_day_ha, biomass_turnover)) + geom_point() + facet_wrap(~nutrient, scales='free') +
-#   stat_smooth(method='gam')
-# ggplot(prod_reef, aes(biomass_kgha, biomass_turnover)) + geom_point() + facet_wrap(~nutrient, scales='free') +
-#   stat_smooth(method='gam')
-# ggplot(prod_reef, aes(biomass_kgha, nut_turnover)) + geom_point() + facet_wrap(~nutrient, scales='free')
-
 
 pdf(file = 'fig/explore/wcs_nutrient_prod_reef.pdf', height=7, width=12)
 ggplot(prod_reef, aes(biomass_kgha, nut_prod_day_ha)) + geom_point() + facet_wrap(~nutrient, scales='free')
