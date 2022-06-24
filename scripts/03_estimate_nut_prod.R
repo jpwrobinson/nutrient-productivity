@@ -7,8 +7,8 @@ load(file = 'results/wcs_productivity.rds')
 
 prod<-fishp %>% rowwise() %>%mutate(nscore3 = sum(ca_rda, fe_rda, zn_rda)) %>% 
     pivot_longer(calcium.mg:vitamin_a.mug, names_to = 'nutrient', values_to = 'conc') %>% 
-    mutate(nut_prod_day_ha = conc / 100 * prod_g_day_ha * 0.87,
-           nut_biomass_kgha = conc * 0.87 * biomass_kgha)
+    mutate(nut_prod_day_ha = conc / 100 * prod_g_day_ha * 0.87, ## per gram edible yield
+           nut_biomass_kgha = conc * 10 * 0.87 * biomass_kgha) ## per kg edible yield 
 
 ## change here to set the base FG for all analyses
 prod<-prod %>% mutate(fg = trophic_group)
@@ -34,8 +34,8 @@ prod_reef<-prod %>% group_by(country, fish_taxon, trophic_group, dietP,
                       nut_biomass_kgha = sum(nut_biomass_kgha),
                       prod_day_ha = sum(prod_day_ha),
                       biomass_kgha = sum(biomass_kgha)) %>% 
-      mutate(nut_turnover = nut_prod_day_ha / nut_biomass_kgha,
-         biomass_turnover = prod_day_ha / biomass_kgha) 
+      mutate(nut_turnover = ((nut_prod_day_ha / 1000) / nut_biomass_kgha) * 100,
+         biomass_turnover = ((prod_day_ha / 1000) / biomass_kgha) * 100) 
 
 
 pdf(file = 'fig/explore/wcs_nutrient_prod_reef.pdf', height=7, width=12)

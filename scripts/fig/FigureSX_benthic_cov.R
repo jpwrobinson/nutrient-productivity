@@ -13,7 +13,7 @@ load('data/wcs/wcs_fish_benthic.rds')
 ben<-fish_avg %>% filter(country %in% c('Belize', 'Fiji', 'Madagascar', 'Solomon Islands')) %>% 
       ungroup() %>% 
       # mutate(algae = macroalgae + turf_algae) %>% 
-      select(site, country, hard_coral, macroalgae, bare_substrate, rubble, turf_algae) %>% 
+      select(site, country, hard_coral, macroalgae, rubble, turf_algae) %>% 
       pivot_longer(-c(site, country, hard_coral), names_to = 'sub', values_to = 'cover') %>% 
       mutate(id = paste0(country, sub)) %>% 
       filter(site != 'NK02') %>% 
@@ -67,6 +67,7 @@ ben$cover_lab<-ben.cols$benthic_lab[match(ben$sub, ben.cols$benthic)]
 
 g2<-ggplot(ben, aes(hard_coral, cover)) + 
   geom_point(alpha=0.8, size=1.5, pch=21, col='black', aes(fill=sub)) + 
+  stat_smooth(method = 'lm', se = FALSE, col='#e41a1c') +
   facet_grid(country~cover_lab, scales='free') +
   scale_y_continuous(limits=c(0, NA)) +
   scale_fill_manual(values = ben_cols.named) +
@@ -85,7 +86,7 @@ focal<-read.csv('py-notebook/zinc.mg_reef_unscaled.csv')
 #     geom_histogram(breaks=seq(0, 80, 5)) +
 #     facet_grid(country ~., scales='free_y') 
 
-pdf(file = 'fig/FigureSX_hard_coral_range.pdf', height=2, width=7)
+pdf(file = 'fig/FigureSX_hard_coral_range.pdf', height=2, width=6)
 ggplot(focal %>% group_by(country) %>% summarise(mi =min(hard_coral), ma = max(hard_coral)) %>% 
          mutate(yy = 1:4)) + 
   geom_segment(aes(x = mi, xend = ma, y = yy, yend =yy))  +

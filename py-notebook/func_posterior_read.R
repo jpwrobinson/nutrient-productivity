@@ -7,7 +7,7 @@ stdize<-function(x){(x-mean(x))/(2*sd(x))}
 focal<-read.csv('py-notebook/zinc.mg_reef_unscaled.csv')
 scaled<-read.csv('py-notebook/zinc.mg_reef_scaled.csv')
 
-ben.cols<-data.frame(col = c('#498FC9','#B6B400','#a1d99b', 'grey'),
+ben.cols<-data.frame(col = c('#498FC9','#B6B400','#a1d99b', 'grey60'),
                      benthic = c('hard_coral', 'macroalgae', 'turf_algae', 'rubble'),
                      benthic_lab = c('Hard coral', 'Macroalgae', 'Turf algae', 'Rubble'))
 
@@ -90,11 +90,11 @@ g2<-ggplot(pred %>% filter(!is.na(hc_raw)), aes(prop_hc, prop_mu)) +
   labs(x = 'proportion of max. hard coral', y = paste0('proportion of max. ', var_name)) +
   # geom_ribbon(aes(ymin = lo, ymax = hi, group=fg), alpha=0.5, fill='grey90') +
   geom_line(size=1.3, aes(col=benthic)) +
-  scale_y_continuous(expand=c(0,0),breaks=seq(20, 100, 20), labels=c('20%', '40%', '60%', '80%', '100%')) +
+  scale_y_continuous(expand=c(0,0),breaks=seq(20, 100, 20), limits=c(20,100), labels=c('20%', '40%', '60%', '80%', '100%')) +
   scale_x_continuous(expand=c(0,0),breaks=seq(0, 100, 20), labels=c('0%', '20%', '40%', '60%', '80%', '100%')) +
   scale_colour_manual(values=ben_cols.named) +
   # facet_wrap(country~benthic) +
-  theme(legend.position = 'none') + th
+  theme(legend.position = 'none', plot.margin = unit(c(0.5,1,0.5,0.5), 'cm')) + th
 
 print(cowplot::plot_grid(g, g2))
 
@@ -102,6 +102,10 @@ dev.off()
 
 ## predict maximum biomass by country
 scaled_max<-scaled %>% #filter(management_rules == 'restriction') %>%
+  group_by(country) %>%
+  summarise(across(hard_coral:pop_count, ~ max(.x)))
+
+unscaled_max<-focal %>% #filter(management_rules == 'restriction') %>%
   group_by(country) %>%
   summarise(across(hard_coral:pop_count, ~ max(.x)))
 
@@ -123,7 +127,11 @@ if(filename=='/density'){
     maxer<-data.frame(max_val = exp(mu))
   }
 
+maxer$max_hc = unscaled_max$hard_coral
+maxer$val_50<-0.5 * maxer$max_val
+maxer$hc_50<-0.5 * maxer$max_hc
 maxer$country = unique(focal$country)
+
 
 # filter unobserved benthic by country
 # cc<-unique(focal$country)
