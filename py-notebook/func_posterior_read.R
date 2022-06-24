@@ -1,5 +1,7 @@
 library(tidyverse)
 
+th<-theme(panel.grid.major = element_line(color = "grey85"))
+
 stdize<-function(x){(x-mean(x))/(2*sd(x))}
 
 focal<-read.csv('py-notebook/zinc.mg_reef_unscaled.csv')
@@ -12,7 +14,7 @@ ben.cols<-data.frame(col = c('#498FC9','#B6B400','#a1d99b', 'grey'),
 ben_cols.named<-setNames(as.character(ben.cols$col), ben.cols$benthic)
 
 
-pdf(file = figname, height=5, width=8)
+pdf(file = figname, height=4, width=7)
 
 post<-read.csv(paste0('py-notebook', filename, filename, '_posterior_trace.csv'))
 
@@ -45,16 +47,19 @@ times = 1
 
 macroalgae<-with(post,
          rep(mean(intercept), times=100*times) + 
+           rep(mean(country_ints), times=100*times) + 
            mean(hard_coral)*rep(foc_seq, times = times) +
            mean(macroalgae)*rep(rev(ma_seq), times=times))
 
 turf_algae<-with(post,
             rep(mean(intercept), times=100) + 
+              rep(mean(country_ints), times=100) +
               mean(hard_coral)*foc_seq +
               mean(turf)*rev(ta_seq))
 
 rubble<-with(post,
             rep(mean(intercept), times=100) + 
+              rep(mean(country_ints), times=100) +
               mean(hard_coral)*foc_seq +
               mean(rubble)*rev(rub_seq))
 
@@ -79,17 +84,17 @@ g<-ggplot(pred %>% filter(!is.na(hc_raw)), aes(hc_raw, mu)) +
   geom_line(size=1.3, aes(col=benthic)) +
   scale_colour_manual(values=ben_cols.named) +
   scale_y_log10() +
-  theme(legend.position = c(0.2, 0.8), legend.title=element_blank())
+  theme(legend.position = c(0.2, 0.8), legend.title=element_blank()) + th
 
 g2<-ggplot(pred %>% filter(!is.na(hc_raw)), aes(prop_hc, prop_mu)) +
-  labs(x = 'proportion of max. hard coral', y = paste0('proportion of max ', var_name)) +
+  labs(x = 'proportion of max. hard coral', y = paste0('proportion of max. ', var_name)) +
   # geom_ribbon(aes(ymin = lo, ymax = hi, group=fg), alpha=0.5, fill='grey90') +
   geom_line(size=1.3, aes(col=benthic)) +
-  scale_y_continuous(breaks=seq(20, 100, 20), labels=c('20%', '40%', '60%', '80%', '100%')) +
-  scale_x_continuous(breaks=seq(0, 100, 20), labels=c('0%', '20%', '40%', '60%', '80%', '100%')) +
+  scale_y_continuous(expand=c(0,0),breaks=seq(20, 100, 20), labels=c('20%', '40%', '60%', '80%', '100%')) +
+  scale_x_continuous(expand=c(0,0),breaks=seq(0, 100, 20), labels=c('0%', '20%', '40%', '60%', '80%', '100%')) +
   scale_colour_manual(values=ben_cols.named) +
   # facet_wrap(country~benthic) +
-  theme(legend.position = 'none') 
+  theme(legend.position = 'none') + th
 
 print(cowplot::plot_grid(g, g2))
 

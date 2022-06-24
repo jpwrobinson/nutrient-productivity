@@ -5,12 +5,13 @@ source('scripts/0_plot_theme.R')
 load(file = 'results/wcs_productivity.rds')
 load(file = 'results/wcs_nut_prod.rds')
 
-# fishp$trophic_lab<-trophic.cols$FG_lab[match(fishp$trophic_group, trophic.cols$FG)]
-# prod_fg$trophic_lab<-trophic.cols$FG_lab[match(prod_fg$trophic_group, trophic.cols$FG)]
+fishp$fg_lab<-trophic.cols$FG_lab[match(fishp$fg, trophic.cols$FG)]
+prod_fg$fg_lab<-trophic.cols$FG_lab[match(prod_fg$fg, trophic.cols$FG)]
+prod_sp$fg_lab<-trophic.cols$FG_lab[match(prod_sp$fg, trophic.cols$FG)]
 
-fishp$fg_lab<-fg.cols$FG_lab[match(fishp$fg, fg.cols$FG)]
-prod_sp$fg_lab<-fg.cols$FG_lab[match(prod_sp$fg, fg.cols$FG)]
-prod_fg$fg_lab<-fg.cols$FG_lab[match(prod_fg$fg, fg.cols$FG)]
+# fishp$fg_lab<-fg.cols$FG_lab[match(fishp$fg, fg.cols$FG)]
+# prod_sp$fg_lab<-fg.cols$FG_lab[match(prod_sp$fg, fg.cols$FG)]
+# prod_fg$fg_lab<-fg.cols$FG_lab[match(prod_fg$fg, fg.cols$FG)]
 
 prod_sp<-prod_sp %>% group_by(nutrient, country) %>% 
             # arrange((nut_prod_day_ha))  %>% 
@@ -80,16 +81,22 @@ prod_reef$country<-factor(prod_reef$country, levels = meds$country)
 #           scale_colour_manual(values = trophic_cols.named)
 # 
 
+## order prod_fg by average nutprop
+levs<-prod_fg %>% group_by(fg_lab) %>% summarise(m=mean(nutprop)) %>% arrange(m) %>%  pull(fg_lab)
+prod_fg$fg_lab<-factor(prod_fg$fg_lab, levels = levs)
+prod_fg2$fg_lab<-factor(prod_fg2$fg_lab, levels = levs)
+prod_fg_co$fg_lab<-factor(prod_fg_co$fg_lab, levels = levs)
+
 # plabs<-c('Herbivore/detritivore zinc.mg', 'Herbivore/detritivore vitamin_a.mug', 'Invertivore (mobile) vitamin_a.mug')
-g1<-ggplot(prod_fg, aes(fct_reorder(fg_lab, nutprop),nutprop, fill=fg_lab),col='black') + 
+g1<-ggplot(prod_fg, aes(fg_lab ,nutprop, fill=fg_lab),col='black') + 
   # geom_segment(aes(x = fct_reorder(fg_lab, nut_prod_day_ha), xend =fct_reorder(fg_lab, nut_prod_day_ha), y =-Inf, yend = nut_prod_day_ha), col='grey') +
   geom_jitter(size=2, pch=21, width = 0.25) +
   geom_pointrange(data = prod_fg2, aes(ymin = lower, ymax = upper), size=1.5, pch=21) +
   # geom_label_repel(data = prod_fg %>% filter(id %in% plabs), aes(label=nutrient_lab), fill='white', size=2) +
   coord_flip() +
   th + theme(legend.position = 'none') +
-  scale_fill_manual(values = fg_cols.named2)  +
-  scale_color_manual(values = fg_cols.named2) +
+  scale_fill_manual(values = trophic_cols.named)  +
+  scale_color_manual(values = trophic_cols.named) +
   scale_y_continuous(breaks=seq(0, 0.8, by = 0.1), labels=seq(0, 80, by = 10)) +
   labs(x = '', y = "Mean proportion of nutrient productivity, %") 
 
@@ -98,7 +105,7 @@ g2<-ggplot(prod_fg_co, aes(nutrient_lab, nutprop, fill=fg_lab)) +
   coord_flip() +
   theme(legend.position = 'none') +
   labs(x = '', y = 'Proportion of assemblage biomass, productivity or nutrient production, %') +
-  scale_fill_manual(values = fg_cols.named2) +
+  scale_fill_manual(values = trophic_cols.named) +
   scale_color_manual(values = 'white') +
   scale_y_continuous(expand=c(0,0)) +
   facet_grid(~country, scales='free') + th +
@@ -109,8 +116,8 @@ g3<-ggplot(prod_reef %>% filter(nutrient == 'calcium.mg') %>% mutate(x = log10(b
                 aes(x = x)) +
         geom_histogram(col = 'black', fill='grey60', bins = 10) +
         facet_grid(~country) +
-        labs(x = 'Log10 biomass kgha', y = 'N sites') +
-        stat_summary(aes(x = 0.1, y = x, xintercept = stat(y), group = country), 
+        labs(x = expression(paste('Log'[10], ' biomass kg ha'^-1)), y = 'N sites') +
+        stat_summary(aes(x = 1, y = x, xintercept = stat(y), group = country),
                fun = median, geom = "vline", linetype = 5, col='#e31a1c',size = 0.8) +
         scale_y_continuous(expand=c(0,0)) +
         scale_x_continuous(expand=c(0,0)) +
@@ -120,7 +127,7 @@ g3<-ggplot(prod_reef %>% filter(nutrient == 'calcium.mg') %>% mutate(x = log10(b
 g4<-ggplot(prod_sp, aes(log10(biomass_kgha), nutprop, col=fg_lab)) + 
   geom_point(alpha=0.8, size=1.5) + facet_wrap(~nutrient, scales='free') +
   scale_color_manual(values = fg_cols.named2) +
-  labs(x = 'Log10 biomass, kg ha-1', y = 'Proportion of total nutrient productivity, %') +
+  labs(x = expression(paste('Log'[10], ' biomass kg ha'^-1)), y = 'Proportion of total nutrient productivity, %') +
   th + theme(legend.position = 'none')
 
 
