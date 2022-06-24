@@ -9,6 +9,9 @@ prod<-fishp %>% rowwise() %>%mutate(nscore3 = sum(ca_rda, fe_rda, zn_rda)) %>%
     pivot_longer(calcium.mg:vitamin_a.mug, names_to = 'nutrient', values_to = 'conc') %>% 
     mutate(nut_prod_day_ha = conc / 100 * prod_g_day_ha * 0.87,
            nut_biomass_kgha = conc * 0.87 * biomass_kgha)
+
+## change here to set the base FG for all analyses
+prod<-prod %>% mutate(fg = trophic_group)
   
 ## reef level estimates of nutrient productivity metrics
 prod_reef<-prod %>% group_by(country, fish_taxon, trophic_group, dietP, 
