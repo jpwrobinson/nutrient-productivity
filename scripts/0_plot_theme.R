@@ -48,14 +48,14 @@ fg_cols.named2<-setNames(as.character(fg.cols$col), fg.cols$FG_lab)
 # 		"Spongivore", "Piscivore") )
 
 
-reef.cols<-data.frame(col = c(disco(palette = "vibrant")[c(2,3,1)], disco(palette = "muted")[c(1,3,4,6,7)]),
-                      type = c('Gear restriction', 'No-take', 'Open-access', 'fore reef', 'fringing', 'back reef', 'patch', 'barrier'),
-                      type_lab = c('Gear\nrestriction', 'No-take', 'Open-access', 'Forereef', 'Fringing', 'Backreef', 'Patch', 'Barrier'))
+# reef.cols<-data.frame(col = c(disco::disco(palette = "vibrant")[c(2,3,1)], disco(palette = "muted")[c(1,3,4,6,7)]),
+#                       type = c('Gear restriction', 'No-take', 'Open-access', 'fore reef', 'fringing', 'back reef', 'patch', 'barrier'),
+#                       type_lab = c('Gear\nrestriction', 'No-take', 'Open-access', 'Forereef', 'Fringing', 'Backreef', 'Patch', 'Barrier'))
 
-gear.cols<-data.frame(m_col = disco::disco(palette = "vibrant")[c(2,3,1)], 
-                      management_rules = c('gear restriction', 'no take', 'open access'),
-                      manage_lab = c('Gear restriction', 'No-take', 'Open-access'),
-                      manage_lab2 = c('G-R', 'No-take', 'O-A'))
+# gear.cols<-data.frame(m_col = disco(palette = "vibrant")[c(2,3,1)], 
+#                       management_rules = c('gear restriction', 'no take', 'open access'),
+#                       manage_lab = c('Gear restriction', 'No-take', 'Open-access'),
+#                       manage_lab2 = c('G-R', 'No-take', 'O-A'))
 
 ben.cols<-data.frame(col = c('#498FC9','#9CE5FA','#B6B400','#DEF4AC','#870E00','#FBD7D5','#FAFBB2','#F2F3F3','#C2B280','#4E4E4E','#494949','#4E4E4E'),
                      benthic = c('hard_coral', 'soft_coral', 'macroalgae', 'turf_algae', 'cyanobacteria', 'crustose_coralline_algae',
