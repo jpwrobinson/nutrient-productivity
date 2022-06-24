@@ -1,5 +1,7 @@
 library(tidyverse)
+source('scripts/0_plot_theme.R')
 theme_set(funk::theme_sleek())
+
 
 ## Plot predicted covariate values
 
@@ -36,17 +38,17 @@ source('py-notebook/func_posterior_pred_plot.R')
 ## Future scenarios holding regimes conditions
 figname='fig/model/future_biomass_regimes.pdf'
 filename='/biomass'
-var_name = 'biomass, kg ha'
+var_name = 'biomass'
 source('py-notebook/func_posterior_read.R')
 
 figname='fig/model/future_productivity_regimes.pdf'
 filename='/prod'
-var_name = 'productivity, g day ha'
+var_name = 'productivity'
 source('py-notebook/func_posterior_read.R')
 
 figname='fig/model/future_nutrient_regimes.pdf'
 filename='/turnover'
-var_name = 'nutrient turnover, mg day ha'
+var_name = 'nutrient turnover'
 source('py-notebook/func_posterior_read.R')
 
 figname='fig/model/future_nutrient_density.pdf'
