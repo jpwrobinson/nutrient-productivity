@@ -18,7 +18,7 @@ pdf(file = figname, height=4, width=7)
 
 post<-read.csv(paste0('py-notebook', filename, filename, '_posterior_trace.csv'))
 
-S<-stdize(focal[,covs2])
+S<-stdize(focal[,'hard_coral'])
 foc_seq<-seq(min(S), max(S), length.out=100)
 foc_seq_raw<-seq(min(focal$hard_coral), max(focal$hard_coral), length.out=100)
 
@@ -128,7 +128,6 @@ if(filename=='/density'){
   }
 
 maxer$max_hc = unscaled_max$hard_coral
-maxer$val_50<-0.5 * maxer$max_val
 maxer$hc_50<-0.5 * maxer$max_hc
 maxer$country = unique(focal$country)
 

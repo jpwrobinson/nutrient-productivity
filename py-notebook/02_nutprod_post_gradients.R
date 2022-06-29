@@ -57,7 +57,9 @@ var_name = 'nutrient density, %'
 source('py-notebook/func_posterior_read.R')
 
 vv<-pred %>% filter(benthic == 'turf_algae' & prop_hc < 51 & prop_hc > 50) %>% pull(prop_mu)
-maxer$sim_val<-maxer$max_val*vv/100
+max<-pred %>% filter(benthic == 'turf_algae' & prop_hc == 100) %>% pull(prop_mu)
+maxer$sim_val<-maxer$max_val*max/100
+maxer$sim_val_50<-maxer$max_val*vv/100
 maxer$max_val - maxer$sim_val
 
 
