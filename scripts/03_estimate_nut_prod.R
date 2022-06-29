@@ -5,10 +5,11 @@ source('scripts/0_plot_theme.R')
 # definitions: https://github.com/jpwrobinson/nut-prod/issues/1
 load(file = 'results/wcs_productivity.rds')
 
+## estimate productivity, accounting for edible yield
 prod<-fishp %>% rowwise() %>%mutate(nscore3 = sum(ca_rda, fe_rda, zn_rda)) %>% 
     pivot_longer(calcium.mg:vitamin_a.mug, names_to = 'nutrient', values_to = 'conc') %>% 
-    mutate(nut_prod_day_ha = conc / 100 * prod_g_day_ha * 0.87, ## per gram edible yield
-           nut_biomass_kgha = conc * 10 * 0.87 * biomass_kgha) ## per kg edible yield 
+    mutate(nut_prod_day_ha = conc / 100 * prod_g_day_ha * 0.87, ## nutrients produced per day per hectare
+           nut_biomass_kgha = conc * 10 * 0.87 * biomass_kgha) ## nutrient yield per hectare
 
 ## change here to set the base FG for all analyses
 prod<-prod %>% mutate(fg = trophic_group)
@@ -34,8 +35,9 @@ prod_reef<-prod %>% group_by(country, fish_taxon, trophic_group, dietP,
                       nut_biomass_kgha = sum(nut_biomass_kgha),
                       prod_day_ha = sum(prod_day_ha),
                       biomass_kgha = sum(biomass_kgha)) %>% 
-      mutate(nut_turnover = ((nut_prod_day_ha / 1000) / nut_biomass_kgha) * 100,
-         biomass_turnover = ((prod_day_ha / 1000) / biomass_kgha) * 100) 
+            ## turnover is per year
+      mutate(nut_turnover = ((nut_prod_day_ha*365) / (nut_biomass_kgha)) * 100,
+         biomass_turnover = ((prod_day_ha*365) / (biomass_kgha)) * 100) 
 
 
 pdf(file = 'fig/explore/wcs_nutrient_prod_reef.pdf', height=7, width=12)
