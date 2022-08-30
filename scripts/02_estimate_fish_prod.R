@@ -27,8 +27,8 @@ hist(log10(fish$size))
 ##--------------------------------------------------##
 # 1. Check if any individuals are larger than species max size:
 ##--------------------------------------------------##
-fish %>% filter(size >= lmax) %>% dim() ## 757 observations
-fish %>% filter(size >= lmax) %>% summarise(sum(count)) ## 1714 fishes
+fish %>% filter(size >= lmax) %>% dim() ## 690 observations
+fish %>% filter(size >= lmax) %>% summarise(sum(count)) ## 1611 fishes
 
 # These need to be reduced to equal lmax (prod= exactly 0) 
 # OR 0.1cm below lmax (tiny prod values)
