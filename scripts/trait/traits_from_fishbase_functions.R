@@ -37,30 +37,7 @@ getTaxo <- function(sp,tax){
   }#end of k
   
   correctNames <- data.frame(Species,Species_corrected,SpecCode)
-  # 
-  # taxoFB <- as.data.frame(tax)
-  # 
-  # Genus <- rep("NA",nrow(correctNames))
-  # Family <- rep("NA",nrow(correctNames))
-  # Order <- rep("NA",nrow(correctNames))
-  # Class <- rep("NA",nrow(correctNames))
-  # 
-  # for(k in 1:nrow(correctNames)){
-  #   id <- which(taxoFB$Species == correctNames$Species_corrected[k])
-  #   if(length(id)==1){
-  #     Genus[k] <- taxoFB$Genus[id]
-  #     Family[k] <- taxoFB$Family[id]
-  #     Order[k] <- taxoFB$Order[id]
-  #     Class[k] <- taxoFB$Class[id]
-  #   }else{
-  #     next
-  #   }
-  # } #end of k
-  
-  # taxo <- data.frame(Species_corrected,Genus,Family,Order,Class)
-  # sp_data<-merge(correctNames,taxo,by="Species_corrected",all.x=T)
-  # sp_data<-sp_data[!duplicated(sp_data),]
-  
+
   sp_data<-left_join(correctNames, 
                      as.data.frame(tax) %>% 
                        select(Genus, Family, Order, Class, Species_corrected), by = 'Species_corrected')
