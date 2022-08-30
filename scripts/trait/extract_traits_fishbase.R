@@ -83,6 +83,8 @@ lmax$diet<-diet$dietP[match(lmax$Species_corrected, diet$species)]
 trait<-lmax
 save(trait, file = 'data/trait/wcs_sp_lmax_diet.rds')
 
+# export incorrect species
+trait[trait$Species != trait$Species_corrected,] %>% write.csv('data/trait/wcs_species_incorrect.csv')
 #END
 
 
