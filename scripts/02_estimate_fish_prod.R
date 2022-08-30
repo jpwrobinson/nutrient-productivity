@@ -123,9 +123,7 @@ fishp <- predKmax (fish,
 # save Kmax predictions
 fishp <- fishp$pred
 hist(fishp$Kmax)
-# save(fishp, file = 'results/wcs_productivity.rds')
 
-# 
 # # Positioning fish in their growth trajectory 
 # # i.e. what's the size they're supposed to have on the next day? 
 fishp$L.1day <- with (fishp, applyVBGF (Lmeas = size2,
