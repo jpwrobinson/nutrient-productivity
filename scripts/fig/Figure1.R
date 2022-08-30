@@ -1,4 +1,4 @@
-pacman::p_load(tidyverse, skimr, cowplot, here, funk,disco, patchwork, mermaidr, mermaidreporting, install=FALSE)
+pacman::p_load(tidyverse, skimr, cowplot, here, funk,disco, patchwork, install=FALSE)
 source('scripts/0_plot_theme.R')
 
 
@@ -33,7 +33,7 @@ gg<-ggplot(fish2, aes(log10(Kmax), nscore, col=trophic_lab)) +
   labs(x = 'Derived growth coefficent (Kmax)', y = 'Nutrient density, %') +
   # scale_x_continuous(breaks=seq(0, 0.6, by = 0.1)) +
   th +
-  theme(legend.position = c(0.8, 0.88), 
+  theme(legend.position = 'none',
         panel.border=element_rect(color='black'),
         axis.line = element_blank()) +
   scale_fill_manual(values = trophic_cols.named) +
