@@ -34,23 +34,31 @@ tax<-tax %>% filter(!SpecCode %in% dupe$SpecCode) %>% rbind(duped) %>%
 #Import species list here
 # sp <- read.csv("data/trait/all_species.csv")
 sp<-mermaid_get_reference(reference = c("fishspecies", 'fishgenera', 'fishfamilies'))
+# wcs_lmax<-sp$fishspecies$max_length # where does this come from? 72 NAs
 
-# species_list <- sp$species
-species_list <- sort(sp$fishspecies$display) # 3,293 species
+## save new data with species names
+species_list <- data.frame(Species = sort(sp$fishspecies$species)) # 3,308 species
+species_list<-species_list %>% left_join(tax)
 
-# validate names
-sp_data <- getTaxo(sp = species_list , tax = tax)
-sp_data<- sp_data[!duplicated(sp_data),]
-save(sp_data, file = 'data/trait/wcs_sp_data.rds')
+# validate names for incorrect species
+incor<-species_list$Species[is.na(species_list$SpecCode)]
+sp_data <- getTaxo(sp = incor , tax = tax)
+species_list$Species_corrected[is.na(species_list$SpecCode)]<-sp_data$Species_corrected
+species_list$Genus[is.na(species_list$SpecCode)]<-sp_data$Genus
+species_list$Family[is.na(species_list$SpecCode)]<-sp_data$Family
+species_list$SpecCode[is.na(species_list$SpecCode)]<-sp_data$SpecCode
 
-sp_data %>% filter(is.na(SpecCode))
+## data checks
+species_list[duplicated(species_list),]
+species_list %>% filter(is.na(SpecCode))
+species_list<- species_list[!duplicated(species_list),]
 
+# save 
+save(species_list, file = 'data/trait/wcs_sp_data.rds')
 
 
 #Get Lmax
-# fix a species_corrected NA (Upeneus indicus)
-sp_data$Species_corrected[is.na(sp_data$Species_corrected)]<-sp_data$Species[is.na(sp_data$Species_corrected)]
-lmax <- getLmax(sp_data)
+lmax <- getLmax(species_list)
 
 ## get Diet (Parravicini et al. 2020, PLoS ONE)
 diet<-read.csv('data/trait/parravicini_trophic_guilds_2020.csv') %>% janitor::clean_names() %>% 
