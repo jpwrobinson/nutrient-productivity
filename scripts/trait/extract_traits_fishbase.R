@@ -65,7 +65,7 @@ lmax_3307<-getLmax(species_list[2501:3307,])
 lmax<-rbind(lmax_1500, lmax_2500, lmax_3307)
 
 # change incorrect value (1) for Acanthurus bahianus
-lmax$lmax[lmax$Species_corrected=='Acanthurus bahianus']<-NA
+lmax$lmax[lmax$Species_corrected %in% c('Acanthurus bahianus', 'Choerodon melanostigma')]<-NA
 
 ## get Diet (Parravicini et al. 2020, PLoS ONE)
 diet<-read.csv('data/trait/parravicini_trophic_guilds_2020.csv') %>% janitor::clean_names() %>% 
