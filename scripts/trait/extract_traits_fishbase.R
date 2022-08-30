@@ -64,6 +64,9 @@ lmax_2500 <- getLmax(species_list[1501:2500,])
 lmax_3307<-getLmax(species_list[2501:3307,])
 lmax<-rbind(lmax_1500, lmax_2500, lmax_3307)
 
+# change incorrect value (1) for Acanthurus bahianus
+lmax$lmax[lmax$Species_corrected=='Acanthurus bahianus']<-NA
+
 ## get Diet (Parravicini et al. 2020, PLoS ONE)
 diet<-read.csv('data/trait/parravicini_trophic_guilds_2020.csv') %>% janitor::clean_names() %>% 
       mutate(species = str_replace_all(species, '_', '\\ '))
@@ -86,28 +89,3 @@ save(trait, file = 'data/trait/wcs_sp_lmax_diet.rds')
 # export incorrect species
 trait[trait$Species != trait$Species_corrected,] %>% write.csv('data/trait/wcs_species_incorrect.csv')
 #END
-
-
-########################################
-# #Testing area for Reef position with Seychelles data
-# sey <- read.csv("/Users/maire/Downloads/Species traits_Seychelles_exactMaxSizeTL.csv")
-# 
-# species_list <- sey$species
-# 
-# #Load GASPAR database
-# gaspar <- read.csv("data/trait/gaspar.csv")
-# 
-# #Test MainFood
-# Diet <- read.xlsx("data/trait/SAU data/FeedingPathway_Fishbase.xlsx",sheetName = "Diet")
-# Food <- read.xlsx("data/trait/FeedingPathway_Fishbase.xlsx",sheetName = "Food Items")
-# 
-# mainfood <- getMainFood(sp_data,Diet, Food)
-# mainfood
-# 
-# #Test Demersal versus Pelagic
-# dem <- getDemersPelag(sp_data)
-# dem
-# 
-# #Test biology
-# vert <- getVerticalPosition(sp_data,gaspar)
-# vert
