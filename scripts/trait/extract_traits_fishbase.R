@@ -52,13 +52,17 @@ species_list$SpecCode[is.na(species_list$SpecCode)]<-sp_data$SpecCode
 species_list[duplicated(species_list),]
 species_list %>% filter(is.na(SpecCode))
 species_list<- species_list[!duplicated(species_list),]
+species_list<- species_list %>% filter(Species != 'Pterocaesio spp.')
 
 # save 
 save(species_list, file = 'data/trait/wcs_sp_data.rds')
 
 
-#Get Lmax
-lmax <- getLmax(species_list)
+#Get Lmax (split into 2 dfs bc of timeout error)
+lmax_1500 <- getLmax(species_list[1:1500,])
+lmax_2500 <- getLmax(species_list[1501:2500,])
+lmax_3307<-getLmax(species_list[2501:3307,])
+lmax<-rbind(lmax_1500, lmax_2500, lmax_3307)
 
 ## get Diet (Parravicini et al. 2020, PLoS ONE)
 diet<-read.csv('data/trait/parravicini_trophic_guilds_2020.csv') %>% janitor::clean_names() %>% 
