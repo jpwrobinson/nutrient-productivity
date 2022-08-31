@@ -56,7 +56,7 @@ focal<-left_join(data.frame(prod_reef) %>% mutate(id=paste(site, year, country, 
   # left_join(threat, by = 'site') %>% ungroup() ## lots of sites missing, incl. all of Belize
   mutate_if(is.character, as.factor) %>% 
   dplyr::select(
-    nut_turnover, nut_prod_day_ha, prod_day_ha, biomass_kgha, nscore3, nutrient, nutrient_lab, country, site, year, 
+    nut_turnover, nut_prod_day_ha, prod_day_ha, biomass_kgha, nscore, nscore3, nutrient, nutrient_lab, country, site, year, 
     hard_coral, macroalgae, turf_algae, bare_substrate,rubble, reef_type, reef_zone, depth,
     management_rules, grav_nc, sediment, nutrient_load, pop_count) %>%  
   filter(nutrient==nut) %>% 
@@ -70,7 +70,7 @@ hist(focal$nut_turnover, main = nut, xlab = 'Nutrient turnover, %')
 ## scale numeric, pivot wider
 source('scripts/scaler.R')
 focal.scaled<-scaler(focal, 
-                     ID = c('biomass_kgha','nut_turnover','nut_prod_day_ha','prod_day_ha','nscore3', 'nutrient','nutrient_lab',
+                     ID = c('biomass_kgha','nut_turnover','nut_prod_day_ha','prod_day_ha','nscore','nscore3', 'nutrient','nutrient_lab',
                             'country', 'site','year','id2',
                              'reef_type', 'reef_zone',
                             'management_rules'), cats = FALSE) 
