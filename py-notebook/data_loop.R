@@ -44,24 +44,23 @@ for(i in 1:length(nut.vec)){
 }
 
 
-
-focal<-read.csv('py-notebook/zinc.mg_scaled.csv') %>% 
-  pivot_longer(browser:scraper.excavator, names_to = 'fg', values_to = 'nutprop')
-ggplot(focal, aes(nutprop)) + geom_histogram() + facet_wrap(~fg)
+## checking nut proportion df
+# focal<-read.csv('py-notebook/zinc.mg_scaled.csv') %>% 
+#   pivot_longer(browser:scraper.excavator, names_to = 'fg', values_to = 'nutprop')
+# ggplot(focal, aes(nutprop)) + geom_histogram() + facet_wrap(~fg)
 # ggplot(focal, aes(depth, nutprop, col=fg)) + geom_point() + geom_smooth()
 # ggplot(focal, aes(grav_nc, nutprop, col=fg)) + geom_point() + geom_smooth()
 # ggplot(focal, aes(fg, nutprop, fill=fg)) + geom_boxplot() + facet_wrap(~country)
-ggplot(focal, aes(management_rules, nutprop, fill=fg)) + geom_boxplot() + facet_wrap(~country)
+# ggplot(focal, aes(management_rules, nutprop, fill=fg)) + geom_boxplot() + facet_wrap(~country)
 # focal %>% group_by(fg) %>% summarise(median(nutprop), min(nutprop), max(nutprop))
 
+## checking reef-scale nutrient df
 focal<-read.csv('py-notebook/zinc.mg_reef_unscaled.csv') 
 ggplot(focal, aes(country, biomass_kgha, fill=management_rules)) + geom_boxplot()
 ggplot(focal, aes(hard_coral, nscore3)) + geom_point()
 ggplot(focal, aes(management_rules, nscore3, fill=country)) + geom_boxplot()
 
-
+# covariate correlations
 test<-read.csv('py-notebook/zinc.mg_reef_unscaled.csv')
-pairs2(test[,c(10:14,17, 19:22)])
-
-test<-read.csv('py-notebook/zinc.mg_reef_unscaled.csv')
+pairs2(test[,c(11:15,18, 20:23)])
 hist(log(test$nut_turnover))
