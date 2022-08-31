@@ -64,4 +64,5 @@ ggplot(focal, aes(management_rules, nscore3, fill=country)) + geom_boxplot()
 # covariate correlations
 test<-read.csv('py-notebook/zinc.mg_reef_unscaled.csv')
 pairs2(test[,c(11:15,18, 20:23)])
+pairs2(test[,c(1:6)])
 hist(log(test$nut_turnover))

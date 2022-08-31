@@ -5,11 +5,13 @@ conts<-c('hard_coral', 'bare_sub', 'gravity', 'turf', 'population', 'macroalgae'
 
 pBiom<-read.csv('py-notebook/biomass/posterior_summary.csv') %>% mutate(service = 'Biomass')
 pProd<-read.csv('py-notebook/prod/posterior_summary.csv') %>% mutate(service = 'Productivity')
-pTurn<-read.csv('py-notebook/turnover/zinc_posterior_summary.csv') %>% mutate(service = 'Zinc turnover')
-pDens<-read.csv('py-notebook/density/posterior_summary.csv') %>% mutate(service = 'Nutrient density')
+pCa<-read.csv('py-notebook/turnover/calcium_posterior_summary.csv') %>% mutate(service = 'Calcium turnover')
+pFe<-read.csv('py-notebook/turnover/iron_posterior_summary.csv') %>% mutate(service = 'Iron turnover')
+pZn<-read.csv('py-notebook/turnover/zinc_posterior_summary.csv') %>% mutate(service = 'Zinc turnover')
+# pDens<-read.csv('py-notebook/density/posterior_summary.csv') %>% mutate(service = 'Nutrient density')
 
 # join posts
-posts<-rbind(pBiom, pProd, pTurn, pDens) %>% 
+posts<-rbind(pBiom, pProd, pTurn, pCa, pFe, pZn) %>% 
   mutate(var = str_split_fixed(X, '\\[', 2)[,1]) %>% 
   # filter(!var %in% c('intercept', 'alpha', 'β0_cnc', 'β0_managenc')) %>%
   filter(var %in% conts) %>%

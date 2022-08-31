@@ -64,3 +64,11 @@ ggplot(prod_reef, aes(prod_day_ha, nut_prod_day_ha, col=country)) + geom_point()
 ggplot(prod_reef, aes(biomass_kgha, nut_prod_day_ha, col=country)) + geom_point() + facet_wrap(~nutrient, scales='free')
 ggplot(prod_reef, aes(biomass_kgha, nut_turnover, col=country)) + geom_point() + facet_wrap(~nutrient, scales='free')
 ggplot(prod_reef, aes(biomass_kgha, prod_day_ha, col=country)) + geom_point() + facet_wrap(~nutrient, scales='free')
+
+## correlation between nutrient productivity metrics
+turns<-prod_reef %>% ungroup() %>% dplyr::select(country, site, year, nutrient, nut_turnover) %>% 
+  pivot_wider(names_from = 'nutrient', values_from = 'nut_turnover')
+pairs2(turns[,-c(1:3)])
+
+prods<-prod_reef %>% ungroup() %>% dplyr::select(country, site, year, nutrient, nut_prod_day_ha) %>% pivot_wider(names_from = 'nutrient', values_from = 'nut_prod_day_ha')
+pairs2(prods[,-c(1:3)])
