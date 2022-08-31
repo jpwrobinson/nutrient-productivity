@@ -6,7 +6,8 @@ source('scripts/0_plot_theme.R')
 load(file = 'results/wcs_productivity.rds')
 
 ## estimate productivity, accounting for edible yield
-prod<-fishp %>% rowwise() %>%mutate(nscore3 = sum(ca_rda, fe_rda, zn_rda)) %>% 
+prod<-fishp %>% rowwise() %>% 
+    mutate(nscore3 = sum(ca_rda, fe_rda, zn_rda)) %>% 
     pivot_longer(calcium.mg:vitamin_a.mug, names_to = 'nutrient', values_to = 'conc') %>% 
     mutate(nut_prod_day_ha = conc / 100 * prod_g_day_ha * 0.87, ## nutrients produced per day per hectare
            nut_biomass_kgha = conc * 10 * 0.87 * biomass_kgha) ## nutrient yield per hectare
@@ -16,13 +17,13 @@ prod<-prod %>% mutate(fg = trophic_group)
   
 ## reef level estimates of nutrient productivity metrics
 prod_reef<-prod %>% group_by(country, fish_taxon, trophic_group, dietP, 
-                             management, site, year, sample_date, transect_number, depth, nutrient, nscore3) %>% 
+                             management, site, year, sample_date, transect_number, depth, nutrient, nscore3, nscore) %>% 
             summarise(
               nut_prod_day_ha = sum(nut_prod_day_ha), 
               nut_biomass_kgha = sum(nut_biomass_kgha),
               prod_day_ha = sum(prod_g_day_ha),
               biomass_kgha = sum(biomass_kgha)) %>% 
-            group_by(country, fish_taxon, trophic_group, management, site, year, depth, nutrient, nscore3) %>% 
+            group_by(country, fish_taxon, trophic_group, management, site, year, depth, nutrient, nscore, nscore3) %>% 
             summarise(
               nut_prod_day_ha = mean(nut_prod_day_ha), 
               nut_biomass_kgha = mean(nut_biomass_kgha),
@@ -31,6 +32,7 @@ prod_reef<-prod %>% group_by(country, fish_taxon, trophic_group, dietP,
             ungroup() %>% 
             group_by(country,site, year, nutrient) %>% 
             summarise(nscore3 = weighted.mean(nscore3, w = biomass_kgha),
+                      nscore = weighted.mean(nscore, w = biomass_kgha),
                       nut_prod_day_ha = sum(nut_prod_day_ha), 
                       nut_biomass_kgha = sum(nut_biomass_kgha),
                       prod_day_ha = sum(prod_day_ha),
