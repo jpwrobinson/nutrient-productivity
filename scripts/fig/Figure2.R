@@ -1,6 +1,7 @@
 
 ## FG level nutrient productivity
 source('scripts/0_plot_theme.R')
+th_ticks<-theme(axis.ticks.x = element_line(colour='black'))
 
 load(file = 'results/wcs_productivity.rds')
 load(file = 'results/wcs_nut_prod.rds')
@@ -91,25 +92,27 @@ prod_fg_co$fg_lab<-factor(prod_fg_co$fg_lab, levels = levs)
 g1<-ggplot(prod_fg, aes(fg_lab ,nutprop, fill=fg_lab),col='black') + 
   # geom_segment(aes(x = fct_reorder(fg_lab, nut_prod_day_ha), xend =fct_reorder(fg_lab, nut_prod_day_ha), y =-Inf, yend = nut_prod_day_ha), col='grey') +
   geom_jitter(size=2, pch=21, width = 0.25) +
-  geom_pointrange(data = prod_fg2, aes(ymin = lower, ymax = upper), size=1.5, pch=21) +
+  geom_pointrange(data = prod_fg2, aes(ymin = lower, ymax = upper), size=1, fatten=4.5, pch=21) +
   # geom_label_repel(data = prod_fg %>% filter(id %in% plabs), aes(label=nutrient_lab), fill='white', size=2) +
   coord_flip() +
   th + theme(legend.position = 'none') +
   scale_fill_manual(values = trophic_cols.named)  +
   scale_color_manual(values = trophic_cols.named) +
   scale_y_continuous(breaks=seq(0, 0.8, by = 0.1), labels=seq(0, 80, by = 10)) +
-  labs(x = '', y = "Mean proportion of nutrient productivity, %") 
+  labs(x = '', y = "Mean proportion of nutrient productivity, %") +
+  th_ticks
 
 g2<-ggplot(prod_fg_co, aes(nutrient_lab, nutprop, fill=fg_lab)) + 
-  geom_bar(stat='identity') +
+  geom_bar(stat='identity', col='black',size=0.1) +
   coord_flip() +
   theme(legend.position = 'none') +
   labs(x = '', y = 'Proportion of assemblage biomass, productivity or nutrient production, %') +
   scale_fill_manual(values = trophic_cols.named) +
   scale_color_manual(values = 'white') +
-  scale_y_continuous(expand=c(0,0)) +
+  scale_y_continuous(expand=c(0,0), breaks=seq(25, 100,25)) +
   facet_grid(~country, scales='free') + th +
-  theme(legend.position = 'none', strip.text.x = element_blank(), plot.margin=unit(c(0, 0.5, 0.1, 0.1), 'cm')) 
+  theme(legend.position = 'none', strip.text.x = element_blank(), plot.margin=unit(c(0, 0.5, 0.1, 0.1), 'cm')) +
+  th_ticks
 
 ## biom distributions
 g3<-ggplot(prod_reef %>% filter(nutrient == 'calcium.mg') %>% mutate(x = log10(biomass_kgha)),
@@ -121,7 +124,8 @@ g3<-ggplot(prod_reef %>% filter(nutrient == 'calcium.mg') %>% mutate(x = log10(b
                fun = median, geom = "vline", linetype = 5, col='#e31a1c',size = 0.8) +
         scale_y_continuous(expand=c(0,0)) +
         scale_x_continuous(expand=c(0,0)) +
-        th
+        th + th_ticks
+        
 
 ## sup fig
 g4<-ggplot(prod_sp, aes(log10(biomass_kgha), nutprop, col=fg_lab)) + 
@@ -132,7 +136,7 @@ g4<-ggplot(prod_sp, aes(log10(biomass_kgha), nutprop, col=fg_lab)) +
 
 
 pdf(file='fig/Figure2.pdf', height=5, width=14)
-rp<-plot_grid(g3, g2, nrow =2, rel_heights=c(0.5, 1), align='v')
+rp<-plot_grid(g3, g2, nrow =2, rel_heights=c(0.5, 1), align='v', labels=c('', 'C'))
 print(
   plot_grid(g1, rp, nrow=1, labels=c('A', 'B'), rel_widths=c(0.7, 1))
 )
