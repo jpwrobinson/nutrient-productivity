@@ -16,27 +16,24 @@ prod<-fishp %>% rowwise() %>%
 prod<-prod %>% mutate(fg = trophic_group)
   
 ## reef level estimates of nutrient productivity metrics
-prod_reef<-prod %>% group_by(country, fish_taxon, trophic_group, dietP, 
-                             management, site, year, sample_date, transect_number, depth, nutrient, nscore3, nscore) %>% 
+prod_reef<-prod %>% group_by(country, management, site, year, sample_date, transect_number, depth, nutrient) %>% 
             summarise(
+              nscore = weighted.mean(nscore, w = biomass_kgha),
+              nscore3 = weighted.mean(nscore3, w = biomass_kgha),
               nut_prod_day_ha = sum(nut_prod_day_ha), 
               nut_biomass_kgha = sum(nut_biomass_kgha),
               prod_day_ha = sum(prod_g_day_ha),
-              biomass_kgha = sum(biomass_kgha)) %>% 
-            group_by(country, fish_taxon, trophic_group, management, site, year, depth, nutrient, nscore, nscore3) %>% 
+              biomass_kgha = sum(biomass_kgha),
+              depth = mean(depth)) %>% 
+            group_by(country, management, site, year, nutrient) %>% 
             summarise(
+              depth = mean(depth),
               nut_prod_day_ha = mean(nut_prod_day_ha), 
               nut_biomass_kgha = mean(nut_biomass_kgha),
               prod_day_ha = mean(prod_day_ha),
-              biomass_kgha = mean(biomass_kgha)) %>% 
-            ungroup() %>% 
-            group_by(country,site, year, nutrient) %>% 
-            summarise(nscore3 = weighted.mean(nscore3, w = biomass_kgha),
-                      nscore = weighted.mean(nscore, w = biomass_kgha),
-                      nut_prod_day_ha = sum(nut_prod_day_ha), 
-                      nut_biomass_kgha = sum(nut_biomass_kgha),
-                      prod_day_ha = sum(prod_day_ha),
-                      biomass_kgha = sum(biomass_kgha)) %>% 
+              biomass_kgha = mean(biomass_kgha),
+              nscore = mean(nscore),
+              nscore3 = mean(nscore3))  %>% 
             ## turnover is per year
       mutate(nut_turnover = ((nut_prod_day_ha*365) / (nut_biomass_kgha)) * 100,
          biomass_turnover = ((prod_day_ha*365) / (biomass_kgha)) * 100) 
