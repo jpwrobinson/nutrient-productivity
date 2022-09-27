@@ -73,3 +73,5 @@ pairs2(turns[,-c(1:3)])
 
 prods<-prod_reef %>% ungroup() %>% dplyr::select(country, site, year, nutrient, nut_prod_day_ha) %>% pivot_wider(names_from = 'nutrient', values_from = 'nut_prod_day_ha')
 pairs2(prods[,-c(1:3)])
+
+

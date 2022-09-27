@@ -16,7 +16,9 @@ prod_fg<-prod_fg %>%
   mutate(tnut = sum(nut_prod_day_ha), 
          nutprop = nut_prod_day_ha / tnut,
          tprod = sum(prod_g_day_ha),
-         prodprop = prod_g_day_ha / tprod) 
+         prodprop = prod_g_day_ha / tprod,
+         tbiom = sum(biomass_kgha),
+         biomprop = biomass_kgha / tbiom) 
 
 prod_reef<-prod_reef %>% 
   mutate(nutrient_lab = recode(nutrient, 'calcium.mg' = 'Calcium', 'iron.mg' = 'Iron', 'zinc.mg' = 'Zinc',
@@ -26,15 +28,18 @@ prod_reef<-prod_reef %>%
 nut.vec<-unique(prod_fg$nutrient)
 
 # model data - extract for fg
-# for(i in 1:length(nut.vec)){
-#   nut<-nut.vec[i]
-#   print(paste('Data mangle + scale for', nut))
-#   source('py-notebook/data_extract.R')
-# }
-# 
-# ## productivity only
-# nut = 'productivity'
-# source('py-notebook/data_extract.R')
+for(i in 1:length(nut.vec)){
+  nut<-nut.vec[i]
+  print(paste('Data mangle + scale for', nut))
+  source('py-notebook/data_extract.R')
+}
+
+## biomass or productivity only
+nut = 'productivity'
+source('py-notebook/data_extract.R')
+
+nut = 'biomass'
+source('py-notebook/data_extract.R')
 
 # model data - extract for reef
 for(i in 1:length(nut.vec)){

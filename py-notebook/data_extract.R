@@ -31,11 +31,12 @@ threat$nutrient_load<-log10(threat$nutrient_load+1)
 manage<-read.csv(file = 'data/wcs/mermaid_management_clean.csv') %>% dplyr::select(-country)
 
 # join prod estimates with benthic + fishing covariates
-focal<-left_join(data.frame(prod_fg) %>% mutate(id2=paste(site, country, sep='_')), 
+focal<-left_join(data.frame(prod_fg) %>% mutate(id = paste(site, year, country, sep='_'),
+                                                id2=paste(site, country, sep='_')), 
                  fish_avg %>% ungroup() %>%  
                    dplyr::select(site, reef_type, reef_zone, management_rules, 
-                          hard_coral, macroalgae, turf_algae, bare_substrate, rubble, depth, fish_richness, id2),
-                 by='id2') %>% 
+                          hard_coral, macroalgae, turf_algae, bare_substrate, rubble, depth, fish_richness,id, id2),
+                 by=c('id2', 'id')) %>% 
   left_join(threat, by = 'id2') %>% 
   # left_join(manage, by = 'site') %>% 
   # recode management_rules
@@ -55,7 +56,7 @@ focal<-left_join(data.frame(prod_fg) %>% mutate(id2=paste(site, country, sep='_'
   # left_join(threat, by = 'site') %>% ungroup() ## lots of sites missing, incl. all of Belize
   mutate_if(is.character, as.factor) %>% 
   dplyr::select(
-    nutprop, prodprop, nutrient, nutrient_lab, country, site, year, fg, 
+    nutprop, prodprop,biomprop, nutrient, nutrient_lab, country, site, year, fg, 
     hard_coral, macroalgae, turf_algae, bare_substrate, rubble, reef_type, reef_zone, depth,
     management_rules, grav_nc, sediment, nutrient_load, pop_count) %>%  
   mutate(management_rules = fct_relevel(management_rules, 'open-access', after=0))
@@ -64,18 +65,22 @@ focal<-left_join(data.frame(prod_fg) %>% mutate(id2=paste(site, country, sep='_'
 
 
 if(nut == 'productivity'){
-  write.csv(focal %>% filter(nutrient=='calcium.mg') %>% select(-nutprop) %>% pivot_wider(names_from = fg, values_from = prodprop), 
-          file = paste0('py-notebook/', nut, '_unscaled.csv'))} else {
+  write.csv(focal %>% filter(nutrient=='calcium.mg') %>% select(-nutprop, -biomprop) %>% pivot_wider(names_from = fg, values_from = prodprop), 
+          file = paste0('py-notebook/', nut, '_unscaled.csv'))} else 
+
+if(nut == 'biomass'){
+              write.csv(focal %>% filter(nutrient=='calcium.mg') %>% select(-nutprop, -prodprop) %>% pivot_wider(names_from = fg, values_from = biomprop), 
+                        file = paste0('py-notebook/', nut, '_unscaled.csv'))} else {
 
 ## check reponse hist, bounded 0 - 1
-focal<-focal %>% filter(nutrient==nut) %>% select(-prodprop)
+focal<-focal %>% filter(nutrient==nut) %>% select(-prodprop, -biomprop)
 hist(focal$nutprop, main = nut, xlab = 'Proportion of productivity')
 focal$nutprop[focal$nutprop==1]<-0.99
 
 ## scale numeric, pivot wider
 source('scripts/scaler.R')
 focal.scaled<-scaler(focal, 
-                     ID = c('nutprop', 'prodprop', 'nutrient','nutrient_lab', 'country', 'site','year','id2',
+                     ID = c('nutprop', 'prodprop','biomprop', 'nutrient','nutrient_lab', 'country', 'site','year','id2',
                             'fg', 'reef_type', 'reef_zone',
                             'management_rules'), cats = FALSE) %>% 
               pivot_wider(names_from = fg, values_from = nutprop)

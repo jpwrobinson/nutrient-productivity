@@ -35,7 +35,7 @@ focal<-left_join(data.frame(prod_reef) %>% mutate(id=paste(site, year, country, 
                                                   id2=paste(site, country, sep='_')), 
                  fish_avg %>% ungroup() %>%  
                    dplyr::select(site, reef_type, reef_zone, management_rules, 
-                          hard_coral, macroalgae, turf_algae, bare_substrate, rubble, depth, fish_richness,id, id2),
+                          hard_coral, macroalgae, turf_algae, bare_substrate, rubble, fish_richness,id, id2),
                  by=c('id', 'id2')) %>% 
   left_join(threat, by = 'id2') %>% 
   # left_join(manage, by = 'site') %>% 
