@@ -147,18 +147,22 @@ fishp<-left_join(fishp, lwp)
 fishp$mass<-fishp$biomass_constant_a * fishp$size2 ^ fishp$biomass_constant_b
 
 ## estimate productivity of each fish
-fishp$size_nextday<-lplus(lmax = fishp$lmax, K = fishp$Kmax, age = fishp$age ) 
+fishp$size_nextday<-lplus(lmax = fishp$lmax, K = fishp$Kmax, age = fishp$age )
+fishp$prod_mass_g<-somaGain(a = fishp$biomass_constant_a, b = fishp$biomass_constant_b,
+                             Lmeas = fishp$size2, Lmax = fishp$lmax, Kmax = fishp$Kmax)
+
+## estimate natural mortality
+fishp$Z<-predM(fishp$size2, Kmax = fishp$Kmax, Lmax = fishp$lmax) ## estimated mortality rate by species
+fishp$per_capita_mortality<-somaLoss(fishp$Z, fishp$size2, t = 1) ## daily per capita loss from natural mortality
+
+# remove mortality from mass gain 
+fishp$prod_mass_g <- fishp$prod_mass_g - fishp$per_capita_mortality
+fishp$prod_mass_g <- ifelse(fishp$prod_mass_g < 0, 0, fishp$prod_mass_g)
 
 fishp<-fishp %>% mutate(
         prod_cm_day_perfish = size_nextday - size2,
-        prod_g_day_perfish = (biomass_constant_a * size_nextday ^ biomass_constant_b) - mass,
-        prod_g_day = prod_g_day_perfish * count,
+        prod_g_day = prod_mass_g * count,
         prod_g_day_ha = prod_g_day * (10000 / transect_area)) ## convert transect to hectare
-
-with(fishp, plot(prod_cm_day_perfish, prod_g_day_perfish))
-with(fishp, plot(log10(prod_cm_day_perfish), log10(prod_g_day_perfish)))
-
-fishp$trophic_group[fishp$fish_taxon=='Herklotsichthys quadrimaculatus']<-'planktivore'
 
 fishp$fg<-fishp$functional_group
 fishp$fg[fishp$fg %in% c('corallivore', 'spongivore')]<-'invertivore-sessile'
@@ -167,4 +171,3 @@ fishp$fg[fishp$fg %in% c('macro-invertivore', 'micro-invertivore')]<-'invertivor
 fishp$fg[fishp$fg %in% c('pisci-invertivore')]<-'mixed-diet feeder'
 
 save(fishp, file = 'results/wcs_productivity.rds')
-

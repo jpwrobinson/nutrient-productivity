@@ -24,9 +24,9 @@ top5<-prod_sp %>%
   group_by(nutrient, country) %>% 
   slice_max(nut_prod_day_ha, n = 5)
 
-g1<-ggplot(prod_sp, aes(country, y=prod_g_day_ha, fill = fct_reorder(species, nutprop))) + geom_col(position = 'fill') + 
+g1<-ggplot(prod_sp, aes(nutrient, y=prod_g_day_ha, fill = fct_reorder(species, nutprop))) + geom_col(position = 'fill') + 
       theme(legend.position = 'right') +
-      facet_grid(~nutrient) +
+      facet_grid(~country) +
       scale_y_continuous(expand=c(0,0)) +
       scale_fill_manual(values = c('grey', RColorBrewer::brewer.pal(12, 'Paired'), RColorBrewer::brewer.pal(12, 'Set3')))
 
@@ -43,7 +43,6 @@ ggplot(prod_sp %>% group_by(country, nutrient) %>% slice_max(n = 5, nut_prod_day
 pdf(file = 'fig/FigureSX_key_nutprod_species.pdf', height=7, width=22)
 print(g1)
 dev.off()
-
 
 
 ggplot(prod_reef, aes(nut_turnover)) + geom_histogram() + facet_wrap(~nutrient, scales='free')
