@@ -8,10 +8,17 @@ pProd<-read.csv('py-notebook/prod/posterior_summary.csv') %>% mutate(service = '
 pCa<-read.csv('py-notebook/turnover/calcium_posterior_summary.csv') %>% mutate(service = 'Calcium turnover')
 pFe<-read.csv('py-notebook/turnover/iron_posterior_summary.csv') %>% mutate(service = 'Iron turnover')
 pZn<-read.csv('py-notebook/turnover/zinc_posterior_summary.csv') %>% mutate(service = 'Zinc turnover')
+<<<<<<< HEAD
 pDens<-read.csv('py-notebook/density/posterior_summary.csv') %>% mutate(service = 'Nutrient density')
 
 # join posts
 posts<-rbind(pBiom, pProd, pCa, pFe, pZn, pDens) %>% 
+=======
+# pDens<-read.csv('py-notebook/density/posterior_summary.csv') %>% mutate(service = 'Nutrient density')
+
+# join posts
+posts<-rbind(pBiom, pProd, pTurn, pCa, pFe, pZn) %>% 
+>>>>>>> 4831053d61ab0c13a38345ed1b1bec80a049841b
   mutate(var = str_split_fixed(X, '\\[', 2)[,1]) %>% 
   # filter(!var %in% c('intercept', 'alpha', 'β0_cnc', 'β0_managenc')) %>%
   filter(var %in% conts) %>%
@@ -24,15 +31,22 @@ levs<-c('hard_coral','macroalgae', 'bare_sub', 'turf',  'gravity', 'population',
 labs<-c('Hard coral','Macroalgae', 'Bare substrate', 'Turf algae',  'Market gravity', 'Human population', 'Sedimentation', 'Nutrient load')
 posts$varname<-factor(posts$varname, levels=rev(levs))
 
+<<<<<<< HEAD
 posts$service<-factor(posts$service, levels = c('Biomass', 'Productivity', 'Calcium turnover', 'Iron turnover', 'Zinc turnover', 'Nutrient density'))
 
+=======
+>>>>>>> 4831053d61ab0c13a38345ed1b1bec80a049841b
 g1<-ggplot(posts, aes(mean, varname, xmin = hdi_2.5., xmax = hdi_97.5., fill=fill)) + 
       geom_vline(xintercept = 0, linetype=5) +
       geom_pointrange(pch=21, fatten=8) + 
       scale_fill_identity() +
       scale_y_discrete(labels=rev(labs)) +
       labs(x = 'posterior', y = '') +
+<<<<<<< HEAD
       facet_grid(~service, scales='free') +
+=======
+      facet_grid(~service) +
+>>>>>>> 4831053d61ab0c13a38345ed1b1bec80a049841b
       theme(panel.grid.minor.x = element_line(colour='grey')) +
       th 
 
