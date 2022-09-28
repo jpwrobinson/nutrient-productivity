@@ -4,6 +4,7 @@ theme_set(funk::theme_sleek())
 
 
 ## Plot predicted covariate values
+fg=FALSE
 
 ## prod
 focal<-read.csv('py-notebook/zinc.mg_reef_unscaled.csv')
@@ -21,6 +22,15 @@ source('py-notebook/func_posterior_pred_plot.R')
 focal<-read.csv('py-notebook/zinc.mg_reef_unscaled.csv')
 filename='py-notebook/turnover/'
 figname='fig/model/posterior_predicted_turnover.pdf'
+source('py-notebook/func_posterior_pred_plot.R')
+
+## FG 
+fg=TRUE
+
+# prod
+focal<-read.csv('py-notebook/productivity_unscaled.csv')
+filename='py-notebook/fg/prod/prod_'
+figname='fig/model/posterior_predicted_prod_fg.pdf'
 source('py-notebook/func_posterior_pred_plot.R')
 
 ### Future scenarios

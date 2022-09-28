@@ -19,13 +19,18 @@ pd<-position_dodge(width=0.4)
 empty_margin<-theme(plot.margin=unit(c(0, 0, 0, 0), 'cm'))
 
 ## colour palettes
-trophic.cols<-data.frame(col=c('#fdae61', '#377eb8', '#4d9221', '#d9ef8b', '#bebada', '#80cdc1', '#ffd92f'),
+trophic.cols<-data.frame(col=c('#fdae61', '#377eb8', '#4d9221', '#a0cd10', '#bebada', '#80cdc1', '#ffd92f'),
                          FG=c('invertivore-mobile', 'piscivore','herbivore-macroalgae', 'herbivore-detritivore','planktivore', 'omnivore', 'invertivore-sessile'),
                          FG_lab=c("Invertivore (mobile)", 'Piscivore', 'Herbivore (macroalgae)', 'Herbivore (detritivore)', 'Planktivore', 'Omnivore', 'Invertivore (sessile)'))
 
-fg.cols<-data.frame(col=c('#fdae61', '#377eb8','#80cdc1', '#4d9221','#f7fcb9', '#d9ef8b', '#bebada', '#a6761d', '#ffd92f'),
-                    FG=c('invertivore-mobile', 'piscivore','mixed-diet feeder', 'browser','cropper/grazer', 'scraper-excavator','planktivore', 'detritivore', 'invertivore-sessile'),
-                    FG_lab=c("Invertivore (mobile)", 'Piscivore','Mixed-diet feeder', 'Herbivore (browser)','Herbivore (grazer)', 'Herbivore (scraper/excavator)', 'Planktivore', 'Detritivore', 'Invertivore (sessile)'))
+# fg.cols<-data.frame(col=c('#fdae61', '#377eb8','#80cdc1', '#4d9221','#f7fcb9', '#a0cd10', '#bebada', '#a6761d', '#ffd92f'),
+#                     FG=c('invertivore-mobile', 'piscivore','mixed-diet feeder', 'browser','cropper/grazer', 'scraper-excavator','planktivore', 'detritivore', 'invertivore-sessile'),
+#                     FG_lab=c("Invertivore (mobile)", 'Piscivore','Mixed-diet feeder', 'Herbivore (browser)','Herbivore (grazer)', 'Herbivore (scraper/excavator)', 'Planktivore', 'Detritivore', 'Invertivore (sessile)'))
+
+fg.cols<-data.frame(col=c('#fdae61', '#377eb8','#80cdc1', '#4d9221', '#a0cd10', '#bebada'),
+                    FG=c('invertivore-mobile', 'piscivore','omnivore', 'herbivore-macroalgae', 'herbivore-detritivore','planktivore'),
+                    FG_lab=c("Invertivore (mobile)", 'Piscivore','Omnivore', 'Herbivore (browser)','Herbivore (grazer/scraper)', 'Planktivore'))
+
 
 diet.cols<-data.frame(col=c('#fdae61', '#377eb8',  '#4d9221', '#bebada', '#ffd92f'),
                          dietP=c('Mobile invertivore', 'Piscivore','Herbivores Microvores Detritivores','Planktivore',  'Sessile invertivore'),
