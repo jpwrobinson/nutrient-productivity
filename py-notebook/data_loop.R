@@ -71,3 +71,27 @@ test<-read.csv('py-notebook/zinc.mg_reef_unscaled.csv')
 pairs2(test[,c(11:15,18, 20:23)])
 pairs2(test[,c(1:6)])
 hist(log(test$nut_turnover))
+
+
+# fg correlations
+t1<-read.csv('py-notebook/productivity_unscaled.csv')
+t2<-read.csv('py-notebook/biomass_unscaled.csv')
+t3<-read.csv('py-notebook/zinc.mg_unscaled.csv')
+t4<-read.csv('py-notebook/calcium.mg_unscaled.csv')
+t5<-read.csv('py-notebook/iron.mg_unscaled.csv')
+hnames<-c("herbivore.detritivore","herbivore.macroalgae","invertivore.mobile","piscivore","planktivore", "omnivore")
+
+pdf(file = 'fig/model/fg_proportion_correlations.pdf', height=7, width=12)
+for(i in 1:6){
+  # paste('Correlation:', hnames[i])
+  print(
+    pairs2(cbind(t1 %>% pull(hnames[i]),
+            t2 %>% pull(hnames[i]),
+            t3 %>% pull(hnames[i]),
+            t4 %>% pull(hnames[i]),
+            t5 %>% pull(hnames[i])),
+         labels = c('productivity', 'biomass', 'zinc', 'calcium', 'iron')))
+  title(hnames[i])
+  }
+dev.off()
+
