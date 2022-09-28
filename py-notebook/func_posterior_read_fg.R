@@ -18,7 +18,9 @@ fg.cols<-data.frame(col=c('#fdae61', '#377eb8','#80cdc1', '#4d9221', '#d9ef8b', 
                     FG_lab=c("Invertivore (mobile)", 'Piscivore','Omnivore', 'Herbivore (browser)','Herbivore (grazer/scraper)', 'Planktivore'))
 fg_cols.named<-setNames(as.character(fg.cols$col), fg.cols$FG)
 
+# hnames<-names(focal  %>% select(herbivore.detritivore:planktivore)) %>% str_replace_all('\\.', '-')
 hnames<-c("herbivore-detritivore","herbivore-macroalgae","invertivore-mobile","piscivore","planktivore", "omnivore")
+
 
 covs<-c('grav_nc','hard_coral','macroalgae','bare_substrate','turf_algae','pop_count','sediment','nutrient_load','rubble','depth')
 covs2<-c('gravity','hard_coral','macroalgae','bare_sub','turf','population','sediment','nut_load','rubble','depth')
@@ -33,6 +35,16 @@ ints_country<-post %>%
   rename(Belize.0 = Belize, Fiji.0 = Fiji, Madagascar.0 = Madagascar, Solomon.Islands.0 = Solomon.Islands) %>% 
    rename_with(.fn = ~ str_replace(.x, "Solomon.Islands", "Solomon_Islands"),
                 .cols = starts_with("Solomon.Islands")) %>% 
+    pivot_longer(
+      cols = everything(),
+      names_to = c("cov", "fg"),
+      names_sep = "\\.",
+      values_to = "mu"
+    )
+
+ints_fringing<-post %>% 
+  select(contains('fringing')) %>% 
+   rename(fringing.0 = fringing) %>% 
     pivot_longer(
       cols = everything(),
       names_to = c("cov", "fg"),
@@ -60,12 +72,16 @@ conts<-post %>% select(starts_with(c( 'hard', 'mac', 'bare', 'turf', 'rub', 'pop
 ## add real fg names
 ints$fg<-rep(hnames, times = dim(ints)[1]/6)
 ints_country$fg<-rep(hnames, times = dim(ints_country)[1]/6)
+ints_fringing$fg<-rep(hnames, times = dim(ints_fringing)[1]/6)
 conts$fg<-rep(hnames, times = dim(conts)[1]/6)
 
 meanInts<-ints  %>%  group_by(fg) %>% summarise(med = median(mu),
       lo = rethinking::HPDI(mu, prob=.95)[1], hi = rethinking::HPDI(mu, prob=.95)[2])
 
 meanIntsCo<-ints_country  %>%  group_by(fg) %>% summarise(med = median(mu),
+      lo = rethinking::HPDI(mu, prob=.95)[1], hi = rethinking::HPDI(mu, prob=.95)[2])
+
+meanIntsFringing<-ints_fringing  %>%  group_by(fg) %>% summarise(med = median(mu),
       lo = rethinking::HPDI(mu, prob=.95)[1], hi = rethinking::HPDI(mu, prob=.95)[2])
 
 
@@ -84,9 +100,21 @@ for(a in 1:length(covs)){
         summarise(med = median(mu), lo = rethinking::HPDI(mu, prob=.95)[1], hi = rethinking::HPDI(mu, prob=.95)[2])
 
       # pull stats 
-      p<-dd %>% filter(cov == covs2[a])  %>% pull(med)*foc_seq + meanInts$med[meanInts$fg == hnames[i]]
-      lo<-dd %>% filter(cov == covs2[a])  %>% pull(lo)*foc_seq + meanInts$lo[meanInts$fg == hnames[i]]
-      hi<-dd %>% filter(cov == covs2[a])  %>% pull(hi)*foc_seq + meanInts$hi[meanInts$fg == hnames[i]]
+      p<-dd %>% filter(cov == covs2[a])  %>% pull(med)*foc_seq  +
+            meanInts$med[meanInts$fg == hnames[i]] 
+            # meanIntsFringing$med[meanIntsFringing$fg == hnames[i]] +
+            # meanIntsCo$med[meanIntsCo$fg == hnames[i]] 
+
+      lo<-dd %>% filter(cov == covs2[a])  %>% pull(lo)*foc_seq  +
+            meanInts$lo[meanInts$fg == hnames[i]] 
+            # meanIntsFringing$lo[meanIntsFringing$fg == hnames[i]] +
+            # meanIntsCo$lo[meanIntsCo$fg == hnames[i]] 
+
+      hi<-dd %>% filter(cov == covs2[a])  %>% pull(hi)*foc_seq  +
+            meanInts$hi[meanInts$fg == hnames[i]] 
+            # meanIntsFringing$hi[meanIntsFringing$fg == hnames[i]] +
+            # meanIntsCo$hi[meanIntsCo$fg == hnames[i]] 
+
       
       ## save
       pred<-rbind(pred, data.frame(mu = exp(p), lo = exp(lo), hi = exp(hi),
@@ -108,8 +136,8 @@ for(a in 1:length(covs)){
       # geom_ribbon(alpha=0.2) +
       geom_line(aes(col=fg)) + 
       labs(x = covs[a], y = 'proportion community, %') +
-      scale_fill_manual(values = fg_cols.named) +
-      scale_colour_manual(values = fg_cols.named) +
+      scale_fill_manual(values = trophic_cols.named) +
+      scale_colour_manual(values = trophic_cols.named) +
       # facet_grid(~fg) +
       scale_y_continuous(expand=c(0,0)) +
       theme(legend.position = 'none')

@@ -14,7 +14,7 @@ if(FG == FALSE){
   posts<-p1 %>% 
     mutate(var = str_split_fixed(X, '\\[', 2)[,1]) %>% 
     # drop hierarchical terms than contain the intercept
-    filter(!var %in% c('intercept', 'alpha', 'β0_c', 'β0_manage')) %>% 
+    filter(!var %in% c( 'alpha', 'β0_c', 'β0_manage')) %>% 
     mutate(varname = str_split_fixed(varname, '\\[', 2)[,1],
            varnum=as.numeric(factor(var)),
            sig = ifelse(hdi_2.5. > 0 & hdi_97.5. > 0, 'black', 'white'),
@@ -51,7 +51,7 @@ if(FG == TRUE){
   posts<-p1 %>% 
     mutate(var = str_split_fixed(X, '\\[', 2)[,1]) %>% 
     # drop hierarchical terms than contain the intercept
-    filter(!var %in% c('intercept', 'alpha', 'β0_c', 'β0_manage')) %>% 
+    filter(!var %in% c( 'alpha', 'β0_c', 'β0_manage')) %>% 
     mutate(varname = str_split_fixed(varname, '\\[', 2)[,1],
            varnum=as.numeric(factor(var)),
            sig = ifelse(hdi_2.5. > 0 & hdi_97.5. > 0, 'black', 'white'),

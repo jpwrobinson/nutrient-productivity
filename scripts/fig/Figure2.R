@@ -14,17 +14,21 @@ prod_sp$fg_lab<-trophic.cols$FG_lab[match(prod_sp$fg, trophic.cols$FG)]
 # prod_sp$fg_lab<-fg.cols$FG_lab[match(prod_sp$fg, fg.cols$FG)]
 # prod_fg$fg_lab<-fg.cols$FG_lab[match(prod_fg$fg, fg.cols$FG)]
 
-prod_sp<-prod_sp %>% group_by(nutrient, country) %>% 
+prod_sp<-prod_sp %>% ## drop invert sessile as these are small proportion, consistently, and not fished
+             filter(!fg %in% c('invertivore-sessile', 'detritivore')) %>% 
+              group_by(nutrient, country) %>% 
             # arrange((nut_prod_day_ha))  %>% 
-            mutate(tnut = sum(nut_prod_day_ha), nutprop = nut_prod_day_ha / tnut * 100) %>% 
-            mutate(nutrient_lab = recode(nutrient, 'calcium.mg' = 'Calcium', 'iron.mg' = 'Iron', 'zinc.mg' = 'Zinc',
+              mutate(tnut = sum(nut_prod_day_ha), 
+                  nutprop = nut_prod_day_ha / tnut * 100) %>% 
+              mutate(nutrient_lab = recode(nutrient, 'calcium.mg' = 'Calcium', 'iron.mg' = 'Iron', 'zinc.mg' = 'Zinc',
                                      'selenium.mug' = 'Selenium', 'vitamin_a.mug' = 'Vitamin A', 'omega3.g' = 'Omega-3\nfatty acids'))
 
 
 prod_fg<-prod_fg %>% 
+                  filter(!fg %in% c('invertivore-sessile', 'detritivore')) %>% 
                   mutate(nutrient_lab = recode(nutrient, 'calcium.mg' = 'Calcium', 'iron.mg' = 'Iron', 'zinc.mg' = 'Zinc',
                                'selenium.mug' = 'Selenium', 'vitamin_a.mug' = 'Vitamin A', 'omega3.g' = 'Omega-3\nfatty acids')) %>% 
-                  group_by(country, nutrient,nutrient_lab) %>% 
+                  group_by(country, nutrient, year, site,nutrient_lab) %>% 
                   mutate(nut_prod_day_ha_scaled = scale(nut_prod_day_ha)[,1]) %>% 
                   arrange((nut_prod_day_ha))  %>% 
                   mutate(tnut = sum(nut_prod_day_ha), 
@@ -98,15 +102,15 @@ g1<-ggplot(prod_fg, aes(fg_lab ,nutprop, fill=fg_lab),col='black') +
   th + theme(legend.position = 'none') +
   scale_fill_manual(values = trophic_cols.named)  +
   scale_color_manual(values = trophic_cols.named) +
-  scale_y_continuous(breaks=seq(0, 0.8, by = 0.1), labels=seq(0, 80, by = 10)) +
-  labs(x = '', y = "Mean proportion of nutrient productivity, %") +
+  scale_y_continuous(breaks=seq(0, 80, by = 10), labels=seq(0, 80, by = 10)) +
+  labs(x = '', y = "proportion of nutrient productivity, %") +
   th_ticks
 
 g2<-ggplot(prod_fg_co, aes(nutrient_lab, nutprop, fill=fg_lab)) + 
   geom_bar(stat='identity', col='black',size=0.1) +
   coord_flip() +
   theme(legend.position = 'none') +
-  labs(x = '', y = 'Proportion of assemblage biomass, productivity or nutrient production, %') +
+  labs(x = '', y = 'proportion of fish assemblage, %') +
   scale_fill_manual(values = trophic_cols.named) +
   scale_color_manual(values = 'white') +
   scale_y_continuous(expand=c(0,0), breaks=seq(25, 100,25)) +
@@ -131,7 +135,7 @@ g3<-ggplot(prod_reef %>% filter(nutrient == 'calcium.mg') %>% mutate(x = log10(b
 g4<-ggplot(prod_sp, aes(log10(biomass_kgha), nutprop, col=fg_lab)) + 
   geom_point(alpha=0.8, size=1.5) + facet_wrap(~nutrient, scales='free') +
   scale_color_manual(values = fg_cols.named2) +
-  labs(x = expression(paste('Log'[10], ' biomass kg ha'^-1)), y = 'Proportion of total nutrient productivity, %') +
+  labs(x = expression(paste('Log'[10], ' biomass kg ha'^-1)), y = 'proportion of nutrient productivity, %') +
   th + theme(legend.position = 'none')
 
 

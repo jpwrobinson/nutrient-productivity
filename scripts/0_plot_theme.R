@@ -23,13 +23,9 @@ trophic.cols<-data.frame(col=c('#fdae61', '#377eb8', '#4d9221', '#a0cd10', '#beb
                          FG=c('invertivore-mobile', 'piscivore','herbivore-macroalgae', 'herbivore-detritivore','planktivore', 'omnivore', 'invertivore-sessile'),
                          FG_lab=c("Invertivore (mobile)", 'Piscivore', 'Herbivore (macroalgae)', 'Herbivore (detritivore)', 'Planktivore', 'Omnivore', 'Invertivore (sessile)'))
 
-# fg.cols<-data.frame(col=c('#fdae61', '#377eb8','#80cdc1', '#4d9221','#f7fcb9', '#a0cd10', '#bebada', '#a6761d', '#ffd92f'),
-#                     FG=c('invertivore-mobile', 'piscivore','mixed-diet feeder', 'browser','cropper/grazer', 'scraper-excavator','planktivore', 'detritivore', 'invertivore-sessile'),
-#                     FG_lab=c("Invertivore (mobile)", 'Piscivore','Mixed-diet feeder', 'Herbivore (browser)','Herbivore (grazer)', 'Herbivore (scraper/excavator)', 'Planktivore', 'Detritivore', 'Invertivore (sessile)'))
-
-fg.cols<-data.frame(col=c('#fdae61', '#377eb8','#80cdc1', '#4d9221', '#a0cd10', '#bebada'),
-                    FG=c('invertivore-mobile', 'piscivore','omnivore', 'herbivore-macroalgae', 'herbivore-detritivore','planktivore'),
-                    FG_lab=c("Invertivore (mobile)", 'Piscivore','Omnivore', 'Herbivore (browser)','Herbivore (grazer/scraper)', 'Planktivore'))
+fg.cols<-data.frame(col=c('#fdae61', '#377eb8','#80cdc1', '#4d9221','#f7fcb9', '#a0cd10', '#bebada', '#a6761d', '#ffd92f'),
+                    FG=c('invertivore-mobile', 'piscivore','mixed-diet feeder', 'browser','cropper/grazer', 'scraper-excavator','planktivore', 'detritivore', 'invertivore-sessile'),
+                    FG_lab=c("Invertivore (mobile)", 'Piscivore','Mixed-diet feeder', 'Herbivore (browser)','Herbivore (grazer)', 'Herbivore (scraper/excavator)', 'Planktivore', 'Detritivore', 'Invertivore (sessile)'))
 
 
 diet.cols<-data.frame(col=c('#fdae61', '#377eb8',  '#4d9221', '#bebada', '#ffd92f'),
