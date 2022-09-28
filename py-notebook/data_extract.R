@@ -1,4 +1,4 @@
-
+source('scripts/scaler.R')
 ## Data prep for fitting dirichlet models in python
 
 # ## set up model data
@@ -65,27 +65,27 @@ focal<-left_join(data.frame(prod_fg) %>% mutate(id = paste(site, year, country, 
 
 
 if(nut == 'productivity'){
-  write.csv(focal %>% filter(nutrient=='calcium.mg') %>% select(-nutprop, -biomprop) %>% pivot_wider(names_from = fg, values_from = prodprop), 
-          file = paste0('py-notebook/', nut, '_unscaled.csv'))} else 
+  focal<-focal %>% filter(nutrient=='calcium.mg') %>% mutate(nutprop=prodprop) %>% select(-biomprop, -prodprop)
+  } else 
 
 if(nut == 'biomass'){
-              write.csv(focal %>% filter(nutrient=='calcium.mg') %>% select(-nutprop, -prodprop) %>% pivot_wider(names_from = fg, values_from = biomprop), 
-                        file = paste0('py-notebook/', nut, '_unscaled.csv'))} else {
+  focal<-focal %>% filter(nutrient=='calcium.mg') %>% mutate(nutprop=biomprop) %>% select(-biomprop, -prodprop)
+  } else {
+  focal<-focal %>% filter(nutrient==nut) %>% select(-prodprop, -biomprop)
+  }
 
 ## check reponse hist, bounded 0 - 1
-focal<-focal %>% filter(nutrient==nut) %>% select(-prodprop, -biomprop)
 hist(focal$nutprop, main = nut, xlab = 'Proportion of productivity')
 focal$nutprop[focal$nutprop==1]<-0.99
 
 ## scale numeric, pivot wider
-source('scripts/scaler.R')
 focal.scaled<-scaler(focal, 
-                     ID = c('nutprop', 'prodprop','biomprop', 'nutrient','nutrient_lab', 'country', 'site','year','id2',
+                     ID = c('nutprop', 'nutrient','nutrient_lab', 'country', 'site','year','id2',
                             'fg', 'reef_type', 'reef_zone',
                             'management_rules'), cats = FALSE) %>% 
               pivot_wider(names_from = fg, values_from = nutprop)
 
-write.csv(focal %>% pivot_wider(names_from = fg, values_from = nutprop), 
-          file = paste0('py-notebook/', nut, '_unscaled.csv'))
+focal<-focal %>% pivot_wider(names_from = fg, values_from = nutprop)
+
+write.csv(focal, file = paste0('py-notebook/', nut, '_unscaled.csv'))
 write.csv(focal.scaled, file = paste0('py-notebook/', nut, '_scaled.csv'))
-}

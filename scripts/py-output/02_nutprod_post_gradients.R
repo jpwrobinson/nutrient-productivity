@@ -62,7 +62,6 @@ maxer$sim_val<-maxer$max_val*max/100
 maxer$sim_val_50<-maxer$max_val*vv/100
 maxer$sim_val - maxer$sim_val_50
 
-
 ## testing brms alt
 # library(brms)
 # focal$ylog<-log(focal$biomass_kgha)
