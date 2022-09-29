@@ -78,7 +78,7 @@ conts$fg<-rep(hnames, times = dim(conts)[1]/6)
 meanInts<-ints  %>%  group_by(fg) %>% summarise(med = median(mu),
       lo = rethinking::HPDI(mu, prob=.95)[1], hi = rethinking::HPDI(mu, prob=.95)[2])
 
-meanIntsCo<-ints_country  %>%  group_by(fg) %>% summarise(med = median(mu),
+meanIntsCo<-ints_country  %>%  filter(cov != 'Belize') %>% group_by(fg) %>% summarise(med = median(mu),
       lo = rethinking::HPDI(mu, prob=.95)[1], hi = rethinking::HPDI(mu, prob=.95)[2])
 
 meanIntsFringing<-ints_fringing  %>%  group_by(fg) %>% summarise(med = median(mu),
@@ -101,19 +101,19 @@ for(a in 1:length(covs)){
 
       # pull stats 
       p<-dd %>% filter(cov == covs2[a])  %>% pull(med)*foc_seq  +
-            meanInts$med[meanInts$fg == hnames[i]] 
+            # meanInts$med[meanInts$fg == hnames[i]] 
             # meanIntsFringing$med[meanIntsFringing$fg == hnames[i]] +
-            # meanIntsCo$med[meanIntsCo$fg == hnames[i]] 
+            meanIntsCo$med[meanIntsCo$fg == hnames[i]] 
 
       lo<-dd %>% filter(cov == covs2[a])  %>% pull(lo)*foc_seq  +
-            meanInts$lo[meanInts$fg == hnames[i]] 
+            # meanInts$lo[meanInts$fg == hnames[i]] 
             # meanIntsFringing$lo[meanIntsFringing$fg == hnames[i]] +
-            # meanIntsCo$lo[meanIntsCo$fg == hnames[i]] 
+            meanIntsCo$lo[meanIntsCo$fg == hnames[i]] 
 
       hi<-dd %>% filter(cov == covs2[a])  %>% pull(hi)*foc_seq  +
-            meanInts$hi[meanInts$fg == hnames[i]] 
+            # meanInts$hi[meanInts$fg == hnames[i]] 
             # meanIntsFringing$hi[meanIntsFringing$fg == hnames[i]] +
-            # meanIntsCo$hi[meanIntsCo$fg == hnames[i]] 
+            meanIntsCo$hi[meanIntsCo$fg == hnames[i]] 
 
       
       ## save
@@ -136,8 +136,8 @@ for(a in 1:length(covs)){
       # geom_ribbon(alpha=0.2) +
       geom_line(aes(col=fg)) + 
       labs(x = covs[a], y = 'proportion community, %') +
-      scale_fill_manual(values = trophic_cols.named) +
-      scale_colour_manual(values = trophic_cols.named) +
+      scale_fill_manual(values = trophic_cols.named2) +
+      scale_colour_manual(values = trophic_cols.named2) +
       # facet_grid(~fg) +
       scale_y_continuous(expand=c(0,0)) +
       theme(legend.position = 'none')

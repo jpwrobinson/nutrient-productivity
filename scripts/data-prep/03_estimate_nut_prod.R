@@ -103,13 +103,10 @@ prod_fg<-prod %>%
     nut_prod_day_ha = mean(nut_prod_day_ha), 
     nut_biomass_kgha = mean(nut_biomass_kgha),
     prod_g_day_ha = mean(prod_g_day_ha),
-    biomass_kgha = mean(biomass_kgha)) %>% 
-  group_by(nutrient, country, year) %>%
-  complete(site,fg,
-           fill = list(nut_prod_day_ha = 0, nut_biomass_kgha = 0, prod_g_day_ha =0, biomass_kgha = 0))  
+    biomass_kgha = mean(biomass_kgha)) 
 
 ## Rows are filled with zeroes if FG were not observed at a site
-prod_fg %>% group_by(site, country, year) %>% summarise(n_distinct(fg))
+prod_fg %>% group_by(site, country, year) %>% summarise(n_distinct(fg)) 
   
 ## labelling for plots
 # prod_sp$trophic_lab<-trophic.cols$FG_lab[match(prod_sp$trophic_group, trophic.cols$FG)]

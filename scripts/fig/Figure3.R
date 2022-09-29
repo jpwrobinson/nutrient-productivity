@@ -1,49 +1,85 @@
-source('scripts/0_plot_theme.R')
-th_ticks<-theme(axis.ticks.x = element_line(colour='black'))
 
-load(file = 'results/wcs_productivity.rds')
-load(file = 'results/wcs_nut_prod.rds')
-
-fishp$fg_lab<-trophic.cols$FG_lab[match(fishp$fg, trophic.cols$FG)]
-prod_fg$fg_lab<-trophic.cols$FG_lab[match(prod_fg$fg, trophic.cols$FG)]
-prod_sp$fg_lab<-trophic.cols$FG_lab[match(prod_sp$fg, trophic.cols$FG)]
-
-# fishp$fg_lab<-fg.cols$FG_lab[match(fishp$fg, fg.cols$FG)]
-# prod_sp$fg_lab<-fg.cols$FG_lab[match(prod_sp$fg, fg.cols$FG)]
-# prod_fg$fg_lab<-fg.cols$FG_lab[match(prod_fg$fg, fg.cols$FG)]
-
-prod_sp<-prod_sp %>% group_by(nutrient, country) %>% 
-  # arrange((nut_prod_day_ha))  %>% 
-  mutate(tnut = sum(nut_prod_day_ha), nutprop = nut_prod_day_ha / tnut * 100) %>% 
-  mutate(nutrient_lab = recode(nutrient, 'calcium.mg' = 'Calcium', 'iron.mg' = 'Iron', 'zinc.mg' = 'Zinc',
-                               'selenium.mug' = 'Selenium', 'vitamin_a.mug' = 'Vitamin A', 'omega3.g' = 'Omega-3\nfatty acids')) %>% 
-  mutate(species = factor(ifelse(nutprop<5, 'Other', fish_taxon))) 
+source('scripts/py-output/03_nutprod_post_gradients_fg.R')
 
 
-top5<-prod_sp %>% 
-  group_by(nutrient, country) %>% 
-  slice_max(nut_prod_day_ha, n = 5)
+## Figure 3
+bens<-c('hard_coral','macroalgae','bare_substrate','turf_algae','rubble')
 
-g1<-ggplot(prod_sp, aes(nutrient, y=prod_g_day_ha, fill = fct_reorder(species, nutprop))) + geom_col(position = 'fill') + 
-      theme(legend.position = 'right') +
-      facet_grid(~country) +
-      scale_y_continuous(expand=c(0,0)) +
-      scale_fill_manual(values = c('grey', RColorBrewer::brewer.pal(12, 'Paired'), RColorBrewer::brewer.pal(12, 'Set3')))
+pdf(file = 'fig/Figure3.pdf', height=9, width = 7.5)
+
+g0<-ggplot(biom_main %>% filter(cov %in% bens), 
+		aes(X_raw, prop, fill=fg)) + 
+      # geom_ribbon(alpha=0.2) +
+      geom_line(size=0.8, aes(col=fg)) + 
+      labs(x = '% cover', y = 'proportion community, %', subtitle = 'Standing biomass') +
+      scale_colour_manual(values = trophic_cols.named2) +
+      facet_wrap(~cov, nrow=1, scales='free_x') +
+      scale_y_continuous(expand=c(0,0), limits=c(0,.62), breaks =seq(0, .5, by = .1), labels=seq(0, 50, by = 10)) +
+      theme(legend.position = 'none')
+
+g1<-ggplot(prod_main %>% filter(cov %in% bens), 
+		aes(X_raw, prop, fill=fg)) + 
+      # geom_ribbon(alpha=0.2) +
+      geom_line(size=0.8, aes(col=fg)) + 
+      labs(x = '% cover', y = 'proportion community, %', subtitle = 'Biomass production') +
+      scale_colour_manual(values = trophic_cols.named2) +
+      facet_wrap(~cov, nrow=1, scales='free_x') +
+      scale_y_continuous(expand=c(0,0), limits=c(0,.62), breaks =seq(0, .5, by = .1), labels=seq(0, 50, by = 10)) +
+      theme(legend.position = 'none')
+
+g2<-ggplot(nuts %>% filter(cov %in% bens), 
+		aes(X_raw, prop, fill=fg)) + 
+      # geom_ribbon(alpha=0.2) +
+      geom_line(size=0.8, aes(col=fg)) + 
+      labs(x = '% cover', y = 'proportion community, %', subtitle = 'Nutrient production (Ca, Fe, Zn)') +
+      scale_colour_manual(values = trophic_cols.named2) +
+      facet_wrap(~cov, nrow=1, scales='free_x') +
+      scale_y_continuous(expand=c(0,0), limits=c(0,.62), breaks =seq(0, .5, by = .1), labels=seq(0, 50, by = 10)) +
+      theme(legend.position = 'none') 
 
 
-ggplot(prod_sp %>% group_by(country, nutrient) %>% slice_max(n = 5, nut_prod_day_ha), 
-           aes(y=nut_prod_day_ha, nutrient)) + 
-  geom_point(aes(col=country)) + 
-  # theme(legend.position = 'right') +
-  facet_wrap(~nutrient, scales='free') +
-  # scale_y_continuous(expand=c(0,0)) +
-  scale_fill_manual(values = c('grey', RColorBrewer::brewer.pal(12, 'Paired'), RColorBrewer::brewer.pal(12, 'Set3')))
+print(
+	plot_grid(g0, g1, g2, nrow = 3 , labels = c('A', 'B', 'C'))
+	)
 
-
-pdf(file = 'fig/FigureSX_key_nutprod_species.pdf', height=7, width=22)
-print(g1)
 dev.off()
 
+## Sup fig - anthro drivers
 
-ggplot(prod_reef, aes(nut_turnover)) + geom_histogram() + facet_wrap(~nutrient, scales='free')
+pdf(file = 'fig/FigureSX_anthro_drivers.pdf', height=9, width = 7.5)
 
+g0S<-ggplot(biom_main %>% filter(!cov %in% bens), 
+		aes(X_raw, prop, fill=fg)) + 
+      # geom_ribbon(alpha=0.2) +
+      geom_line(size=0.8, aes(col=fg)) + 
+      labs(x = '', y = 'proportion community, %', subtitle = 'Standing biomass') +
+      scale_colour_manual(values = trophic_cols.named2) +
+      facet_wrap(~cov, nrow=1, scales='free', strip.position = 'bottom') +
+      scale_y_continuous(expand=c(0,0), limits=c(0,.62), breaks =seq(0, .5, by = .1), labels=seq(0, 50, by = 10)) +
+      theme(legend.position = 'none', strip.placement='outside')
+
+g1S<-ggplot(prod_main %>% filter(!cov %in% bens), 
+		aes(X_raw, prop, fill=fg)) + 
+      # geom_ribbon(alpha=0.2) +
+      geom_line(size=0.8, aes(col=fg)) + 
+      labs(x = '', y = 'proportion community, %', subtitle = 'Biomass production') +
+      scale_colour_manual(values = trophic_cols.named2) +
+      facet_wrap(~cov, nrow=1, scales='free', strip.position = 'bottom') +
+      scale_y_continuous(expand=c(0,0), limits=c(0,.62), breaks =seq(0, .5, by = .1), labels=seq(0, 50, by = 10)) +
+      theme(legend.position = 'none', strip.placement='outside')
+
+g2S<-ggplot(nuts %>% filter(!cov %in% bens), 
+		aes(X_raw, prop, fill=fg)) + 
+      # geom_ribbon(alpha=0.2) +
+      geom_line(size=0.8, aes(col=fg)) + 
+      labs(x = '', y = 'proportion community, %', subtitle = 'Nutrient production (Ca, Fe, Zn)') +
+      scale_colour_manual(values = trophic_cols.named2) +
+      facet_wrap(~cov, nrow=1, scales='free', strip.position = 'bottom') +
+      scale_y_continuous(expand=c(0,0), limits=c(0,.62), breaks =seq(0, .5, by = .1), labels=seq(0, 50, by = 10)) +
+      theme(legend.position = 'none', strip.placement='outside') 
+
+print(
+	plot_grid(g0S, g1S, g2S, nrow = 3, labels = c('A', 'B', 'C'))
+	)
+
+dev.off()
