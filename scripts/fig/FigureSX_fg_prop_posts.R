@@ -1,7 +1,7 @@
 library(tidyverse)
 source('scripts/0_plot_theme.R')
 
-conts<-c('hard_coral', 'bare_sub', 'gravity', 'turf', 'population', 'macroalgae', 'sediment', 'nut_load')
+conts<-c('hard_coral', 'bare_sub', 'gravity', 'turf', 'population', 'macroalgae', 'sediment', 'nut_load', 'rubble')
 
 
 ## read posts by model
@@ -27,8 +27,8 @@ posts<-posts %>%
   mutate(mod = recode(mod, prod = 'Biomass production', biom = 'Standing biomass', calcium = 'Calcium production', 
                     iron = 'Iron production', zinc = 'Zinc production'))
 
-levs<-c('hard_coral','macroalgae', 'bare_sub', 'turf',  'gravity', 'population', 'sediment', 'nut_load')
-labs<-c('Hard coral','Macroalgae', 'Bare substrate', 'Turf algae',  'Market gravity', 'Human population', 'Sedimentation', 'Nutrient load')
+levs<-c('hard_coral','macroalgae', 'bare_sub', 'turf','rubble',  'gravity', 'population', 'sediment', 'nut_load')
+labs<-c('Hard coral','Macroalgae', 'Bare substrate', 'Turf algae','Rubble',  'Market gravity', 'Human population', 'Sedimentation', 'Nutrient load')
 posts$varname<-factor(posts$varname, levels=rev(levs))
 
 # unique(posts$mod)
