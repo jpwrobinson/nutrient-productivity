@@ -84,21 +84,22 @@ meanIntsCo<-ints_country  %>%  filter(cov != 'Belize') %>% group_by(fg) %>%
 meanIntsFringing<-ints_fringing  %>%  group_by(fg) %>% summarise(med = median(mu),
       lo = rethinking::HPDI(mu, prob=.95)[1], hi = rethinking::HPDI(mu, prob=.95)[2])
 
-IntsCo<-ints_country  %>% group_by(fg, cov) %>% 
-      summarise(med = median(mu), lo = rethinking::HPDI(mu, prob=.95)[1], hi = rethinking::HPDI(mu, prob=.95)[2])
-
-
 main<-numeric()
 
 # pull focal covariate, scale and raw versions
-hc<-stdize(focal[,covs['hard_coral']])
-ma<-stdize(focal[,covs['hard_coral']])
-ta<-stdize(focal[,covs['hard_coral']])
-rub<-stdize(focal[,covs['hard_coral']])
-bare<-stdize(focal[,covs['hard_coral']])
-pop<-stdize(focal[,covs['hard_coral']])
-nut<-stdize(focal[,covs['hard_coral']])
-grav<-stdize(focal[,covs['hard_coral']])
+
+## coral regime
+hc<-quantile(stdize(focal[,'hard_coral']))[4]
+hc_raw<-quantile(focal[,'hard_coral'])[4]
+
+
+ma<-stdize(focal[,'hard_coral'])
+ta<-stdize(focal[,'hard_coral'])
+rub<-stdize(focal[,'hard_coral'])
+bare<-stdize(focal[,'hard_coral'])
+pop<-stdize(focal[,'hard_coral'])
+nut<-stdize(focal[,'hard_coral'])
+grav<-stdize(focal[,'hard_coral'])
 
 
   

@@ -31,6 +31,8 @@ fish2 %>% distinct(fish_taxon, calcium.mg, iron.mg, selenium.mug, zinc.mg, omega
   pivot_longer(-fish_taxon, names_to = 'nut', values_to= 'mu') %>% 
   group_by(nut) %>% summarise(cv = sd(mu)/mean(mu))
 
+pairs2(fish2 %>% distinct(calcium.mg, iron.mg, selenium.mug, zinc.mg, omega3.g, vitamin_a.mug))
+
 ## top nutrient productivity species
 tops<-c('Pterocaesio tile', 'Caesio teres', 'Chlorurus sordidus', 
         'Lutjanus gibbus', 'Sparisoma viride')
