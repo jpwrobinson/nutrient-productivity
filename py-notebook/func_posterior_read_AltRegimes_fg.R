@@ -78,8 +78,8 @@ conts$fg<-rep(hnames, times = dim(conts)[1]/6)
 meanInts<-ints  %>%  group_by(fg) %>% summarise(med = median(mu),
       lo = rethinking::HPDI(mu, prob=.95)[1], hi = rethinking::HPDI(mu, prob=.95)[2])
 
-meanIntsCo<-ints_country  %>%  filter(cov != 'Belize') %>% group_by(fg) %>% summarise(med = median(mu),
-      lo = rethinking::HPDI(mu, prob=.95)[1], hi = rethinking::HPDI(mu, prob=.95)[2])
+meanIntsCo<-ints_country  %>%  filter(cov != 'Belize') %>% group_by(fg) %>% 
+      summarise(med = median(mu), lo = rethinking::HPDI(mu, prob=.95)[1], hi = rethinking::HPDI(mu, prob=.95)[2])
 
 meanIntsFringing<-ints_fringing  %>%  group_by(fg) %>% summarise(med = median(mu),
       lo = rethinking::HPDI(mu, prob=.95)[1], hi = rethinking::HPDI(mu, prob=.95)[2])
@@ -103,28 +103,30 @@ for(a in 1:length(covs)){
 
       # get median and HPDI for each FG and covariate
       dd<-conts %>% filter(fg == hnames[i]) %>% group_by(cov) %>% 
-        summarise(med = median(mu), lo = rethinking::HPDI(mu, prob=.95)[1], hi = rethinking::HPDI(mu, prob=.95)[2]) %>% 
-        filter(cov == covs2[a])
+        summarise(med = median(mu), lo = rethinking::HPDI(mu, prob=.95)[1], hi = rethinking::HPDI(mu, prob=.95)[2]) 
 
       # pull stats 
-      p<-dd %>% pull(med)*foc_seq  +  dd %>% pull(med)*coral_seq +
+      p<-exp( dd %>% filter(cov == covs2[a]) %>% pull(med)*foc_seq  +  
+              dd %>% filter(cov == 'hard_coral') %>%  pull(med)*coral_seq +
             # meanInts$med[meanInts$fg == hnames[i]] 
             # meanIntsFringing$med[meanIntsFringing$fg == hnames[i]] +
-            meanIntsCo$med[meanIntsCo$fg == hnames[i]] 
+            meanIntsCo$med[meanIntsCo$fg == hnames[i]])
 
-      lo<-dd %>% pull(lo)*foc_seq  +  dd %>% pull(lo)*coral_seq +
+      lo<-exp(dd %>% filter(cov == covs2[a]) %>% pull(lo)*foc_seq  +  
+              dd %>% filter(cov == 'hard_coral') %>%  pull(lo)*coral_seq +
             # meanInts$lo[meanInts$fg == hnames[i]] 
             # meanIntsFringing$lo[meanIntsFringing$fg == hnames[i]] +
-            meanIntsCo$lo[meanIntsCo$fg == hnames[i]] 
+            meanIntsCo$lo[meanIntsCo$fg == hnames[i]])
 
-      hi<-dd %>% pull(hi)*foc_seq  +  dd %>% pull(hi)*coral_seq +
+      hi<-exp(dd %>% filter(cov == covs2[a]) %>% pull(hi)*foc_seq  +  
+              dd %>% filter(cov == 'hard_coral') %>%  pull(hi)*coral_seq +
             # meanInts$hi[meanInts$fg == hnames[i]] 
             # meanIntsFringing$hi[meanIntsFringing$fg == hnames[i]] +
-            meanIntsCo$hi[meanIntsCo$fg == hnames[i]] 
+            meanIntsCo$hi[meanIntsCo$fg == hnames[i]])
 
       
       ## save
-      pred<-rbind(pred, data.frame(mu = exp(p), lo = exp(lo), hi = exp(hi),
+      pred<-rbind(pred, data.frame(mu = p, lo = lo, hi = hi,
                                   X = foc_seq, 
                                   X_raw = foc_seq_raw, 
                                   coral = coral_seq, 

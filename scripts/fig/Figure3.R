@@ -3,9 +3,24 @@ source('scripts/py-output/03_nutprod_post_gradients_fg.R')
 
 
 ## Figure 3
+pdf(file = 'fig/Figure3.pdf', height=4, width = 12)
+
+gMain<-ggplot(servs_agg, aes(X_raw, prop*100)) + 
+        geom_line(data=servs, aes(group=id, col=fg), alpha=0.5) +
+        geom_line(aes(col=fg), size=1.2) + 
+        facet_grid(~cov) +
+        labs(x = '% cover', y = 'proportion community, %') 
+
+print(
+    plot_grid(gMain, nrow = 1) 
+    )
+dev.off()
+
+
+## Sup fig benthic drivers
 bens<-c('hard_coral','macroalgae','bare_substrate','turf_algae','rubble')
 
-pdf(file = 'fig/Figure3.pdf', height=9, width = 7.5)
+pdf(file = 'fig/FigureSX_benthic_drivers.pdf', height=9, width = 7.5)
 
 g0<-ggplot(biom_main %>% filter(cov %in% bens), 
 		aes(X_raw, prop, fill=fg)) + 
