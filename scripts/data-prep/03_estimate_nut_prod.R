@@ -35,8 +35,8 @@ prod_reef<-prod %>% group_by(country, management, site, year, sample_date, trans
               nscore = mean(nscore),
               nscore3 = mean(nscore3))  %>% 
             ## turnover is per year
-      mutate(nut_turnover = ((nut_prod_day_ha*365) / (nut_biomass_kgha)) * 100,
-         biomass_turnover = ((prod_day_ha*365) / (biomass_kgha)) * 100) 
+      mutate(nut_turnover = ((nut_prod_day_ha/1000*365) / (nut_biomass_kgha)) * 100,
+         biomass_turnover = ((prod_day_ha/1000*365) / (biomass_kgha)) * 100) 
 
 
 pdf(file = 'fig/explore/wcs_nutrient_prod_reef.pdf', height=7, width=12)
@@ -94,14 +94,18 @@ prod_fg<-prod %>%
     nut_biomass_kgha = sum(nut_biomass_kgha),
     prod_g_day_ha = sum(prod_g_day_ha),
     biomass_kgha = sum(biomass_kgha)) %>% 
+  mutate(nut_turnover = ((nut_prod_day_ha/1000*365) / (nut_biomass_kgha)) * 100,
+         biomass_turnover = ((prod_g_day_ha/1000*365) / (biomass_kgha)) * 100)  %>% 
   group_by(nutrient, country, year) %>%
   complete(site,nesting(fg),
-           fill = list(nut_prod_day_ha = 0, nut_biomass_kgha = 0, prod_g_day_ha =0, biomass_kgha = 0))  %>% 
+           fill = list(nut_prod_day_ha = 0, nut_biomass_kgha = 0, prod_g_day_ha =0, biomass_kgha = 0, biomass_turnover=0, nut_turnover=0))  %>% 
   ungroup() %>% 
   group_by(country, site,year,fg, nutrient) %>% 
   summarise(
     nut_prod_day_ha = mean(nut_prod_day_ha), 
     nut_biomass_kgha = mean(nut_biomass_kgha),
+    nut_turnover = mean(nut_turnover),
+    biomass_turnover = mean(biomass_turnover),
     prod_g_day_ha = mean(prod_g_day_ha),
     biomass_kgha = mean(biomass_kgha)) 
 

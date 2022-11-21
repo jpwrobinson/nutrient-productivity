@@ -1,21 +1,25 @@
 
-source('scripts/py-output/03_nutprod_post_gradients_fg.R')
+source('scripts/py-output/04_nutprod_post_altRegimes.R')
 
 
 ## Figure 3
-pdf(file = 'fig/Figure3.pdf', height=4, width = 12)
+pdf(file = 'fig/Figure3.pdf', height=3, width = 12)
 
 gMain<-ggplot(servs_agg, aes(X_raw, prop*100)) + 
         geom_line(data=servs, aes(group=id, col=fg), alpha=0.5) +
         geom_line(aes(col=fg), size=1.2) + 
-        facet_grid(~cov) +
-        labs(x = '% cover', y = 'proportion community, %') 
+        facet_grid(~cov, scales = "free_x", switch = 'x') +
+        labs(x = '% cover', y = 'proportion community, %') +
+        theme(strip.placement = "outside") 
 
 print(
     plot_grid(gMain, nrow = 1) 
     )
 dev.off()
 
+
+
+source('scripts/py-output/03_nutprod_post_gradients_fg.R')
 
 ## Sup fig benthic drivers
 bens<-c('hard_coral','macroalgae','bare_substrate','turf_algae','rubble')
