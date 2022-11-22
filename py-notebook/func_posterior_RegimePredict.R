@@ -13,14 +13,14 @@ ben.cols<-data.frame(col = c('#498FC9','#B6B400','#a1d99b', 'grey60'),
 
 ben_cols.named<-setNames(as.character(ben.cols$col), ben.cols$benthic)
 
-fg.cols<-data.frame(col=c('#fdae61', '#377eb8','#80cdc1', '#4d9221', '#d9ef8b', '#bebada'),
-                    FG=c('invertivore-mobile', 'piscivore','omnivore', 'herbivore-macroalgae', 'herbivore-detritivore','planktivore'),
-                    FG_lab=c("Invertivore (mobile)", 'Piscivore','Omnivore', 'Herbivore (browser)','Herbivore (grazer/scraper)', 'Planktivore'))
+fg.cols<-data.frame(col=c('#fdae61', '#377eb8','#80cdc1', '#4d9221', '#d9ef8b', '#bebada', '#4d9221'),
+                    FG=c('invertivore-mobile', 'piscivore','omnivore', 'herbivore-macroalgae', 'herbivore-detritivore','planktivore', 'herbivore'),
+                    FG_lab=c("Invertivore (mobile)", 'Piscivore','Omnivore', 'Herbivore (browser)','Herbivore (grazer/scraper)', 'Planktivore', 'Herbivore'))
 fg_cols.named<-setNames(as.character(fg.cols$col), fg.cols$FG)
 
 # hnames<-names(focal  %>% select(herbivore.detritivore:planktivore)) %>% str_replace_all('\\.', '-')
-hnames<-c("herbivore-detritivore","herbivore-macroalgae","invertivore-mobile","piscivore","planktivore", "omnivore")
-
+# hnames<-c("herbivore-detritivore","herbivore-macroalgae","invertivore-mobile","piscivore","planktivore", "omnivore")
+hnames=c("herbivore","invertivore-mobile","piscivore","planktivore", "omnivore")
 
 covs<-c('macroalgae','bare_substrate','turf_algae','rubble')
 covs2<-c('macroalgae','bare_sub','turf','rubble')

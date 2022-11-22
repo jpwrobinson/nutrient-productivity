@@ -70,8 +70,8 @@ prod_sp<-prod %>%
     prod_g_day_ha = mean(prod_g_day_ha),
     biomass_kgha = mean(biomass_kgha)) %>% 
   group_by(country) %>%
-  complete(fg, nesting(nutrient, site, year, transect_number, id),
-           fill = list(nut_prod_day_ha = 0, nut_biomass_kgha = 0, prod_g_day_ha =0, biomass_kgha = 0))  %>% 
+  # complete(fg, nesting(nutrient, site, year, transect_number, id),
+  #          fill = list(nut_prod_day_ha = 0, nut_biomass_kgha = 0, prod_g_day_ha =0, biomass_kgha = 0))  %>% 
   ungroup() %>% 
   # mutate(nut_turnover = nut_prod_day_ha / nut_biomass_kgha,
   #        biomass_turnover = prod_day / biomass_kg) %>% 
@@ -87,6 +87,12 @@ prod_sp<-prod %>%
 # FG level nutrient productivity
 prod_fg<-prod %>% 
   mutate(id = paste(site, year, sep = '_')) %>% 
+  ## drop invert sessile as these are small proportion, consistently, and not fished
+  filter(!fg %in% c('invertivore-sessile', 'detritivore')) %>% 
+  # mutate(fg = recode(fg, 'herbivore-macroalgae' = 'herbivore', 'herbivore-detritivore' = 'herbivore')) %>% 
+  # group_by(site, year, country) %>% 
+  # mutate(n = length(fish_taxon), n_fg = n_distinct(fg)) %>% 
+  # filter(n_fg == 5) %>% 
   ## transect level: total metric by diet group
   group_by(country, site, year, id, transect_number,fg, nutrient) %>% 
   summarise(
@@ -108,6 +114,8 @@ prod_fg<-prod %>%
          biomass_turnover = ((prod_g_day_ha/1000) / (biomass_kgha)) * 100) %>% 
   mutate(nut_turnover = ifelse(nut_prod_day_ha == 0, 0, nut_turnover),
         biomass_turnover = ifelse(prod_g_day_ha == 0, 0, biomass_turnover))
+
+
 
 ## Rows are filled with zeroes if FG were not observed at a site
 prod_fg %>% group_by(site, country, year) %>% summarise(n_distinct(fg)) 

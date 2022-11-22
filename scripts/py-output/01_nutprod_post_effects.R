@@ -9,30 +9,30 @@ th<-theme(panel.spacing=unit(.05, "lines"),
       axis.line = element_line(colour='black'))
 
 ## READ SERVICE MODELS
-FG = FALSE
-## Turnover - zinc
-p1<-read.csv('py-notebook/turnover/zinc_posterior_summary.csv') 
-p2<-read.csv('py-notebook/turnover/zinc_posterior_summary_50.csv') 
-filename = 'posterior_params_turnover'
-source('py-notebook/func_posterior_plot.R')
+# FG = FALSE
+# ## Turnover - zinc
+# p1<-read.csv('py-notebook/turnover/zinc_posterior_summary.csv') 
+# p2<-read.csv('py-notebook/turnover/zinc_posterior_summary_50.csv') 
+# filename = 'posterior_params_turnover'
+# source('py-notebook/func_posterior_plot.R')
 
-## Productivity
-p1<-read.csv('py-notebook/prod/posterior_summary.csv') 
-p2<-read.csv('py-notebook/prod/posterior_summary_50.csv') 
-filename = 'posterior_params_prod'
-source('py-notebook/func_posterior_plot.R')
+# ## Productivity
+# p1<-read.csv('py-notebook/prod/posterior_summary.csv') 
+# p2<-read.csv('py-notebook/prod/posterior_summary_50.csv') 
+# filename = 'posterior_params_prod'
+# source('py-notebook/func_posterior_plot.R')
 
-## Biomass
-p1<-read.csv('py-notebook/biomass/posterior_summary.csv') 
-p2<-read.csv('py-notebook/biomass/posterior_summary_50.csv') 
-filename = 'posterior_params_biomass'
-source('py-notebook/func_posterior_plot.R')
+# ## Biomass
+# p1<-read.csv('py-notebook/biomass/posterior_summary.csv') 
+# p2<-read.csv('py-notebook/biomass/posterior_summary_50.csv') 
+# filename = 'posterior_params_biomass'
+# source('py-notebook/func_posterior_plot.R')
 
-## Density
-p1<-read.csv('py-notebook/density/posterior_summary.csv') 
-p2<-read.csv('py-notebook/density/posterior_summary_50.csv') 
-filename = 'posterior_params_density'
-source('py-notebook/func_posterior_plot.R')
+# ## Density
+# p1<-read.csv('py-notebook/density/posterior_summary.csv') 
+# p2<-read.csv('py-notebook/density/posterior_summary_50.csv') 
+# filename = 'posterior_params_density'
+# source('py-notebook/func_posterior_plot.R')
 
 ## READ FG MODELS
 FG = TRUE
@@ -66,4 +66,5 @@ p1<-read.csv('py-notebook/fg/biom/biom_posterior_summary.csv')
 p2<-read.csv('py-notebook/fg/biom/biom_posterior_summary_50.csv') 
 filename = 'posterior_params_biom_fg'
 source('py-notebook/func_posterior_plot.R')
+
 

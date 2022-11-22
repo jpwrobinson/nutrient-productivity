@@ -11,11 +11,12 @@ prod_reef<-prod_reef %>%
                                'selenium.mug' = 'Selenium', 'vitamin_a.mug' = 'Vitamin A', 'omega3.g' = 'Omega-3\nfatty acids')) 
 
 ## recode and estimate nutrient proportion per site per fg
-prod_fg<-prod_fg %>% 
+prod_fg<-prod_fg %>%
+  filter(country != 'Belize') %>% 
+  group_by(site, year) %>%
+  # filter(!any(prod_g_day_ha==0)) %>%
   mutate(nutrient_lab = recode(nutrient, 'calcium.mg' = 'Calcium', 'iron.mg' = 'Iron', 'zinc.mg' = 'Zinc',
                                'selenium.mug' = 'Selenium', 'vitamin_a.mug' = 'Vitamin A', 'omega3.g' = 'Omega-3\nfatty acids')) %>% 
-  ## drop invert sessile as these are small proportion, consistently, and not fished
-  filter(!fg %in% c('invertivore-sessile', 'detritivore')) %>% 
   group_by(country, site, year, nutrient,nutrient_lab) %>% 
   mutate(tnut = sum(nut_prod_day_ha), 
          nutprop = nut_prod_day_ha / tnut,
@@ -23,6 +24,12 @@ prod_fg<-prod_fg %>%
          prodprop = biomass_turnover / tprod,
          tbiom = sum(biomass_kgha),
          biomprop = biomass_kgha / tbiom) 
+
+# length(unique(prod_reef$site))
+tt<-prod_fg %>% filter(prodprop==0 & nutrient=='calcium.mg')
+with(tt, table(country,fg))
+# with(prod_fg, table(site, country))
+# prod_fg %>% filter(country=='Belize') %>% ungroup() %>% distinct(site)
 
 ## looping by nutrient
 nut.vec<-unique(prod_fg$nutrient)
@@ -50,11 +57,12 @@ for(i in 1:length(nut.vec)){
 
 
 ## checking nut proportion df
-# focal<-read.csv('py-notebook/zinc.mg_scaled.csv') %>%
-#   pivot_longer(herbivore.detritivore:planktivore, names_to = 'fg', values_to = 'nutprop')
+focal<-read.csv('py-notebook/zinc.mg_scaled.csv') %>%
+  pivot_longer(herbivore.detritivore:planktivore, names_to = 'fg', values_to = 'nutprop')
 # ggplot(focal, aes(nutprop)) + geom_histogram() + facet_wrap(~fg)
 # ggplot(focal, aes(depth, nutprop, col=fg)) + geom_point() + geom_smooth()
 # ggplot(focal, aes(grav_nc, nutprop, col=fg)) + geom_point() + geom_smooth()
+ggplot(focal, aes(rubble, nutprop, col=fg)) + geom_point() + geom_smooth()
 # ggplot(focal, aes(fg, nutprop, fill=fg)) + geom_boxplot() + facet_wrap(~country)
 # ggplot(focal, aes(management_rules, nutprop, fill=fg)) + geom_boxplot() + facet_wrap(~country)
 # focal %>% group_by(fg) %>% summarise(median(nutprop), min(nutprop), max(nutprop))
@@ -72,6 +80,8 @@ for(i in 1:length(nut.vec)){
 # pairs2(test[,c(1:6)])
 # hist(log(test$nut_turnover))
 
+# t1 %>% pivot_longer(herbivore:planktivore, names_to = 'fg', values_to = 'prop') %>% 
+#   ggplot() + geom_point(aes(rubble, prop, col=fg))
 
 # fg correlations
 t1<-read.csv('py-notebook/productivity_unscaled.csv')
@@ -83,9 +93,10 @@ t6<-read.csv('py-notebook/vitamin_a.mug_unscaled.csv')
 t7<-read.csv('py-notebook/selenium.mug_unscaled.csv')
 t8<-read.csv('py-notebook/omega3.g_unscaled.csv')
 hnames<-c("herbivore.detritivore","herbivore.macroalgae","invertivore.mobile","piscivore","planktivore", "omnivore")
+# hnames<-c("herbivore","invertivore.mobile","piscivore","planktivore", "omnivore")
 
 pdf(file = 'fig/model/fg_proportion_correlations.pdf', height=7, width=12)
-for(i in 1:6){
+for(i in 1:length(hnames)){
   # paste('Correlation:', hnames[i])
   print(
     pairs2(cbind(t1 %>% pull(hnames[i]),

@@ -1,7 +1,8 @@
 library(tidyverse)
 
 stdize<-function(x){(x-mean(x))/(2*sd(x))}
-hnames<-c("herbivore-detritivore","herbivore-macroalgae","invertivore-mobile","piscivore","planktivore", "omnivore")
+# hnames<-c("herbivore-detritivore","herbivore-macroalgae","invertivore-mobile","piscivore","planktivore", "omnivore")
+hnames=c("herbivore","invertivore-mobile","piscivore","planktivore", "omnivore")
 
 
 covs<-c('gravity',

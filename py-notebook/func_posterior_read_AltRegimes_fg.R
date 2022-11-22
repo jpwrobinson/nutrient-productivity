@@ -13,13 +13,15 @@ ben.cols<-data.frame(col = c('#498FC9','#B6B400','#a1d99b', 'grey60'),
 
 ben_cols.named<-setNames(as.character(ben.cols$col), ben.cols$benthic)
 
-fg.cols<-data.frame(col=c('#fdae61', '#377eb8','#80cdc1', '#4d9221', '#d9ef8b', '#bebada'),
-                    FG=c('invertivore-mobile', 'piscivore','omnivore', 'herbivore-macroalgae', 'herbivore-detritivore','planktivore'),
-                    FG_lab=c("Invertivore (mobile)", 'Piscivore','Omnivore', 'Herbivore (browser)','Herbivore (grazer/scraper)', 'Planktivore'))
+fg.cols<-data.frame(col=c('#fdae61', '#377eb8','#80cdc1', '#4d9221', '#d9ef8b', '#bebada', '#4d9221'),
+                    FG=c('invertivore-mobile', 'piscivore','omnivore', 'herbivore-macroalgae', 'herbivore-detritivore','planktivore', 'herbivore'),
+                    FG_lab=c("Invertivore (mobile)", 'Piscivore','Omnivore', 'Herbivore (browser)','Herbivore (grazer/scraper)', 'Planktivore', 'Herbivore'))
 fg_cols.named<-setNames(as.character(fg.cols$col), fg.cols$FG)
 
 # hnames<-names(focal  %>% select(herbivore.detritivore:planktivore)) %>% str_replace_all('\\.', '-')
-hnames<-c("herbivore-detritivore","herbivore-macroalgae","invertivore-mobile","piscivore","planktivore", "omnivore")
+# hnames<-c("herbivore-detritivore","herbivore-macroalgae","invertivore-mobile","piscivore","planktivore", "omnivore")
+hnames=c("herbivore","invertivore-mobile","piscivore","planktivore", "omnivore")
+
 
 
 covs<-c('macroalgae','bare_substrate','turf_algae','rubble')
@@ -32,7 +34,8 @@ post<-read.csv(paste0('py-notebook', filename,var_name, '_posterior_trace.csv'))
 ints_country<-post %>% 
   select(starts_with(c('Belize', 'Fiji', 'Sol', 'Mad'))) %>% 
   select(!contains(c('restriction', 'no.take', 'open'))) %>% 
-  rename(Belize.0 = Belize, Fiji.0 = Fiji, Madagascar.0 = Madagascar, Solomon.Islands.0 = Solomon.Islands) %>% 
+  rename(#Belize.0 = Belize, 
+    Fiji.0 = Fiji, Madagascar.0 = Madagascar, Solomon.Islands.0 = Solomon.Islands) %>% 
    rename_with(.fn = ~ str_replace(.x, "Solomon.Islands", "Solomon_Islands"),
                 .cols = starts_with("Solomon.Islands")) %>% 
     pivot_longer(
@@ -70,10 +73,10 @@ conts<-post %>% select(starts_with(c( 'hard', 'mac', 'bare', 'turf', 'rub', 'pop
   )
 
 ## add real fg names
-ints$fg<-rep(hnames, times = dim(ints)[1]/6)
-ints_country$fg<-rep(hnames, times = dim(ints_country)[1]/6)
-ints_fringing$fg<-rep(hnames, times = dim(ints_fringing)[1]/6)
-conts$fg<-rep(hnames, times = dim(conts)[1]/6)
+ints$fg<-rep(hnames, times = dim(ints)[1]/length(hnames))
+ints_country$fg<-rep(hnames, times = dim(ints_country)[1]/length(hnames))
+ints_fringing$fg<-rep(hnames, times = dim(ints_fringing)[1]/length(hnames))
+conts$fg<-rep(hnames, times = dim(conts)[1]/length(hnames))
 
 meanInts<-ints  %>%  group_by(fg) %>% summarise(med = median(mu),
       lo = rethinking::HPDI(mu, prob=.95)[1], hi = rethinking::HPDI(mu, prob=.95)[2])

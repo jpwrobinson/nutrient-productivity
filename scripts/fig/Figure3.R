@@ -1,16 +1,17 @@
 
 source('scripts/py-output/04_nutprod_post_altRegimes.R')
-
+servs$service<-factor(servs$service, levels=unique(servs$service)[c(2,3,1)])
 
 ## Figure 3
-pdf(file = 'fig/Figure3.pdf', height=3, width = 12)
+pdf(file = 'fig/Figure3.pdf', height=5, width = 12)
 
-gMain<-ggplot(servs_agg, aes(X_raw, prop*100)) + 
-        geom_line(data=servs, aes(group=id, col=fg), alpha=0.5) +
-        geom_line(aes(col=fg), size=1.2) + 
-        facet_grid(~cov, scales = "free_x", switch = 'x') +
+gMain<-ggplot(servs, aes(X_raw, prop*100)) + 
+        geom_line(aes(group=id, col=fg), alpha=1) +
+        # geom_line(aes(col=fg), size=1.2) + 
+        facet_grid(service~cov, scales = "free_x", switch = 'x') +
         labs(x = '% cover', y = 'proportion community, %') +
-        theme(strip.placement = "outside") 
+        theme(strip.placement = "outside",
+            strip.text.y = element_text(angle=360)) 
 
 print(
     plot_grid(gMain, nrow = 1) 
