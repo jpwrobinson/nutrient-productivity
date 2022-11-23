@@ -68,11 +68,14 @@ ggplot(focal, aes(rubble, nutprop, col=fg)) + geom_point() + geom_smooth()
 # focal %>% group_by(fg) %>% summarise(median(nutprop), min(nutprop), max(nutprop))
 
 ## checking reef-scale nutrient df
-# focal<-read.csv('py-notebook/zinc.mg_reef_unscaled.csv') 
-# ggplot(focal, aes(country, biomass_kgha, fill=management_rules)) + geom_boxplot()
-# ggplot(focal, aes(hard_coral, nscore3)) + geom_point()
-# ggplot(focal, aes(nscore3, nscore)) + geom_point()
-# ggplot(focal, aes(management_rules, nscore3, fill=country)) + geom_boxplot()
+focal<-read.csv('py-notebook/iron.mg_reef_unscaled.csv')
+ggplot(focal, aes(country, biomass_kgha, fill=management_rules)) + geom_boxplot()
+ggplot(focal, aes(log(biomass_kgha), nut_prod_day_ha, col=management_rules)) + 
+  geom_point() + geom_smooth()
+ggplot(focal, aes(log(biomass_kgha), nut_turnover, col=management_rules)) + 
+  geom_point() + geom_smooth() + facet_wrap(~country)
+ggplot(focal, aes(hard_coral, nut_prod_day_ha, col=country)) + geom_point()
+ggplot(focal, aes(country, nut_turnover, fill=management_rules)) + geom_boxplot()
 
 # covariate correlations
 # test<-read.csv('py-notebook/zinc.mg_reef_unscaled.csv')
@@ -111,5 +114,27 @@ for(i in 1:length(hnames)){
          labels = c('productivity', 'biomass', 'zinc', 'calcium', 'iron', 'vitA', 'selenium', 'O-3')))
   title(hnames[i])
   }
+dev.off()
+
+t3<-read.csv('py-notebook/zinc.mg_reef_unscaled.csv')
+t4<-read.csv('py-notebook/calcium.mg_reef_unscaled.csv')
+t5<-read.csv('py-notebook/iron.mg_reef_unscaled.csv')
+t6<-read.csv('py-notebook/vitamin_a.mug_reef_unscaled.csv')
+t7<-read.csv('py-notebook/selenium.mug_reef_unscaled.csv')
+t8<-read.csv('py-notebook/omega3.g_reef_unscaled.csv')
+
+pdf(file = 'fig/model/reef_prod_correlations.pdf', height=7, width=12)
+  print(
+    pairs2(cbind(t3 %>% pull(biomass_turnover),
+                 t3 %>% pull(biomass_kgha),
+                 t3 %>% pull(nut_prod_day_ha),
+                 t4 %>% pull(nut_prod_day_ha),
+                 t5 %>% pull(nut_prod_day_ha),
+                 t6 %>% pull(nut_prod_day_ha),
+                 t7 %>% pull(nut_prod_day_ha),
+                 t8 %>% pull(nut_prod_day_ha)
+    ),
+    labels = c('productivity', 'biomass', 'zinc', 'calcium', 'iron', 'vitA', 'selenium', 'O-3')))
+
 dev.off()
 
