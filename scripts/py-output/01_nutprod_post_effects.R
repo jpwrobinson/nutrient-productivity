@@ -55,6 +55,24 @@ p2<-read.csv('py-notebook/fg/zinc/zinc_posterior_summary_50.csv')
 filename = 'posterior_params_zinc_fg'
 source('py-notebook/func_posterior_plot.R')
 
+## FG - selenium
+p1<-read.csv('py-notebook/fg/selenium/selenium_posterior_summary.csv')
+p2<-read.csv('py-notebook/fg/selenium/selenium_posterior_summary_50.csv') 
+filename = 'posterior_params_selenium_fg'
+source('py-notebook/func_posterior_plot.R')
+
+## FG - vitaminA
+p1<-read.csv('py-notebook/fg/vitaminA/vitaminA_posterior_summary.csv')
+p2<-read.csv('py-notebook/fg/vitaminA/vitaminA_posterior_summary_50.csv') 
+filename = 'posterior_params_vitaminA_fg'
+source('py-notebook/func_posterior_plot.R')
+
+## FG - omega
+p1<-read.csv('py-notebook/fg/omega/omega_posterior_summary.csv')
+p2<-read.csv('py-notebook/fg/omega/omega_posterior_summary_50.csv') 
+filename = 'posterior_params_omega_fg'
+source('py-notebook/func_posterior_plot.R')
+
 ## FG - prod
 p1<-read.csv('py-notebook/fg/prod/prod_posterior_summary.csv')
 p2<-read.csv('py-notebook/fg/prod/prod_posterior_summary_50.csv') 

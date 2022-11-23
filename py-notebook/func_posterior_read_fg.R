@@ -19,8 +19,8 @@ fg.cols<-data.frame(col=c('#fdae61', '#377eb8','#80cdc1', '#4d9221', '#d9ef8b', 
 fg_cols.named<-setNames(as.character(fg.cols$col), fg.cols$FG)
 
 # hnames<-names(focal  %>% select(herbivore.detritivore:planktivore)) %>% str_replace_all('\\.', '-')
-# hnames<-c("herbivore-detritivore","herbivore-macroalgae","invertivore-mobile","piscivore","planktivore", "omnivore")
-hnames=c("herbivore","invertivore-mobile","piscivore","planktivore", "omnivore")
+hnames<-c("herbivore-detritivore","herbivore-macroalgae","invertivore-mobile","piscivore","planktivore", "omnivore")
+# hnames=c("herbivore","invertivore-mobile","piscivore","planktivore", "omnivore")
 
 
 covs<-c('grav_nc','hard_coral','macroalgae','bare_substrate','turf_algae','pop_count','sediment','nutrient_load','rubble','depth')

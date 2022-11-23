@@ -45,6 +45,30 @@ var_name = 'zinc'
 source('py-notebook/func_posterior_read_fg.R')
 zinc_main<-main
 
+## Selenium
+figname='fig/model/covariates_selenium_fg.pdf'
+csvname='results/covariates_selenium_fg.csv'
+filename='/fg/selenium/'
+var_name = 'selenium'
+source('py-notebook/func_posterior_read_fg.R')
+selenium_main<-main
+
+## Omega-3
+figname='fig/model/covariates_omega_fg.pdf'
+csvname='results/covariates_omega_fg.csv'
+filename='/fg/omega/'
+var_name = 'omega'
+source('py-notebook/func_posterior_read_fg.R')
+omega_main<-main
+
+## VitaminA
+figname='fig/model/covariates_vitaminA_fg.pdf'
+csvname='results/covariates_vitaminA_fg.csv'
+filename='/fg/vitaminA/'
+var_name = 'vitaminA'
+source('py-notebook/func_posterior_read_fg.R')
+vitaminA_main<-main
+
 ## average of 3 nutrients
 nuts<-rbind(calcium_main %>% mutate(nutrient = 'Ca'),
 			iron_main %>% mutate(nutrient = 'Fe'),

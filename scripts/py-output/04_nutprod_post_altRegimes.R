@@ -45,30 +45,45 @@ source('py-notebook/func_posterior_read_AltRegimes_fg.R')
 zinc_main_alt<-main
 
 ## VitA
-# figname='fig/model/future_vita_regimes_fg.pdf'
-# csvname='results/future_vita_regimes_fg.csv'
-# filename='/fg/vitaminA/'
-# var_name = 'vitaminA'
-# source('py-notebook/func_posterior_read_AltRegimes_fg.R')
-# vita_main_alt<-main
+figname='fig/model/future_vita_regimes_fg.pdf'
+csvname='results/future_vita_regimes_fg.csv'
+filename='/fg/vitaminA/'
+var_name = 'vitaminA'
+source('py-notebook/func_posterior_read_AltRegimes_fg.R')
+vita_main_alt<-main
 
-# ## Selenium
-# figname='fig/model/future_selenium_regimes_fg.pdf'
-# csvname='results/future_selenium_regimes_fg.csv'
-# filename='/fg/selenium/'
-# var_name = 'selenium'
-# source('py-notebook/func_posterior_read_AltRegimes_fg.R')
-# selenium_main_alt<-main
+## Selenium
+figname='fig/model/future_selenium_regimes_fg.pdf'
+csvname='results/future_selenium_regimes_fg.csv'
+filename='/fg/selenium/'
+var_name = 'selenium'
+source('py-notebook/func_posterior_read_AltRegimes_fg.R')
+selenium_main_alt<-main
+
+## Omega-3
+figname='fig/model/future_omega_regimes_fg.pdf'
+csvname='results/future_omega_regimes_fg.csv'
+filename='/fg/omega/'
+var_name = 'omega'
+source('py-notebook/func_posterior_read_AltRegimes_fg.R')
+omega_main_alt<-main
 
 ## average of 3 nutrients
 nuts<-rbind(calcium_main_alt %>% mutate(nutrient = 'Ca'),
 			iron_main_alt %>% mutate(nutrient = 'Fe'),
-			zinc_main_alt %>% mutate(nutrient = 'Zn')) %>% 
-		group_by(X, X_raw, fg, cov) %>% 
-		summarise(prop = mean(prop))
+			zinc_main_alt %>% mutate(nutrient = 'Zn'),
+			omega_main_alt %>% mutate(nutrient = 'O-3'),
+			vita_main_alt %>% mutate(nutrient = 'VitA'),
+			selenium_main_alt %>% mutate(nutrient = 'Se'))  %>% 
+		mutate(id = paste(nutrient, fg))
+
+nuts_agg<-nuts %>% group_by(X, X_raw, fg, cov) %>% 
+		summarise(prop = mean(prop)) 
+
+
 
 ## average of fishery services
-servs<-rbind(nuts %>% mutate(service = 'Nutrient\nproduction'),
+servs<-rbind(nuts_agg %>% mutate(service = 'Nutrient\nproduction'),
 			biom_main_alt %>% mutate(service = 'Standing\nbiomass'),
 			prod_main_alt %>% mutate(service = 'Biomass\nturnover')) %>% 
 		mutate(id = paste(service, fg))

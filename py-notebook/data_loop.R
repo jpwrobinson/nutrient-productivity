@@ -80,8 +80,8 @@ ggplot(focal, aes(rubble, nutprop, col=fg)) + geom_point() + geom_smooth()
 # pairs2(test[,c(1:6)])
 # hist(log(test$nut_turnover))
 
-# t1 %>% pivot_longer(herbivore:planktivore, names_to = 'fg', values_to = 'prop') %>% 
-#   ggplot() + geom_point(aes(rubble, prop, col=fg))
+t2 %>% pivot_longer(herbivore.detritivore:planktivore, names_to = 'fg', values_to = 'prop') %>%
+  ggplot(aes(hard_coral, prop, col=fg)) + geom_point() + geom_smooth() + facet_wrap(~fg)
 
 # fg correlations
 t1<-read.csv('py-notebook/productivity_unscaled.csv')
