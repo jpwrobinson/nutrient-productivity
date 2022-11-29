@@ -1,3 +1,223 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:5c978dab52589662e5fef827c01f642afb106c4bd9352789596d47914cf04834
-size 22286
+,mean,sd,hdi_2.5%,hdi_97.5%,mcse_mean,mcse_sd,ess_bulk,ess_tail,r_hat,varname,fg
+intercept[0],0.146,0.946,-1.769,1.994,0.042,0.03,504.0,1315.0,1.0,intercept[0],herbivore-detritivore
+intercept[1],-0.912,1.007,-2.958,1.013,0.041,0.029,612.0,1313.0,1.0,intercept[1],herbivore-macroalgae
+intercept[2],0.645,0.992,-1.258,2.481,0.039,0.028,641.0,1546.0,1.0,intercept[2],invertivore-mobile
+intercept[3],0.345,0.991,-1.581,2.288,0.032,0.023,930.0,1695.0,1.0,intercept[3],piscivore
+intercept[4],0.868,0.998,-1.163,2.811,0.047,0.034,449.0,812.0,1.0,intercept[4],planktivore
+intercept[5],-0.583,0.981,-2.436,1.435,0.038,0.027,659.0,1315.0,1.0,intercept[5],omnivore
+hard_coral[0],-0.035,0.189,-0.4,0.349,0.004,0.003,1996.0,2229.0,1.0,hard_coral[0],herbivore-detritivore
+hard_coral[1],0.018,0.211,-0.432,0.399,0.004,0.004,2576.0,2234.0,1.0,hard_coral[1],herbivore-macroalgae
+hard_coral[2],-0.228,0.171,-0.555,0.107,0.004,0.003,2260.0,2388.0,1.0,hard_coral[2],invertivore-mobile
+hard_coral[3],-0.125,0.188,-0.506,0.229,0.004,0.003,2276.0,2278.0,1.0,hard_coral[3],piscivore
+hard_coral[4],-0.145,0.179,-0.48,0.207,0.004,0.003,1868.0,2132.0,1.0,hard_coral[4],planktivore
+hard_coral[5],-0.055,0.198,-0.429,0.339,0.004,0.003,2562.0,2369.0,1.0,hard_coral[5],omnivore
+macroalgae[0],-0.2,0.159,-0.491,0.124,0.003,0.002,2083.0,2142.0,1.0,macroalgae[0],herbivore-detritivore
+macroalgae[1],0.164,0.173,-0.189,0.473,0.003,0.003,2478.0,2064.0,1.0,macroalgae[1],herbivore-macroalgae
+macroalgae[2],-0.041,0.149,-0.346,0.243,0.003,0.002,2416.0,2377.0,1.0,macroalgae[2],invertivore-mobile
+macroalgae[3],-0.382,0.154,-0.687,-0.091,0.003,0.002,2388.0,2453.0,1.0,macroalgae[3],piscivore
+macroalgae[4],-0.313,0.151,-0.613,-0.027,0.003,0.002,2293.0,2499.0,1.0,macroalgae[4],planktivore
+macroalgae[5],0.041,0.173,-0.275,0.387,0.003,0.003,2845.0,2630.0,1.0,macroalgae[5],omnivore
+bare_sub[0],-0.19,0.157,-0.505,0.102,0.003,0.002,3102.0,2424.0,1.0,bare_sub[0],herbivore-detritivore
+bare_sub[1],0.016,0.179,-0.326,0.367,0.003,0.003,3829.0,1967.0,1.0,bare_sub[1],herbivore-macroalgae
+bare_sub[2],-0.212,0.162,-0.53,0.101,0.003,0.002,2373.0,2146.0,1.0,bare_sub[2],invertivore-mobile
+bare_sub[3],-0.168,0.178,-0.529,0.157,0.004,0.003,2277.0,2236.0,1.0,bare_sub[3],piscivore
+bare_sub[4],-0.005,0.191,-0.383,0.348,0.004,0.003,2171.0,2069.0,1.0,bare_sub[4],planktivore
+bare_sub[5],-0.021,0.169,-0.36,0.291,0.003,0.003,2959.0,2358.0,1.0,bare_sub[5],omnivore
+turf[0],0.006,0.173,-0.336,0.333,0.004,0.003,2050.0,2233.0,1.0,turf[0],herbivore-detritivore
+turf[1],0.055,0.185,-0.31,0.419,0.003,0.003,3103.0,2421.0,1.0,turf[1],herbivore-macroalgae
+turf[2],0.151,0.16,-0.157,0.461,0.004,0.003,1804.0,1931.0,1.0,turf[2],invertivore-mobile
+turf[3],0.007,0.155,-0.292,0.307,0.003,0.002,2309.0,2490.0,1.0,turf[3],piscivore
+turf[4],-0.012,0.165,-0.304,0.344,0.004,0.003,2053.0,2043.0,1.0,turf[4],planktivore
+turf[5],-0.074,0.184,-0.434,0.278,0.003,0.003,3080.0,2416.0,1.0,turf[5],omnivore
+rubble[0],-0.097,0.175,-0.431,0.252,0.004,0.003,2319.0,1785.0,1.0,rubble[0],herbivore-detritivore
+rubble[1],-0.013,0.195,-0.402,0.365,0.004,0.003,2741.0,2431.0,1.0,rubble[1],herbivore-macroalgae
+rubble[2],0.126,0.173,-0.236,0.441,0.004,0.003,1858.0,1977.0,1.0,rubble[2],invertivore-mobile
+rubble[3],-0.163,0.173,-0.506,0.172,0.003,0.002,2501.0,1950.0,1.0,rubble[3],piscivore
+rubble[4],0.385,0.168,0.053,0.721,0.004,0.003,1888.0,2096.0,1.0,rubble[4],planktivore
+rubble[5],-0.07,0.182,-0.407,0.293,0.003,0.003,2859.0,1899.0,1.0,rubble[5],omnivore
+population[0],0.326,0.18,-0.024,0.671,0.003,0.002,3348.0,2272.0,1.0,population[0],herbivore-detritivore
+population[1],-0.021,0.192,-0.389,0.348,0.003,0.004,4587.0,2176.0,1.0,population[1],herbivore-macroalgae
+population[2],0.187,0.17,-0.145,0.523,0.004,0.003,2335.0,2344.0,1.0,population[2],invertivore-mobile
+population[3],-0.001,0.187,-0.349,0.378,0.004,0.003,2675.0,2260.0,1.0,population[3],piscivore
+population[4],-0.244,0.196,-0.628,0.13,0.004,0.003,2290.0,2399.0,1.0,population[4],planktivore
+population[5],0.195,0.191,-0.166,0.591,0.003,0.003,3350.0,2244.0,1.0,population[5],omnivore
+gravity[0],-0.088,0.163,-0.429,0.21,0.003,0.003,2708.0,2499.0,1.0,gravity[0],herbivore-detritivore
+gravity[1],-0.004,0.178,-0.329,0.377,0.003,0.004,3252.0,2109.0,1.0,gravity[1],herbivore-macroalgae
+gravity[2],-0.009,0.151,-0.309,0.286,0.003,0.002,2371.0,2075.0,1.0,gravity[2],invertivore-mobile
+gravity[3],-0.222,0.164,-0.553,0.092,0.003,0.002,2689.0,2215.0,1.0,gravity[3],piscivore
+gravity[4],-0.166,0.183,-0.522,0.191,0.004,0.003,2615.0,2404.0,1.0,gravity[4],planktivore
+gravity[5],-0.273,0.191,-0.633,0.102,0.004,0.003,2931.0,2281.0,1.0,gravity[5],omnivore
+sediment[0],0.125,0.193,-0.26,0.498,0.004,0.003,2583.0,2483.0,1.0,sediment[0],herbivore-detritivore
+sediment[1],0.041,0.2,-0.375,0.406,0.004,0.003,3186.0,2357.0,1.0,sediment[1],herbivore-macroalgae
+sediment[2],0.162,0.172,-0.166,0.508,0.004,0.003,2153.0,2225.0,1.0,sediment[2],invertivore-mobile
+sediment[3],-0.134,0.166,-0.44,0.213,0.004,0.003,2191.0,2143.0,1.0,sediment[3],piscivore
+sediment[4],0.102,0.177,-0.243,0.451,0.004,0.003,2348.0,2319.0,1.0,sediment[4],planktivore
+sediment[5],-0.032,0.184,-0.387,0.32,0.004,0.003,2759.0,2267.0,1.0,sediment[5],omnivore
+nut_load[0],0.099,0.175,-0.25,0.43,0.004,0.003,2118.0,1545.0,1.0,nut_load[0],herbivore-detritivore
+nut_load[1],-0.097,0.177,-0.45,0.242,0.003,0.003,3596.0,1987.0,1.0,nut_load[1],herbivore-macroalgae
+nut_load[2],-0.069,0.151,-0.357,0.22,0.003,0.002,2432.0,2267.0,1.0,nut_load[2],invertivore-mobile
+nut_load[3],0.005,0.167,-0.32,0.321,0.003,0.003,2634.0,1968.0,1.0,nut_load[3],piscivore
+nut_load[4],0.306,0.177,-0.026,0.659,0.004,0.003,2459.0,2113.0,1.0,nut_load[4],planktivore
+nut_load[5],0.034,0.19,-0.308,0.428,0.003,0.003,3096.0,2443.0,1.0,nut_load[5],omnivore
+depth[0],0.086,0.159,-0.205,0.415,0.004,0.002,2030.0,2218.0,1.0,depth[0],herbivore-detritivore
+depth[1],0.128,0.182,-0.218,0.499,0.003,0.003,3333.0,1941.0,1.0,depth[1],herbivore-macroalgae
+depth[2],0.033,0.178,-0.294,0.399,0.004,0.003,1641.0,2176.0,1.0,depth[2],invertivore-mobile
+depth[3],0.258,0.163,-0.087,0.555,0.004,0.003,2133.0,2206.0,1.0,depth[3],piscivore
+depth[4],0.417,0.157,0.098,0.712,0.004,0.003,1934.0,2371.0,1.0,depth[4],planktivore
+depth[5],0.196,0.174,-0.146,0.528,0.003,0.003,2601.0,2239.0,1.0,depth[5],omnivore
+"reeftype_x[0,0]",-0.144,0.515,-1.111,0.905,0.018,0.012,857.0,1378.0,1.0,barrier,herbivore-detritivore
+"reeftype_x[0,1]",0.125,0.526,-0.951,1.091,0.017,0.012,903.0,1423.0,1.0,barrier,herbivore-macroalgae
+"reeftype_x[0,2]",0.125,0.526,-0.878,1.148,0.017,0.012,979.0,1698.0,1.0,barrier,invertivore-mobile
+"reeftype_x[0,3]",-0.041,0.519,-1.048,0.941,0.016,0.011,1020.0,1709.0,1.0,barrier,piscivore
+"reeftype_x[0,4]",-0.314,0.522,-1.263,0.764,0.017,0.012,939.0,1634.0,1.0,barrier,planktivore
+"reeftype_x[0,5]",0.146,0.535,-0.95,1.132,0.018,0.013,913.0,1441.0,1.0,barrier,omnivore
+"reeftype_x[1,0]",0.396,0.504,-0.587,1.386,0.017,0.012,835.0,1254.0,1.0,fringing,herbivore-detritivore
+"reeftype_x[1,1]",0.314,0.51,-0.698,1.309,0.017,0.012,864.0,1523.0,1.0,fringing,herbivore-macroalgae
+"reeftype_x[1,2]",0.637,0.517,-0.353,1.659,0.016,0.012,988.0,1646.0,1.0,fringing,invertivore-mobile
+"reeftype_x[1,3]",0.3,0.513,-0.678,1.3,0.016,0.012,986.0,1714.0,1.0,fringing,piscivore
+"reeftype_x[1,4]",-0.29,0.515,-1.279,0.704,0.018,0.013,826.0,1391.0,1.0,fringing,planktivore
+"reeftype_x[1,5]",0.331,0.521,-0.67,1.377,0.018,0.012,877.0,1320.0,1.0,fringing,omnivore
+"reeftype_x[2,0]",-0.165,0.633,-1.37,1.034,0.016,0.012,1480.0,1962.0,1.0,lagoon,herbivore-detritivore
+"reeftype_x[2,1]",-0.368,0.644,-1.688,0.793,0.017,0.012,1517.0,1960.0,1.0,lagoon,herbivore-macroalgae
+"reeftype_x[2,2]",-1.031,0.669,-2.395,0.182,0.016,0.011,1824.0,2195.0,1.0,lagoon,invertivore-mobile
+"reeftype_x[2,3]",0.213,0.635,-1.121,1.374,0.015,0.011,1799.0,2420.0,1.0,lagoon,piscivore
+"reeftype_x[2,4]",0.756,0.693,-0.527,2.164,0.018,0.013,1454.0,1760.0,1.0,lagoon,planktivore
+"reeftype_x[2,5]",-0.528,0.661,-1.822,0.719,0.015,0.011,1914.0,1975.0,1.0,lagoon,omnivore
+"reeftype_x[3,0]",-0.062,0.524,-1.05,0.966,0.017,0.012,909.0,1503.0,1.0,patch,herbivore-detritivore
+"reeftype_x[3,1]",-0.129,0.538,-1.178,0.937,0.017,0.012,976.0,1519.0,1.0,patch,herbivore-macroalgae
+"reeftype_x[3,2]",0.372,0.541,-0.707,1.377,0.017,0.012,1010.0,1767.0,1.0,patch,invertivore-mobile
+"reeftype_x[3,3]",-0.336,0.538,-1.379,0.703,0.017,0.012,1023.0,1594.0,1.0,patch,piscivore
+"reeftype_x[3,4]",-0.04,0.53,-1.077,0.965,0.018,0.013,822.0,1820.0,1.0,patch,planktivore
+"reeftype_x[3,5]",-0.192,0.53,-1.206,0.882,0.017,0.012,954.0,1637.0,1.0,patch,omnivore
+"reefzone_x[0,0]",0.087,0.701,-1.37,1.36,0.029,0.021,582.0,1609.0,1.0,back reef,herbivore-detritivore
+"reefzone_x[0,1]",-0.037,0.718,-1.474,1.346,0.026,0.018,774.0,1284.0,1.0,back reef,herbivore-macroalgae
+"reefzone_x[0,2]",0.195,0.734,-1.185,1.676,0.026,0.019,778.0,1421.0,1.0,back reef,invertivore-mobile
+"reefzone_x[0,3]",-0.009,0.696,-1.335,1.348,0.021,0.015,1114.0,2052.0,1.0,back reef,piscivore
+"reefzone_x[0,4]",-0.026,0.692,-1.355,1.321,0.028,0.02,619.0,1029.0,1.0,back reef,planktivore
+"reefzone_x[0,5]",-0.124,0.728,-1.546,1.326,0.024,0.017,914.0,1392.0,1.0,back reef,omnivore
+"reefzone_x[1,0]",-0.018,0.684,-1.273,1.371,0.031,0.022,477.0,1074.0,1.0,fore reef,herbivore-detritivore
+"reefzone_x[1,1]",-0.076,0.715,-1.502,1.358,0.029,0.02,612.0,1044.0,1.01,fore reef,herbivore-macroalgae
+"reefzone_x[1,2]",-0.078,0.723,-1.398,1.413,0.03,0.021,578.0,1072.0,1.0,fore reef,invertivore-mobile
+"reefzone_x[1,3]",0.203,0.668,-1.064,1.482,0.022,0.016,906.0,1711.0,1.0,fore reef,piscivore
+"reefzone_x[1,4]",0.209,0.702,-1.097,1.626,0.032,0.023,483.0,884.0,1.0,fore reef,planktivore
+"reefzone_x[1,5]",-0.002,0.708,-1.384,1.337,0.027,0.019,693.0,1409.0,1.0,fore reef,omnivore
+"β0_cnc[0,0]",0.015,0.967,-1.833,1.924,0.014,0.019,4826.0,2185.0,1.0,Fiji,herbivore-detritivore
+"β0_cnc[0,1]",-0.056,0.963,-1.847,1.94,0.015,0.02,4133.0,2203.0,1.0,Fiji,herbivore-macroalgae
+"β0_cnc[0,2]",0.094,1.001,-1.789,2.082,0.013,0.02,5828.0,2216.0,1.0,Fiji,invertivore-mobile
+"β0_cnc[0,3]",0.028,0.958,-1.84,1.836,0.014,0.018,4683.0,2306.0,1.0,Fiji,piscivore
+"β0_cnc[0,4]",-0.1,0.973,-2.048,1.684,0.013,0.02,5789.0,2338.0,1.0,Fiji,planktivore
+"β0_cnc[0,5]",0.006,0.974,-1.934,1.87,0.014,0.02,4520.0,2065.0,1.01,Fiji,omnivore
+"β0_cnc[1,0]",-0.018,1.005,-2.128,1.762,0.012,0.02,6960.0,2277.0,1.0,Madagascar,herbivore-detritivore
+"β0_cnc[1,1]",0.008,0.998,-2.004,1.862,0.015,0.02,4722.0,2259.0,1.0,Madagascar,herbivore-macroalgae
+"β0_cnc[1,2]",0.046,0.968,-1.881,1.875,0.015,0.018,4217.0,2571.0,1.0,Madagascar,invertivore-mobile
+"β0_cnc[1,3]",0.047,0.977,-1.775,2.033,0.014,0.021,4968.0,2073.0,1.0,Madagascar,piscivore
+"β0_cnc[1,4]",0.045,0.95,-1.892,1.816,0.012,0.02,6176.0,1962.0,1.0,Madagascar,planktivore
+"β0_cnc[1,5]",-0.038,1.003,-2.035,1.981,0.014,0.022,4844.0,2101.0,1.0,Madagascar,omnivore
+"β0_cnc[2,0]",-0.023,0.978,-1.869,1.97,0.013,0.022,5696.0,2182.0,1.01,Solomon Islands,herbivore-detritivore
+"β0_cnc[2,1]",-0.018,0.986,-1.912,1.91,0.013,0.019,6049.0,2373.0,1.0,Solomon Islands,herbivore-macroalgae
+"β0_cnc[2,2]",-0.068,0.963,-1.943,1.856,0.015,0.018,4275.0,2125.0,1.0,Solomon Islands,invertivore-mobile
+"β0_cnc[2,3]",-0.042,1.019,-2.089,1.872,0.015,0.024,4656.0,1954.0,1.0,Solomon Islands,piscivore
+"β0_cnc[2,4]",0.096,1.005,-1.846,2.036,0.013,0.021,5890.0,1832.0,1.0,Solomon Islands,planktivore
+"β0_cnc[2,5]",0.006,0.982,-1.992,1.902,0.014,0.02,5207.0,2169.0,1.0,Solomon Islands,omnivore
+"β0_c[0,0]",0.353,0.997,-1.582,2.273,0.044,0.031,509.0,1130.0,1.0,Fiji,herbivore-detritivore
+"β0_c[0,1]",-1.045,1.013,-3.152,0.812,0.044,0.031,523.0,1088.0,1.0,Fiji,herbivore-macroalgae
+"β0_c[0,2]",0.995,1.005,-1.027,2.851,0.041,0.029,597.0,1240.0,1.0,Fiji,invertivore-mobile
+"β0_c[0,3]",0.486,0.993,-1.405,2.452,0.035,0.024,827.0,1456.0,1.01,Fiji,piscivore
+"β0_c[0,4]",0.426,1.03,-1.753,2.302,0.05,0.035,427.0,796.0,1.0,Fiji,planktivore
+"β0_c[0,5]",-0.581,0.996,-2.437,1.398,0.039,0.028,645.0,1381.0,1.0,Fiji,omnivore
+"β0_c[1,0]",0.109,0.923,-1.69,1.897,0.043,0.031,451.0,1045.0,1.0,Madagascar,herbivore-detritivore
+"β0_c[1,1]",-0.929,0.966,-2.828,0.914,0.043,0.03,510.0,954.0,1.0,Madagascar,herbivore-macroalgae
+"β0_c[1,2]",0.74,0.967,-1.172,2.627,0.043,0.03,507.0,1266.0,1.0,Madagascar,invertivore-mobile
+"β0_c[1,3]",0.455,0.945,-1.3,2.397,0.034,0.024,792.0,1295.0,1.0,Madagascar,piscivore
+"β0_c[1,4]",1.062,0.97,-0.779,2.944,0.049,0.035,386.0,697.0,1.0,Madagascar,planktivore
+"β0_c[1,5]",-0.734,0.925,-2.573,1.008,0.039,0.027,570.0,1323.0,1.0,Madagascar,omnivore
+"β0_c[2,0]",0.007,1.016,-1.885,2.096,0.046,0.033,484.0,1301.0,1.0,Solomon Islands,herbivore-detritivore
+"β0_c[2,1]",-0.957,1.074,-3.041,1.122,0.043,0.03,634.0,1245.0,1.0,Solomon Islands,herbivore-macroalgae
+"β0_c[2,2]",0.375,1.043,-1.766,2.283,0.044,0.031,553.0,1176.0,1.0,Solomon Islands,invertivore-mobile
+"β0_c[2,3]",0.19,1.039,-1.827,2.229,0.036,0.025,848.0,1493.0,1.0,Solomon Islands,piscivore
+"β0_c[2,4]",1.325,1.036,-0.758,3.233,0.048,0.034,467.0,816.0,1.0,Solomon Islands,planktivore
+"β0_c[2,5]",-0.581,1.038,-2.542,1.523,0.044,0.031,543.0,1334.0,1.0,Solomon Islands,omnivore
+"β0_managenc[0,0]",0.089,0.989,-1.73,2.126,0.015,0.02,4284.0,2199.0,1.0,Fijino-take,herbivore-detritivore
+"β0_managenc[0,1]",0.01,0.93,-1.741,1.825,0.014,0.018,4529.0,1916.0,1.0,Fijino-take,herbivore-macroalgae
+"β0_managenc[0,2]",0.103,0.955,-1.804,1.951,0.014,0.019,4837.0,2193.0,1.0,Fijino-take,invertivore-mobile
+"β0_managenc[0,3]",0.054,0.97,-1.753,1.978,0.015,0.019,4126.0,2048.0,1.0,Fijino-take,piscivore
+"β0_managenc[0,4]",0.057,0.995,-1.865,1.986,0.013,0.022,5784.0,2011.0,1.01,Fijino-take,planktivore
+"β0_managenc[0,5]",-0.003,0.999,-1.836,2.084,0.015,0.021,4557.0,2232.0,1.0,Fijino-take,omnivore
+"β0_managenc[1,0]",-0.045,0.962,-1.941,1.738,0.013,0.019,5367.0,2280.0,1.0,Fijirestriction,herbivore-detritivore
+"β0_managenc[1,1]",-0.027,0.99,-1.963,1.899,0.015,0.02,4502.0,2216.0,1.0,Fijirestriction,herbivore-macroalgae
+"β0_managenc[1,2]",-0.047,0.985,-2.064,1.796,0.016,0.019,3950.0,1913.0,1.0,Fijirestriction,invertivore-mobile
+"β0_managenc[1,3]",-0.03,1.019,-2.105,1.897,0.015,0.023,4682.0,2004.0,1.0,Fijirestriction,piscivore
+"β0_managenc[1,4]",-0.111,0.963,-1.974,1.736,0.015,0.019,4189.0,2082.0,1.0,Fijirestriction,planktivore
+"β0_managenc[1,5]",0.012,0.964,-1.938,1.841,0.013,0.022,5767.0,1983.0,1.0,Fijirestriction,omnivore
+"β0_managenc[2,0]",-0.023,1.0,-1.953,1.902,0.015,0.019,4294.0,2109.0,1.0,Madagascarno-take,herbivore-detritivore
+"β0_managenc[2,1]",0.009,1.009,-2.08,1.831,0.012,0.022,6880.0,2109.0,1.0,Madagascarno-take,herbivore-macroalgae
+"β0_managenc[2,2]",-0.098,0.991,-1.957,1.901,0.014,0.022,4758.0,2150.0,1.0,Madagascarno-take,invertivore-mobile
+"β0_managenc[2,3]",0.035,1.002,-1.881,2.019,0.015,0.021,4584.0,2169.0,1.0,Madagascarno-take,piscivore
+"β0_managenc[2,4]",-0.09,0.962,-2.131,1.663,0.014,0.021,4564.0,2044.0,1.0,Madagascarno-take,planktivore
+"β0_managenc[2,5]",-0.031,0.993,-2.163,1.821,0.014,0.022,4760.0,1901.0,1.0,Madagascarno-take,omnivore
+"β0_managenc[3,0]",0.063,0.995,-1.902,1.926,0.014,0.024,4961.0,1406.0,1.0,Madagascaropen-access,herbivore-detritivore
+"β0_managenc[3,1]",-0.051,0.968,-2.007,1.758,0.014,0.02,5116.0,2174.0,1.0,Madagascaropen-access,herbivore-macroalgae
+"β0_managenc[3,2]",0.156,0.983,-1.736,2.14,0.014,0.021,5240.0,1732.0,1.0,Madagascaropen-access,invertivore-mobile
+"β0_managenc[3,3]",-0.051,1.019,-2.257,1.815,0.014,0.022,5221.0,2023.0,1.0,Madagascaropen-access,piscivore
+"β0_managenc[3,4]",0.112,0.946,-1.713,1.9,0.013,0.018,5361.0,2224.0,1.0,Madagascaropen-access,planktivore
+"β0_managenc[3,5]",-0.033,0.984,-1.878,1.933,0.013,0.021,6124.0,2140.0,1.0,Madagascaropen-access,omnivore
+"β0_managenc[4,0]",-0.007,0.97,-2.013,1.742,0.014,0.02,4672.0,2156.0,1.0,Madagascarrestriction,herbivore-detritivore
+"β0_managenc[4,1]",0.035,1.0,-1.99,1.905,0.013,0.021,5693.0,2165.0,1.0,Madagascarrestriction,herbivore-macroalgae
+"β0_managenc[4,2]",0.013,1.006,-1.856,2.047,0.014,0.02,5375.0,2450.0,1.0,Madagascarrestriction,invertivore-mobile
+"β0_managenc[4,3]",0.043,0.992,-1.941,1.929,0.015,0.019,4520.0,2202.0,1.0,Madagascarrestriction,piscivore
+"β0_managenc[4,4]",-0.033,0.976,-1.991,1.806,0.015,0.019,4485.0,2351.0,1.0,Madagascarrestriction,planktivore
+"β0_managenc[4,5]",0.059,1.014,-2.018,1.936,0.014,0.021,4908.0,2183.0,1.0,Madagascarrestriction,omnivore
+"β0_managenc[5,0]",-0.002,0.963,-1.895,1.772,0.014,0.019,4806.0,2415.0,1.0,Solomon Islandsno-take,herbivore-detritivore
+"β0_managenc[5,1]",0.033,1.031,-2.107,1.859,0.014,0.02,5441.0,2371.0,1.0,Solomon Islandsno-take,herbivore-macroalgae
+"β0_managenc[5,2]",-0.039,0.989,-1.962,1.838,0.013,0.021,5861.0,2270.0,1.0,Solomon Islandsno-take,invertivore-mobile
+"β0_managenc[5,3]",0.026,0.999,-1.969,1.88,0.014,0.019,4941.0,2273.0,1.0,Solomon Islandsno-take,piscivore
+"β0_managenc[5,4]",0.138,0.999,-1.765,2.152,0.014,0.019,5301.0,2085.0,1.0,Solomon Islandsno-take,planktivore
+"β0_managenc[5,5]",0.06,0.971,-1.763,1.991,0.013,0.02,5492.0,1860.0,1.0,Solomon Islandsno-take,omnivore
+"β0_managenc[6,0]",-0.029,0.995,-1.936,1.865,0.013,0.019,5645.0,2268.0,1.0,Solomon Islandsrestriction,herbivore-detritivore
+"β0_managenc[6,1]",-0.062,0.976,-1.978,1.798,0.013,0.02,5535.0,2294.0,1.0,Solomon Islandsrestriction,herbivore-macroalgae
+"β0_managenc[6,2]",-0.009,0.983,-2.099,1.762,0.013,0.02,6032.0,1892.0,1.0,Solomon Islandsrestriction,invertivore-mobile
+"β0_managenc[6,3]",-0.027,0.958,-1.807,1.764,0.014,0.019,4920.0,2195.0,1.0,Solomon Islandsrestriction,piscivore
+"β0_managenc[6,4]",-0.068,0.965,-1.963,1.766,0.013,0.019,5469.0,2244.0,1.0,Solomon Islandsrestriction,planktivore
+"β0_managenc[6,5]",-0.066,1.041,-2.215,1.913,0.015,0.022,5038.0,1753.0,1.0,Solomon Islandsrestriction,omnivore
+"β0_manage[0,0]",0.893,0.895,-0.976,2.533,0.045,0.032,395.0,893.0,1.0,Fijino-take,herbivore-detritivore
+"β0_manage[0,1]",-1.104,0.926,-2.806,0.833,0.043,0.031,455.0,767.0,1.01,Fijino-take,herbivore-macroalgae
+"β0_manage[0,2]",1.521,0.905,-0.225,3.236,0.042,0.03,461.0,1008.0,1.01,Fijino-take,invertivore-mobile
+"β0_manage[0,3]",0.882,0.862,-0.839,2.505,0.033,0.023,698.0,1316.0,1.01,Fijino-take,piscivore
+"β0_manage[0,4]",0.699,0.915,-1.105,2.459,0.05,0.035,337.0,701.0,1.0,Fijino-take,planktivore
+"β0_manage[0,5]",-0.604,0.901,-2.316,1.165,0.041,0.029,486.0,1060.0,1.01,Fijino-take,omnivore
+"β0_manage[1,0]",0.037,0.783,-1.501,1.585,0.042,0.029,354.0,787.0,1.0,Fijirestriction,herbivore-detritivore
+"β0_manage[1,1]",-1.119,0.824,-2.703,0.504,0.041,0.029,407.0,580.0,1.01,Fijirestriction,herbivore-macroalgae
+"β0_manage[1,2]",0.748,0.827,-0.872,2.306,0.042,0.029,398.0,733.0,1.01,Fijirestriction,invertivore-mobile
+"β0_manage[1,3]",0.235,0.789,-1.317,1.748,0.032,0.023,614.0,1084.0,1.01,Fijirestriction,piscivore
+"β0_manage[1,4]",-0.252,0.817,-1.866,1.323,0.046,0.033,313.0,531.0,1.0,Fijirestriction,planktivore
+"β0_manage[1,5]",-0.565,0.801,-2.096,1.013,0.04,0.028,410.0,829.0,1.01,Fijirestriction,omnivore
+"β0_manage[2,0]",-0.092,0.818,-1.726,1.443,0.043,0.03,366.0,771.0,1.0,Madagascarno-take,herbivore-detritivore
+"β0_manage[2,1]",-0.875,0.855,-2.489,0.827,0.042,0.03,415.0,664.0,1.01,Madagascarno-take,herbivore-macroalgae
+"β0_manage[2,2]",0.059,0.863,-1.593,1.734,0.042,0.03,422.0,833.0,1.0,Madagascarno-take,invertivore-mobile
+"β0_manage[2,3]",0.579,0.822,-1.013,2.226,0.033,0.023,634.0,1101.0,1.0,Madagascarno-take,piscivore
+"β0_manage[2,4]",0.609,0.855,-1.145,2.192,0.047,0.033,333.0,541.0,1.0,Madagascarno-take,planktivore
+"β0_manage[2,5]",-0.888,0.842,-2.504,0.694,0.039,0.028,460.0,1052.0,1.0,Madagascarno-take,omnivore
+"β0_manage[3,0]",0.451,0.915,-1.451,2.096,0.043,0.031,445.0,1021.0,1.0,Madagascaropen-access,herbivore-detritivore
+"β0_manage[3,1]",-1.238,0.934,-2.919,0.664,0.042,0.029,504.0,828.0,1.01,Madagascaropen-access,herbivore-macroalgae
+"β0_manage[3,2]",1.601,0.936,-0.237,3.45,0.042,0.03,496.0,1185.0,1.0,Madagascaropen-access,invertivore-mobile
+"β0_manage[3,3]",0.114,0.894,-1.617,1.906,0.033,0.024,720.0,1384.0,1.0,Madagascaropen-access,piscivore
+"β0_manage[3,4]",1.734,0.933,-0.066,3.628,0.047,0.034,386.0,861.0,1.0,Madagascaropen-access,planktivore
+"β0_manage[3,5]",-0.975,0.895,-2.67,0.804,0.038,0.027,548.0,882.0,1.0,Madagascaropen-access,omnivore
+"β0_manage[4,0]",-0.046,0.811,-1.616,1.521,0.042,0.03,376.0,818.0,1.0,Madagascarrestriction,herbivore-detritivore
+"β0_manage[4,1]",-0.743,0.868,-2.459,0.922,0.042,0.03,427.0,641.0,1.01,Madagascarrestriction,herbivore-macroalgae
+"β0_manage[4,2]",0.658,0.857,-1.012,2.298,0.041,0.029,429.0,848.0,1.0,Madagascarrestriction,invertivore-mobile
+"β0_manage[4,3]",0.763,0.817,-0.815,2.416,0.033,0.023,617.0,1062.0,1.01,Madagascarrestriction,piscivore
+"β0_manage[4,4]",1.032,0.842,-0.604,2.671,0.046,0.032,340.0,652.0,1.0,Madagascarrestriction,planktivore
+"β0_manage[4,5]",-0.446,0.836,-2.077,1.168,0.04,0.028,443.0,824.0,1.01,Madagascarrestriction,omnivore
+"β0_manage[5,0]",-0.002,1.089,-2.177,2.017,0.046,0.032,558.0,1014.0,1.0,Solomon Islandsno-take,herbivore-detritivore
+"β0_manage[5,1]",-0.731,1.191,-3.025,1.644,0.047,0.033,646.0,1410.0,1.0,Solomon Islandsno-take,herbivore-macroalgae
+"β0_manage[5,2]",0.187,1.073,-1.894,2.305,0.045,0.032,578.0,1225.0,1.0,Solomon Islandsno-take,invertivore-mobile
+"β0_manage[5,3]",0.161,1.072,-1.972,2.166,0.037,0.026,847.0,1530.0,1.0,Solomon Islandsno-take,piscivore
+"β0_manage[5,4]",2.162,1.087,0.187,4.359,0.046,0.033,548.0,1178.0,1.0,Solomon Islandsno-take,planktivore
+"β0_manage[5,5]",-0.168,1.172,-2.496,2.11,0.045,0.032,686.0,1441.0,1.0,Solomon Islandsno-take,omnivore
+"β0_manage[6,0]",-0.109,0.793,-1.687,1.407,0.043,0.03,339.0,810.0,1.01,Solomon Islandsrestriction,herbivore-detritivore
+"β0_manage[6,1]",-1.278,0.835,-2.901,0.332,0.041,0.029,417.0,620.0,1.01,Solomon Islandsrestriction,herbivore-macroalgae
+"β0_manage[6,2]",0.315,0.838,-1.414,1.832,0.041,0.029,413.0,836.0,1.01,Solomon Islandsrestriction,invertivore-mobile
+"β0_manage[6,3]",0.079,0.796,-1.413,1.71,0.032,0.023,623.0,1066.0,1.01,Solomon Islandsrestriction,piscivore
+"β0_manage[6,4]",0.982,0.823,-0.777,2.452,0.046,0.032,325.0,640.0,1.0,Solomon Islandsrestriction,planktivore
+"β0_manage[6,5]",-1.04,0.815,-2.638,0.538,0.04,0.028,420.0,779.0,1.01,Solomon Islandsrestriction,omnivore

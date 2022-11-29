@@ -24,7 +24,7 @@ prod_sp<-prod_sp %>% ## drop invert sessile as these are small proportion, consi
                                      'selenium.mug' = 'Selenium', 'vitamin_a.mug' = 'Vitamin A', 'omega3.g' = 'Omega-3\nfatty acids'))
 
 
-prod_fg<-prod_fg %>% 
+prod_fg_avg<-prod_fg %>% 
                   filter(!fg %in% c('invertivore-sessile', 'detritivore')) %>% 
                   mutate(nutrient_lab = recode(nutrient, 'calcium.mg' = 'Calcium', 'iron.mg' = 'Iron', 'zinc.mg' = 'Zinc',
                                'selenium.mug' = 'Selenium', 'vitamin_a.mug' = 'Vitamin A', 'omega3.g' = 'Omega-3\nfatty acids')) %>% 
@@ -37,7 +37,10 @@ prod_fg<-prod_fg %>%
                   summarise(nutprop = mean(nutprop)) %>% 
                   mutate(id = paste(fg_lab, nutrient))
 
-prod_fg_country<-prod_sp %>% 
+prod_fg_country<-prod_fg %>% 
+  filter(!fg %in% c('invertivore-sessile', 'detritivore')) %>% 
+  mutate(nutrient_lab = recode(nutrient, 'calcium.mg' = 'Calcium', 'iron.mg' = 'Iron', 'zinc.mg' = 'Zinc',
+                               'selenium.mug' = 'Selenium', 'vitamin_a.mug' = 'Vitamin A', 'omega3.g' = 'Omega-3\nfatty acids')) %>% 
   group_by(country, fg_lab,nutrient,nutrient_lab) %>% 
   summarise(
     nut_prod_day_ha = sum(nut_prod_day_ha),
@@ -49,7 +52,7 @@ prod_fg_country<-prod_sp %>%
   mutate(tnut = sum(nut_prod_day_ha), nutprop = nut_prod_day_ha / tnut * 100)
 
 ## average across nutrients for panel A
-prod_fg2<-prod_fg %>% group_by(fg_lab) %>% summarise(se = funk::se(nutprop), nutprop = mean(nutprop)) %>% 
+prod_fg2<-prod_fg_avg %>% group_by(fg_lab) %>% summarise(se = funk::se(nutprop), nutprop = mean(nutprop)) %>% 
         mutate(lower = nutprop - 2*se, upper = nutprop + 2*se)
 
 ## average nut contr by country + nutrient
@@ -87,13 +90,13 @@ prod_reef$country<-factor(prod_reef$country, levels = meds$country)
 # 
 
 ## order prod_fg by average nutprop
-levs<-prod_fg %>% group_by(fg_lab) %>% summarise(m=mean(nutprop)) %>% arrange(m) %>%  pull(fg_lab)
-prod_fg$fg_lab<-factor(prod_fg$fg_lab, levels = levs)
+levs<-prod_fg_avg %>% group_by(fg_lab) %>% summarise(m=mean(nutprop)) %>% arrange(m) %>%  pull(fg_lab)
+prod_fg_avg$fg_lab<-factor(prod_fg_avg$fg_lab, levels = levs)
 prod_fg2$fg_lab<-factor(prod_fg2$fg_lab, levels = levs)
 prod_fg_co$fg_lab<-factor(prod_fg_co$fg_lab, levels = levs)
 
 # plabs<-c('Herbivore/detritivore zinc.mg', 'Herbivore/detritivore vitamin_a.mug', 'Invertivore (mobile) vitamin_a.mug')
-g1<-ggplot(prod_fg, aes(fg_lab ,nutprop, fill=fg_lab),col='black') + 
+g1<-ggplot(prod_fg_avg, aes(fg_lab ,nutprop, fill=fg_lab),col='black') + 
   # geom_segment(aes(x = fct_reorder(fg_lab, nut_prod_day_ha), xend =fct_reorder(fg_lab, nut_prod_day_ha), y =-Inf, yend = nut_prod_day_ha), col='grey') +
   geom_jitter(size=2, pch=21, width = 0.25) +
   geom_pointrange(data = prod_fg2, aes(ymin = lower, ymax = upper), size=1, fatten=4.5, pch=21) +
