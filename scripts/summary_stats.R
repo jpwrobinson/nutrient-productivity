@@ -10,11 +10,6 @@ fishp %>% group_by(country) %>% summarise(n=n_distinct(site))
 fishp %>% group_by(country, site) %>% summarise(n=n_distinct(year)) %>% 
           group_by(country,n) %>% count()
 
-# RDA 
-frda<-read.csv(file = 'data/wcs/wcs_nutrients_individuals.csv')
-frda %>% select(fish_taxon, ends_with('rda')) %>% distinct() %>% 
-  pivot_longer(-fish_taxon, names_to = 'nut', values_to= 'mu') %>% 
-  group_by(nut) %>% summarise(cv = sd(mu)/mean(mu), min(mu), max(mu), mean(mu))
 
 ## Figure 1 metadata
 fish2<-fishp %>% group_by(fish_taxon, fish_family, trophic_group, lmax, nscore,
@@ -25,13 +20,6 @@ cor(fish2$Kmax, fish2$nscore)
 fish2 %>% filter(nscore > 350) %>% summarise(mean(Kmax))
 fish2 %>% filter(nscore < 200 & nscore > 90) %>% summarise(range(Kmax))
 fish2 %>% filter(log10(Kmax) > 0) %>% distinct(fish_taxon,  fish_family, trophic_group) %>% data.frame()
-
-## variability in nutrient content
-fish2 %>% distinct(fish_taxon, calcium.mg, iron.mg, selenium.mug, zinc.mg, omega3.g, vitamin_a.mug) %>% 
-  pivot_longer(-fish_taxon, names_to = 'nut', values_to= 'mu') %>% 
-  group_by(nut) %>% summarise(cv = sd(mu)/mean(mu))
-
-pairs2(fish2 %>% distinct(calcium.mg, iron.mg, selenium.mug, zinc.mg, omega3.g, vitamin_a.mug))
 
 ## top nutrient productivity species
 tops<-c('Pterocaesio tile', 'Caesio teres', 'Chlorurus sordidus', 
@@ -78,12 +66,9 @@ ggplot(prod_reef, aes(biomass_kgha, nut_turnover, col=country)) + geom_point() +
 ggplot(prod_reef, aes(biomass_kgha, prod_day_ha, col=country)) + geom_point() + facet_wrap(~nutrient, scales='free')
 
 ## correlation between nutrient productivity metrics
-
 turns<-prod_reef %>% ungroup() %>% dplyr::select(country, site, year, nutrient, nut_turnover, biomass_turnover) %>% 
   pivot_wider(names_from = 'nutrient', values_from = 'nut_turnover')
 pairs2(turns[,-c(1:3)])
 
 prods<-prod_reef %>% ungroup() %>% dplyr::select(country, site, year, nutrient, nut_prod_day_ha) %>% pivot_wider(names_from = 'nutrient', values_from = 'nut_prod_day_ha')
 pairs2(prods[,-c(1:3)])
-
-
