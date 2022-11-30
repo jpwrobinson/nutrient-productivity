@@ -12,12 +12,14 @@ prod_reef<-prod_reef %>%
 
 ## recode and estimate nutrient proportion per site per fg
 prod_fg<-prod_fg %>%
-  filter(country != 'Belize') %>% 
-  group_by(site, year) %>%
+  # filter(country != 'Belize') %>% 
+  # group_by(site, year) %>%
+  group_by(management) %>%
   # filter(!any(prod_g_day_ha==0)) %>%
   mutate(nutrient_lab = recode(nutrient, 'calcium.mg' = 'Calcium', 'iron.mg' = 'Iron', 'zinc.mg' = 'Zinc',
                                'selenium.mug' = 'Selenium', 'vitamin_a.mug' = 'Vitamin A', 'omega3.g' = 'Omega-3\nfatty acids')) %>% 
-  group_by(country, site, year, nutrient,nutrient_lab) %>% 
+  # group_by(country, site, year, nutrient,nutrient_lab) %>% 
+  group_by(country, management,nutrient,nutrient_lab) %>%
   mutate(tnut = sum(nut_prod_day_ha), 
          nutprop = nut_prod_day_ha / tnut,
          tprod = sum(biomass_turnover),

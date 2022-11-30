@@ -84,27 +84,30 @@ prod_sp<-prod %>%
 ## Rows are filled with zeroes if species were observed in country-year-management_rule and are not in site
 # prod_sp %>% group_by(site, country, year, management_rules) %>% summarise(n_distinct(fish_taxon))
 
+others<-c('invertivore-sessile', 'detritivore', 'herbivore-macroalgae')
+
 # FG level nutrient productivity
 prod_fg<-prod %>% 
   mutate(id = paste(site, year, sep = '_')) %>% 
   ## drop invert sessile as these are small proportion, consistently, and not fished
-  filter(!fg %in% c('invertivore-sessile', 'detritivore')) %>% 
+  # filter(!fg %in% c('invertivore-sessile', 'detritivore')) %>% 
+  mutate(fg = ifelse(fg %in% others, 'other', fg)) %>% 
   # mutate(fg = recode(fg, 'herbivore-macroalgae' = 'herbivore', 'herbivore-detritivore' = 'herbivore')) %>% 
   # group_by(site, year, country) %>% 
   # mutate(n = length(fish_taxon), n_fg = n_distinct(fg)) %>% 
   # filter(n_fg == 5) %>% 
   ## transect level: total metric by diet group
-  group_by(country, site, year, id, transect_number,fg, nutrient) %>% 
+  group_by(country, site, year, id, transect_number,fg, nutrient, management) %>% 
   summarise(
     nut_prod_day_ha = sum(nut_prod_day_ha), 
     nut_biomass_kgha = sum(nut_biomass_kgha),
     prod_g_day_ha = sum(prod_g_day_ha),
     biomass_kgha = sum(biomass_kgha)) %>% 
   group_by(country) %>%
-  complete(fg, nesting(nutrient, site, year, transect_number, id),
+  complete(fg, nesting(nutrient, site, transect_number, id, management),
            fill = list(nut_prod_day_ha = 0, nut_biomass_kgha = 0, prod_g_day_ha =0, biomass_kgha = 0))  %>% 
   ungroup() %>% 
-  group_by(country, site,year,fg, nutrient) %>% 
+  group_by(country, management,fg, nutrient) %>% 
   summarise(
     nut_prod_day_ha = mean(nut_prod_day_ha), 
     nut_biomass_kgha = mean(nut_biomass_kgha),
@@ -118,8 +121,12 @@ prod_fg<-prod %>%
 
 
 ## Rows are filled with zeroes if FG were not observed at a site
-prod_fg %>% group_by(site, country, year) %>% summarise(n_distinct(fg)) 
-  
+prod_fg %>% group_by(management, country) %>% summarise(n_distinct(fg)) 
+
+## how many zeroes?
+prod_fg %>% group_by(fg, country) %>% summarise(n = length(which(biomass_kgha == 0))/6) %>% data.frame()
+prod_fg %>% group_by(management) %>% summarise(n = length(which(biomass_kgha == 0))) %>% data.frame()
+
 ## labelling for plots
 # prod_sp$trophic_lab<-trophic.cols$FG_lab[match(prod_sp$trophic_group, trophic.cols$FG)]
 prod_sp$fg_lab<-fg.cols$FG_lab[match(prod_sp$fg, trophic.cols$FG)]
