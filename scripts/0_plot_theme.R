@@ -21,6 +21,7 @@ empty_margin<-theme(plot.margin=unit(c(0, 0, 0, 0), 'cm'))
 ## colour palettes
 trophic.cols<-data.frame(col=c('#fdae61', '#377eb8', '#4d9221', '#a0cd10', '#bebada', '#80cdc1', '#ffd92f'),
                          FG=c('invertivore-mobile', 'piscivore','herbivore-macroalgae', 'herbivore-detritivore','planktivore', 'omnivore', 'invertivore-sessile'),
+                         FG2=c('invertivore_mobile', 'piscivore','herbivore-macroalgae', 'herbivore','planktivore', 'omnivore', 'invertivore-sessile'),
                          FG_lab=c("Invertivore (mobile)", 'Piscivore', 'Herbivore (macroalgae)', 'Herbivore (detritivore)', 'Planktivore', 'Omnivore', 'Invertivore (sessile)'))
 
 fg.cols<-data.frame(col=c('#fdae61', '#377eb8','#80cdc1', '#4d9221','#f7fcb9', '#a0cd10', '#bebada', '#a6761d', '#ffd92f'),
@@ -34,6 +35,7 @@ diet.cols<-data.frame(col=c('#fdae61', '#377eb8',  '#4d9221', '#bebada', '#ffd92
 
 trophic_cols.named<-setNames(as.character(trophic.cols$col), trophic.cols$FG_lab)
 trophic_cols.named2<-setNames(as.character(trophic.cols$col), trophic.cols$FG)
+trophic_cols.named3<-setNames(as.character(trophic.cols$col), trophic.cols$FG2)
 diet_cols.named<-setNames(as.character(diet.cols$col), diet.cols$dietP_lab)
 fg_cols.named<-setNames(as.character(fg.cols$col), fg.cols$FG)
 fg_cols.named2<-setNames(as.character(fg.cols$col), fg.cols$FG_lab)
