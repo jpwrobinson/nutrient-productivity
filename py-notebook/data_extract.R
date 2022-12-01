@@ -18,8 +18,11 @@ fish_avg$management<-prod$management[match(fish_avg$site, prod$site)]
 # get country averages for filling
 threat_co<-threat %>% group_by(country) %>% summarise_at(vars(grav_nc:nutrient_load), mean, na.rm=TRUE)
 threat_manage<-threat %>% group_by(management) %>% summarise_at(vars(grav_nc:nutrient_load), mean, na.rm=TRUE)
-fish_avg_manage<-fish_avg %>% group_by(reef_type, reef_zone, management_rules, management) %>% 
-  summarise_at(vars(rubble:fish_richness), mean, na.rm=TRUE)
+# fish_avg_manage<-fish_avg %>% group_by(reef_type, reef_zone, management_rules, management) %>%
+#   summarise_at(vars(rubble:fish_richness), mean, na.rm=TRUE)
+
+fish_avg_site<-fish_avg %>% group_by(site, country, id2, reef_type, reef_zone, management_rules) %>%
+  summarise_at(vars(biomass_kgha, rubble:fish_richness), mean, na.rm=TRUE)
 
 summary(threat) ## 11 NAs in Fiji + Madagascar
 threat$grav_nc[is.na(threat$grav_nc)]<-threat_co$grav_nc[match(threat$country[is.na(threat$grav_nc)], threat_co$country)]
@@ -38,15 +41,16 @@ threat$nutrient_load<-log10(threat$nutrient_load+1)
 manage<-read.csv(file = 'data/wcs/mermaid_management_clean.csv') %>% dplyr::select(-country)
 
 # join prod estimates with benthic + fishing covariates
-focal<-left_join(data.frame(prod_fg) %>% 
-                   # mutate(id = paste(site, year, country, sep='_'),id2=paste(site, country, sep='_')) %>% 
-                   mutate(id = management, id2=management), 
-                 fish_avg_manage %>% ungroup() %>%  
-                   dplyr::select(reef_type, reef_zone, management_rules, management,
-                          hard_coral, macroalgae, turf_algae, bare_substrate, rubble, depth, fish_richness),
-                 by='management') %>% #'id2', 'id')) %>% 
-  # left_join(threat, by = 'id2') %>% 
-  left_join(threat_manage, by = 'management') %>% 
+focal<-left_join(data.frame(prod_fg) %>% select(-biomass_kgha) %>% 
+                   mutate(#id = paste(site,year, country, sep='_'),
+                          id2=paste(site, country, sep='_')),
+                   # mutate(id = management, id2=management), 
+                 fish_avg_site %>% ungroup() %>%  
+                   dplyr::select(reef_type, reef_zone, management_rules, biomass_kgha,
+                          hard_coral, macroalgae, turf_algae, bare_substrate, rubble, depth, fish_richness, id2),
+                 by=c('id2')) %>% 
+  left_join(threat, by = 'id2') %>%
+  # left_join(threat_manage, by = 'management') %>% 
   mutate(management_rules = recode(management_rules, 'periodic closure' = 'restriction',
                                    'gear restriction' = 'restriction',
                                    'periodic closure; access restriction' = 'restriction',
@@ -55,8 +59,8 @@ focal<-left_join(data.frame(prod_fg) %>%
                                    'access restriction' = 'restriction')) %>%
   filter(!is.na(depth)) %>%  # dropping 2 sites (NK02 in Madasgascar and WaiE1 in Fiji)
   mutate_if(is.character, as.factor) %>% 
-  dplyr::select(
-    nutprop, prodprop,biomprop, nutrient, nutrient_lab, country, management, fg, 
+  dplyr::select(id2,
+    nutprop, prodprop,biomprop, nutrient, nutrient_lab, country, fg, biomass_kgha,
     hard_coral, macroalgae, turf_algae, bare_substrate, rubble, reef_type, reef_zone, depth,
     management_rules, grav_nc, sediment, nutrient_load, pop_count) %>%  
   mutate(management_rules = fct_relevel(management_rules, 'open-access', after=0))
@@ -80,12 +84,12 @@ hist(focal$nutprop, main = nut, xlab = 'Proportion of productivity')
 
 ## scale numeric, pivot wider
 focal.scaled<-scaler(focal, 
-                     ID = c('nutprop', 'nutrient','nutrient_lab', 'country', 'management', #ite','year','id2',
+                     ID = c('nutprop', 'nutrient','nutrient_lab', 'country', 'site','id2',
                             'fg', 'reef_type', 'reef_zone',
                             'management_rules'), cats = FALSE) %>% 
               pivot_wider(names_from = fg, values_from = nutprop)
 
-focal<-focal %>% pivot_wider(names_from = fg, values_from = nutprop)
+focal<-  focal %>% pivot_wider(names_from = fg, values_from = nutprop) 
 
 write.csv(focal %>% janitor::clean_names(), file = paste0('py-notebook/', nut, '_unscaled.csv'))
 write.csv(focal.scaled %>% janitor::clean_names(), file = paste0('py-notebook/', nut, '_scaled.csv'))

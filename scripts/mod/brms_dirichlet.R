@@ -4,46 +4,58 @@ library(janitor)
 library(rethinking)
 bind <- function(...) cbind(...)
 
-reef<-read.csv('py-notebook/zinc.mg_reef_unscaled.csv') 
-  # mutate(id = paste0(site, year))
-reef$management<-prod$management[match(reef$site, prod$site)]
-reef$id<-reef$management
-reef<-reef %>% group_by(id, management) %>% summarise(biomass_kgha = mean(biomass_kgha))
-
-## zinc
-focal<-read.csv('py-notebook/zinc.mg_scaled.csv') %>% clean_names() #%>% mutate(id = paste0(site, year))
-focal$biomass_kgha<-reef$biomass_kgha[match(focal$management, reef$management)]
+## load file
+filename<-paste0('py-notebook/', nut, '_unscaled.csv')
+focal<-read.csv(filename) %>% clean_names() 
 
 focal$planktivore[focal$planktivore==0]<-0.001
 focal$omnivore[focal$omnivore==0]<-0.001
-focal$herbivore_detritivore[focal$herbivore_detritivore==0]<-0.001
+# focal$herbivore_detritivore[focal$herbivore_detritivore==0]<-0.001
+focal$herbivore[focal$herbivore==0]<-0.001
 focal$piscivore[focal$piscivore==0]<-0.001
-focal$other[focal$other==0]<-0.001
+# focal$other[focal$other==0]<-0.001
 
-focal$tot<-rowSums(focal[,c('herbivore_detritivore', 'other',
+## rescale proportions for fished functional groups
+focal$tot<-rowSums(focal[,c('herbivore', #'other',
                             'invertivore_mobile', 'omnivore',
-                            'piscivore', 'planktivore')])
+                            'piscivore' #'planktivore'
+                            )])
 
-focal$planktivore<-focal$planktivore / focal$tot
 focal$omnivore<-focal$omnivore / focal$tot
-focal$herbivore_detritivore<-focal$herbivore_detritivore / focal$tot
+focal$herbivore<-focal$herbivore / focal$tot
 focal$invertivore_mobile<-focal$invertivore_mobile / focal$tot
 focal$piscivore<-focal$piscivore / focal$tot
-focal$other<-focal$other / focal$tot
 
+# scale covariates and log10 biomass
+focal$biomass_kgha<-scale(log10(focal$biomass_kgha))
+focal$hard_coral<-scale(focal$hard_coral)
+focal$macroalgae<-scale(focal$macroalgae)
+focal$bare_substrate<-scale(focal$bare_substrate)
+focal$rubble<-scale(focal$rubble)
+focal$turf_algae<-scale(focal$turf_algae)
 
-fit <- brm(bind(herbivore_detritivore, other,invertivore_mobile, 
-                omnivore, piscivore, planktivore) ~ log10(biomass_kgha) + depth +
-             country, data=focal, dirichlet)
+fit <- brm(bind(herbivore, invertivore_mobile, 
+                omnivore, piscivore) ~ 
+             biomass_kgha + depth +
+             hard_coral + macroalgae + turf_algae + bare_substrate + rubble +
+             (1 + biomass_kgha | country), 
+           data=focal, dirichlet)
 
-conditional_effects(fit, categorical = TRUE)
-
+## predictor dat
 nd<-expand.grid(biomass_kgha = seq(min(focal$biomass_kgha), max(focal$biomass_kgha), 1), 
-                country = unique(focal$country)[1], depth=mean(focal$depth))
+                country = unique(focal$country), 
+                depth=mean(focal$depth),
+                hard_coral = mean(focal$hard_coral),
+                macroalgae = mean(focal$macroalgae),
+                turf_algae = mean(focal$turf_algae),
+                bare_substrate = mean(focal$bare_substrate),
+                rubble = mean(focal$rubble) 
+                )
 
-pred<-posterior_epred(fit, newdata = nd,  re_formula=NA)
+# sample predictions
+pred<-posterior_epred(fit, newdata = nd,  re_formula=NULL)
 name<-dimnames(pred)[[3]]
-for(i in 1:6){
+for(i in 1:length(name)){
   t<-pred[,,i]
   mu<-apply(t, 2, median)
   lower<-apply(t, 2, HPDI, 0.95)[1,]
@@ -56,86 +68,20 @@ for(i in 1:6){
   colnames(nd)[colnames(nd)=='upper']<-paste(name[i], 'upper', sep = '-')
 }
 
-ndl<-nd %>% pivot_longer(-c(biomass_kgha, country, depth),
+ndl<-nd %>% pivot_longer(-c(biomass_kgha, country, depth,
+                            hard_coral, macroalgae, turf_algae, bare_substrate, rubble),
                                     names_to = c(".value", "var"),
                                     names_sep = "-") %>% 
-  pivot_longer(-c(biomass_kgha, country, depth, var), names_to = 'fg', values_to = 'pred') %>% 
+  pivot_longer(-c(biomass_kgha, country, depth,hard_coral, macroalgae, 
+                  turf_algae, bare_substrate, rubble,var), names_to = 'fg', values_to = 'pred') %>% 
   pivot_wider(names_from = 'var', values_from = 'pred')
 
+print(
 ggplot(ndl, aes(biomass_kgha, mu, fill=fg)) + 
   geom_ribbon(aes(ymin = lower, ymax = upper), alpha=0.5) +
-  geom_line(aes(col=fg)) 
+  geom_line(aes(col=fg)) +
+  facet_wrap(~country) +
+  labs(subtitle = nut)
+)
 
-
-save(fit, file  = 'results/mod/zinc_brms.Rdata')
-
-## calcium
-focal<-read.csv('py-notebook/calcium.mg_scaled.csv') %>% mutate(id = paste0(site, year))
-focal$biomass_kgha<-reef$biomass_kgha[match(focal$id, reef$id)]
-
-fit <- brm(bind(herbivore.detritivore, herbivore.macroalgae,
-                invertivore.mobile, omnivore,
-                piscivore, planktivore) ~ log10(biomass_kgha) + 
-             hard_coral + macroalgae + turf_algae + bare_substrate +
-             rubble + grav_nc + pop_count + sediment + nutrient_load + depth + 
-             management_rules + (1 | country), data=focal, dirichlet)
-
-pp_check(fit)
-save(fit, file  = 'results/mod/calcium_brms.Rdata')
-
-## iron
-focal<-read.csv('py-notebook/iron.mg_scaled.csv') %>% mutate(id = paste0(site, year))
-focal$biomass_kgha<-reef$biomass_kgha[match(focal$id, reef$id)]
-
-fit <- brm(bind(herbivore.detritivore, herbivore.macroalgae,
-                invertivore.mobile, omnivore,
-                piscivore, planktivore) ~ log10(biomass_kgha) + 
-             hard_coral + macroalgae + turf_algae + bare_substrate +
-             rubble + grav_nc + pop_count + sediment + nutrient_load + depth + 
-             management_rules + (1 | country), data=focal, dirichlet)
-
-pp_check(fit)
-save(fit, file  = 'results/mod/iron_brms.Rdata')
-
-
-## selenium
-focal<-read.csv('py-notebook/selenium.mug_scaled.csv') %>% mutate(id = paste0(site, year))
-focal$biomass_kgha<-reef$biomass_kgha[match(focal$id, reef$id)]
-
-fit <- brm(bind(herbivore.detritivore, herbivore.macroalgae,
-                invertivore.mobile, omnivore,
-                piscivore, planktivore) ~ log10(biomass_kgha) + 
-             hard_coral + macroalgae + turf_algae + bare_substrate +
-             rubble + grav_nc + pop_count + sediment + nutrient_load + depth + 
-             management_rules + (1 | country), data=focal, dirichlet)
-
-pp_check(fit)
-save(fit, file  = 'results/mod/selenium_brms.Rdata')
-
-## vitamin_a
-focal<-read.csv('py-notebook/vitamin_a.mug_scaled.csv') %>% mutate(id = paste0(site, year))
-focal$biomass_kgha<-reef$biomass_kgha[match(focal$id, reef$id)]
-
-fit <- brm(bind(herbivore.detritivore, herbivore.macroalgae,
-                invertivore.mobile, omnivore,
-                piscivore, planktivore) ~ log10(biomass_kgha) + 
-             hard_coral + macroalgae + turf_algae + bare_substrate +
-             rubble + grav_nc + pop_count + sediment + nutrient_load + depth + 
-             management_rules + (1 | country), data=focal, dirichlet)
-
-pp_check(fit)
-save(fit, file  = 'results/mod/vitamin_a_brms.Rdata')
-
-## omega3
-focal<-read.csv('py-notebook/omega3.g_scaled.csv') %>% mutate(id = paste0(site, year))
-focal$biomass_kgha<-reef$biomass_kgha[match(focal$id, reef$id)]
-
-fit <- brm(bind(herbivore.detritivore, herbivore.macroalgae,
-                invertivore.mobile, omnivore,
-                piscivore, planktivore) ~ log10(biomass_kgha) + 
-             hard_coral + macroalgae + turf_algae + bare_substrate +
-             rubble + grav_nc + pop_count + sediment + nutrient_load + depth + 
-             management_rules + (1 | country), data=focal, dirichlet)
-
-pp_check(fit)
-save(fit, file  = 'results/mod/omega3_brms.Rdata')
+save(fit, ndl, file  = paste0('results/mod/', nut, '_brms.Rdata'))
