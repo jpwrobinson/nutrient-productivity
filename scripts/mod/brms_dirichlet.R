@@ -33,6 +33,7 @@ focal$macroalgae<-scale(focal$macroalgae)
 focal$bare_substrate<-scale(focal$bare_substrate)
 focal$rubble<-scale(focal$rubble)
 focal$turf_algae<-scale(focal$turf_algae)
+focal$depth<-scale(focal$depth)
 
 fit <- brm(bind(herbivore, invertivore_mobile, 
                 omnivore, piscivore) ~ 
