@@ -74,15 +74,15 @@ gr<-ggplot(post_avg, aes(fct_reorder(fg, -mu),mu*100, fill=fg)) +
   geom_text(aes(label=round(mu*100,0)), vjust=-.5, size=2) +
   facet_wrap(~country, nrow=4) +
   scale_fill_manual(values = colcol) +
-  scale_y_continuous(expand=c(0,0), position = 'right', breaks=seq(0, 50, 25), labels=c('0%', '25%', '50%')) +
+  scale_y_continuous(expand=c(0,0), position = 'right', breaks=c(0, 20, 40)) + # , labels=c('0%', '20%', '40%')) +
   labs(x = '', y ='') +
   theme(axis.text.x = element_blank(), legend.position = 'none',
         axis.text.y = element_text(size=9),
         axis.ticks.x = element_blank(),
-        axis.line.y = element_line(),
+        axis.line.y = element_line(colour='grey'),
         panel.border=element_blank(), 
         strip.text.x=element_blank(),
-        plot.margin=unit(c(0,0,0,-.75), 'cm')) +
+        plot.margin=unit(c(0,0,0,-.3), 'cm')) +
   coord_cartesian(clip = "off")
 
 pdf(file = 'fig/Figure3.pdf', width=11, height = 5)
