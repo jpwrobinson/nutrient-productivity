@@ -27,7 +27,7 @@ focal$invertivore_mobile<-focal$invertivore_mobile / focal$tot
 focal$piscivore<-focal$piscivore / focal$tot
 
 # scale covariates and log10 biomass
-focal$biomass_kgha<-scale(log10(focal$biomass_kgha))
+# focal$biomass_kgha<-scale(log10(focal$biomass_kgha))
 focal$hard_coral<-scale(focal$hard_coral)
 focal$macroalgae<-scale(focal$macroalgae)
 focal$bare_substrate<-scale(focal$bare_substrate)
@@ -35,8 +35,7 @@ focal$rubble<-scale(focal$rubble)
 focal$turf_algae<-scale(focal$turf_algae)
 focal$depth<-scale(focal$depth)
 
-fit <- brm(bind(herbivore, invertivore_mobile, 
-                omnivore, piscivore) ~ 
+fit <- brm(bind(omnivore, invertivore_mobile, herbivore, piscivore) ~ 
              biomass_kgha + depth +
              hard_coral + macroalgae + turf_algae + bare_substrate + rubble +
              (1 + biomass_kgha | country), 

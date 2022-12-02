@@ -1,6 +1,8 @@
 ## Functional group nutrient production by country
 source('scripts/0_plot_theme.R')
 library(rethinking)
+library(brms)
+library(ggradar)
 nuts<-c('zinc.mg','calcium.mg','iron.mg','vitamin_a.mug','selenium.mug','omega3.g')
 
 colcol<-trophic_cols.named3[c(1,2,4,6)]
@@ -18,6 +20,16 @@ for(i in 1:length(nuts)){
            fg = str_split_fixed(fg, '_', 2)[,1]) %>% 
     group_by(fg, var) %>% 
     summarise(med = median(mu), lw = HPDI(mu)[1], hi = HPDI(mu)[2]) 
+  # 
+  # # use back-transformation to extract the estimated composition for level 1 (herbivores)
+  # fix <- c("herbivore_bare_substrate" = 0,"herbivore_depth"= 0,
+  #             "herbivore_hard_coral"= 0,"herbivore_macroalgae"= 0,
+  #             "herbivore_rubble"= 0,"herbivore_turf_algae" = 0, 
+  #             fixef(fit, robust = TRUE)[, 'Estimate']) %>%  as.data.frame() 
+  # colnames(fix) <- c('mu')
+  # fix$var<-str_split_fixed(rownames(fix), '_', 2)[,2]
+  # fix$fg<-str_split_fixed(rownames(fix), '_', 2)[,1]
+  # fix<-fix %>% group_by(var) %>% mutate(all = sum(mu), mu = mu / all)
   
   post<-rbind(post, ndl %>% mutate(nutrient = nut))
   covs<-rbind(covs, pp %>% as.data.frame() %>% mutate(nutrient = nut))
@@ -31,15 +43,52 @@ covs<-covs %>% mutate(nutrient_lab = recode(nutrient, 'calcium.mg' = 'Calcium', 
                                             'selenium.mug' = 'Selenium', 'vitamin_a.mug' = 'Vitamin A', 'omega3.g' = 'Omega-3'))
 covs$nutrient_lab<-factor(covs$nutrient_lab, levels=c('Calcium', 'Iron', 'Zinc', 'Selenium', 'Vitamin A', 'Omega-3'))
 
+# truncate biomass
+foc<-read.csv(paste0('py-notebook/', nut[1], '_unscaled.csv'))
+rr<-foc %>% 
+  mutate(biomass_kgha = scale(log10(biomass_kgha))) %>% 
+  group_by(country) %>% 
+  summarise(min = min(biomass_kgha),max = max(biomass_kgha))
+
+post<-left_join(post, rr, by = 'country')
+post$biomass_kgha[post$biomass_kgha < post$min]<-NA
+post$biomass_kgha[post$biomass_kgha > post$max]<-NA
+
+## get post averages by country - nutrient
+post_avg<-post %>% group_by(country, fg) %>% 
+  summarise(mu = mean(mu)*100)
+
 g1<-ggplot(post, aes(biomass_kgha, 100*mu, ymin = 100*lower, ymax = 100*upper, col=fg, fill=fg)) +
   geom_ribbon(col=NA, alpha=0.5) +
   geom_line() +
   scale_colour_manual(values=colcol) +
   scale_fill_manual(values=colcol) +
   facet_grid(country~nutrient_lab) +
-  labs(y = 'proportion of assemblage, %', x='log10(biomass) kg ha') +
-  theme(strip.text.y=element_text(angle=360),
-        legend.title=element_blank())
+  labs(y = '% nutrient production', x='log10(biomass) kg ha') +
+  theme(strip.text.y=element_text(angle=360, hjust=.5),
+        legend.title=element_blank(),
+        legend.position = 'none')
+
+gr<-ggplot(post_avg, aes(fct_reorder(fg, -mu),mu*100, fill=fg)) + 
+  geom_bar(stat='identity') +
+  geom_text(aes(label=round(mu*100,0)), vjust=-.5, size=2) +
+  facet_wrap(~country, nrow=4) +
+  scale_fill_manual(values = colcol) +
+  scale_y_continuous(expand=c(0,0), position = 'right', breaks=seq(0, 50, 25), labels=c('0%', '25%', '50%')) +
+  labs(x = '', y ='') +
+  theme(axis.text.x = element_blank(), legend.position = 'none',
+        axis.text.y = element_text(size=9),
+        axis.ticks.x = element_blank(),
+        axis.line.y = element_line(),
+        panel.border=element_blank(), 
+        strip.text.x=element_blank(),
+        plot.margin=unit(c(0,0,0,-.75), 'cm')) +
+  coord_cartesian(clip = "off")
+
+pdf(file = 'fig/Figure3.pdf', width=11, height = 5)
+print(plot_grid(
+  g1, gr, align='h', rel_widths=c(1,.2), axis='tb'))
+dev.off()
 
 # background panels
 rects <- data.frame(ystart = c(1,3,5)-0.5, yend = c(2,4,6)-0.5, med = 0, var = 1)
@@ -58,11 +107,6 @@ g2<-ggplot(covs, aes(med, var)) +
   scale_fill_manual(values=colcol) +
   scale_y_discrete(labels=rev(labs)) +
   facet_grid(~nutrient_lab)
-
-
-pdf(file = 'fig/Figure3.pdf', width=11, height = 5)
-print(g1)
-dev.off()
 
 pdf(file = 'fig/FigureSX.pdf', width=10, height = 4)
 print(g2)
