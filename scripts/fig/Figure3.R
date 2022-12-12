@@ -19,7 +19,9 @@ for(i in 1:length(nuts)){
            var = str_split_fixed(fg, '_', 2)[,2],
            fg = str_split_fixed(fg, '_', 2)[,1]) %>% 
     group_by(fg, var) %>% 
-    summarise(med = median(mu), lw = HPDI(mu)[1], hi = HPDI(mu)[2]) 
+    summarise(med = median(mu), 
+              lw = HPDI(mu)[1], hi = HPDI(mu)[2],
+              lw50 = HPDI(mu, prob=.5)[1], hi50 = HPDI(mu, prob=.5)[2]) 
   # 
   # # use back-transformation to extract the estimated composition for level 1 (herbivores)
   # fix <- c("herbivore_bare_substrate" = 0,"herbivore_depth"= 0,
@@ -59,8 +61,10 @@ post_avg<-post %>% group_by(country, fg) %>%
   summarise(mu = mean(mu)*100)
 
 g1<-ggplot(post, aes(biomass_kgha, 100*mu, ymin = 100*lower, ymax = 100*upper, col=fg, fill=fg)) +
-  geom_ribbon(col=NA, alpha=0.5) +
+  geom_ribbon(col=NA, alpha=0.3) +
   geom_line() +
+  scale_y_continuous(expand=c(0,0)) +
+  scale_x_continuous(expand=c(0,0)) +
   scale_colour_manual(values=colcol) +
   scale_fill_manual(values=colcol) +
   facet_grid(country~nutrient_lab) +
@@ -69,9 +73,9 @@ g1<-ggplot(post, aes(biomass_kgha, 100*mu, ymin = 100*lower, ymax = 100*upper, c
         legend.title=element_blank(),
         legend.position = 'none')
 
-gr<-ggplot(post_avg, aes(fct_reorder(fg, -mu),mu*100, fill=fg)) + 
+gr<-ggplot(post_avg, aes(fct_reorder(fg, -mu),mu, fill=fg)) + 
   geom_bar(stat='identity') +
-  geom_text(aes(label=round(mu*100,0)), vjust=-.5, size=2) +
+  geom_text(aes(label=round(mu,0)), vjust=-.5, size=2) +
   facet_wrap(~country, nrow=4) +
   scale_fill_manual(values = colcol) +
   scale_y_continuous(expand=c(0,0), position = 'right', breaks=c(0, 20, 40)) + # , labels=c('0%', '20%', '40%')) +
@@ -101,13 +105,14 @@ covs$fg[covs$fg=='invertivoremobile']<-'invertivore_mobile'
 g2<-ggplot(covs, aes(med, var)) +
   geom_rect(data = rects, aes(ymin = ystart, ymax = yend, xmin = -Inf, xmax = Inf), fill = 'grey', alpha = 0.4) +
   geom_vline(xintercept = 0, linetype=5) +
-  geom_pointrange(aes(col=fg, xmin = lw, xmax = hi), position = position_dodge(0.5)) +
+  geom_pointrange(aes(col=fg, xmin = lw, xmax = hi),fatten=0, size=0.4, position = position_dodge(0.75)) +
+  geom_pointrange(aes(col=fg, xmin = lw50, xmax = hi50), fatten=1.1, size=1.2, position = position_dodge(0.75)) +
   labs(x = 'posterior value', y = '', col='') +
-  scale_colour_manual(values=colcol) +
-  scale_fill_manual(values=colcol) +
+  scale_colour_manual(values=colcol[-4]) +
+  scale_fill_manual(values=colcol[-4]) +
   scale_y_discrete(labels=rev(labs)) +
   facet_grid(~nutrient_lab)
 
-pdf(file = 'fig/FigureSX.pdf', width=10, height = 4)
+pdf(file = 'fig/FigureSX.pdf', width=10, height = 3)
 print(g2)
 dev.off()
