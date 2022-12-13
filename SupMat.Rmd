@@ -1,0 +1,41 @@
+---
+title: '**Supplementary Figures**'
+header-includes:
+- \usepackage{pdflscape}
+- \newcommand{\blandscape}{\begin{landscape}}
+- \newcommand{\elandscape}{\end{landscape}}
+output:
+  pdf_document: null
+  latex_engine: pdflatex
+  html_document:
+    df_print: paged
+---
+
+# Nutrient production by coral reef fishes
+
+\newpage
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(tinytex.verbose = TRUE)
+```
+
+```{r, echo=F} 
+## set up figcounter
+i = 0
+```
+
+```{r, out.height="80%", echo=F,fig.align='center', warning=FALSE, message=FALSE}
+knitr::include_graphics("fig/FigureS1.pdf"); i = i + 1
+```
+
+**Fig. S`r i`. Association between nutrient concentrations and growth potential of 541 coral reef fish species.** Points are individual species observed across Belize, Fiji, Madagascar, and the Solomon Islands. Nutrient concentrations are per 100 g of white muscle tissue, for calcium, iron, selenium, zinc, omega-3 fatty acids and vitamin A. The growth coefficient Kmax is the value of growth coefficient K for each species at its theoretical maximum size, derived from the von Bertalanffy equation.
+
+\newpage
+
+```{r, out.height="80%", echo=F,fig.align='center', warning=FALSE, message=FALSE}
+knitr::include_graphics("fig/FigureSX_benthic_cov.pdf"); i = i + 1
+```
+
+**Fig. S`r i`. Association between hard coral and other dominant habitat groups.** Panel a, points are hard coral cover at each reef, against cover of macroalgae, rubble, and turf algae, annotated with simple linear regression fits. Panel b shows the slope estimate for relationships between hard coral and each dominant benthic group, from a simple linear regression, with 95% confidence intervals.
+
+\newpage
