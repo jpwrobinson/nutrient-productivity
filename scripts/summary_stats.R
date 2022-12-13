@@ -29,17 +29,17 @@ fish2 %>% filter(fish_taxon %in% tops) %>% mutate(Kmax = log10(Kmax)) %>% data.f
 
 ## Figure 2 metadata
 source('scripts/fig/Figure2.R')
-prod_fg2 %>% mutate_if(is.numeric, function(x) round(x*100, 0))
-prod_fg %>% mutate_if(is.numeric, function(x) round(x*100, 0)) %>% filter(nutrient=='vitamin_a.mug')
-prod_fg %>% group_by(nutrient) %>% summarise(trophic_lab[which.max(nutprop)])
-prod_fg %>% filter(trophic_lab %in% c('Herbivore (detritivore)', 'Invertivore (mobile)', 'Piscivore')) %>% 
-  group_by(nutrient) %>% summarise(trophic_lab[which.max(nutprop)])
+prod_fg2 %>% mutate_if(is.numeric, function(x) round(x, 0))
+prod_fg_avg %>% mutate_if(is.numeric, function(x) round(x, 0)) %>% filter(nutrient=='vitamin_a.mug')
+prod_fg_co %>% group_by(nutrient, fg_lab) %>% summarise(nutprop= mean(nutprop)) %>% 
+    mutate(fg2 = ifelse(str_detect(fg_lab, 'Herb|mobile'), 'herbi-mobi', 'other')) %>% 
+    group_by(fg2, nutrient) %>% summarise(sum(nutprop))
+                        
 
-## excluding vitA
-prod_fg %>% filter(nutrient!='vitamin_a.mug') %>%  
-  group_by(dietP_lab) %>% summarise(se = se(nutprop), nutprop = mean(nutprop)) %>% 
-  mutate(lower = nutprop - 2*se, upper = nutprop + 2*se) %>% 
-  mutate_if(is.numeric, function(x) round(x*100, 0))
+## Sessile inverts
+# go to 03_estimate_nut_prod hashtag the filter
+prod_fg_avg %>% group_by(fg) %>% summarise(mean(nutprop))
+
 
 ## benthic + threats
 threat<-read.csv('data/threat/sites-threats.csv')  %>% 

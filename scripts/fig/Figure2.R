@@ -3,8 +3,9 @@
 source('scripts/0_plot_theme.R')
 th_ticks<-theme(axis.ticks.x = element_line(colour='black'))
 
-load(file = 'results/wcs_productivity.rds')
-load(file = 'results/wcs_nut_prod.rds')
+# load(file = 'results/wcs_productivity.rds')
+# load(file = 'results/wcs_nut_prod.rds')
+load(file = 'results/wcs_nut_prod_Figure2.rds')
 
 fishp$fg_lab<-trophic.cols$FG_lab[match(fishp$fg, trophic.cols$FG)]
 prod_fg$fg_lab<-trophic.cols$FG_lab[match(prod_fg$fg, trophic.cols$FG)]
@@ -25,10 +26,10 @@ prod_sp<-prod_sp %>% ## drop invert sessile as these are small proportion, consi
 
 
 prod_fg_avg<-prod_fg %>% 
-                  filter(!fg %in% c('invertivore-sessile', 'detritivore')) %>% 
+                  filter(!fg %in% c('invertivore-sessile', 'detritivore')) %>%
                   mutate(nutrient_lab = recode(nutrient, 'calcium.mg' = 'Calcium', 'iron.mg' = 'Iron', 'zinc.mg' = 'Zinc',
                                'selenium.mug' = 'Selenium', 'vitamin_a.mug' = 'Vitamin A', 'omega3.g' = 'Omega-3\nfatty acids')) %>% 
-                  group_by(country, nutrient, year, site,nutrient_lab) %>% 
+                  group_by(country, nutrient, site,nutrient_lab) %>% 
                   mutate(nut_prod_day_ha_scaled = scale(nut_prod_day_ha)[,1]) %>% 
                   arrange((nut_prod_day_ha))  %>% 
                   mutate(tnut = sum(nut_prod_day_ha), 
@@ -65,8 +66,8 @@ prod_fg_co_biom<-prod_fg_country %>% filter(nutrient=='calcium.mg') %>%
         group_by(tb, tp, country, fg_lab) %>% 
         summarise(biomass = sum(biomass_kgha), prod = sum(prod_g_day_ha)) %>% 
         mutate('Standing biomass' = biomass / tb * 100, 
-               'Daily productivity' = prod / tp * 100) %>% 
-        pivot_longer('Standing biomass':'Daily productivity', values_to = 'nutprop', names_to = 'nutrient') %>% 
+               'Biomass turnover' = prod / tp * 100) %>% 
+        pivot_longer('Standing biomass':'Biomass turnover', values_to = 'nutprop', names_to = 'nutrient') %>% 
         mutate(nutrient_lab = nutrient)
 
 prod_fg_co<-rbind(prod_fg_co, prod_fg_co_biom) 
@@ -143,9 +144,9 @@ g4<-ggplot(prod_sp, aes(log10(biomass_kgha), nutprop, col=fg_lab)) +
 
 
 pdf(file='fig/Figure2.pdf', height=5, width=14)
-rp<-plot_grid(g3, g2, nrow =2, rel_heights=c(0.5, 1), align='v', labels=c('', 'C'))
+rp<-plot_grid(g3, g2, nrow =2, rel_heights=c(0.5, 1), align='v', labels=c('', '(c)'))
 print(
-  plot_grid(g1, rp, nrow=1, labels=c('A', 'B'), rel_widths=c(0.7, 1))
+  plot_grid(g1, rp, nrow=1, labels=c('(a)', '(b)'), rel_widths=c(0.7, 1))
 )
 dev.off()
 
