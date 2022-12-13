@@ -70,18 +70,11 @@ post_avg<-post %>% group_by(country, fg) %>%
 labber<-data.frame(fg = unique(post$fg), lab = c("Invertivore", 'Herbivore', 'Piscivore'), 
                    x = 250, y = c(8, 70, 23), country='Belize', nutrient_lab = 'Calcium')
 
-<<<<<<< HEAD
+
 g1<-ggplot(post, aes(biomass_kgha_org, 100*mu, col=fg, fill=fg)) +
   geom_ribbon(col=NA, alpha=0.5, aes(ymin = 100*lower, ymax = 100*upper)) +
   geom_line() +
   geom_text(data = labber, aes(x = x, y = y, label = lab), hjust = 1, size=2.7) +
-=======
-g1<-ggplot(post, aes(biomass_kgha, 100*mu, ymin = 100*lower, ymax = 100*upper, col=fg, fill=fg)) +
-  geom_ribbon(col=NA, alpha=0.3) +
-  geom_line() +
-  scale_y_continuous(expand=c(0,0)) +
-  scale_x_continuous(expand=c(0,0)) +
->>>>>>> 7996b362542bee0a36770531ca68e16efa5b9317
   scale_colour_manual(values=colcol) +
   scale_fill_manual(values=colcol) +
   scale_x_log10(breaks=c(30, 100, 500, 5000)) +
@@ -91,11 +84,7 @@ g1<-ggplot(post, aes(biomass_kgha, 100*mu, ymin = 100*lower, ymax = 100*upper, c
         legend.title=element_blank(),
         legend.position = 'none')
 
-<<<<<<< HEAD
 gr<-ggplot(post_avg, aes(fct_reorder(fg_lab, -mu),mu, fill=fg)) + 
-=======
-gr<-ggplot(post_avg, aes(fct_reorder(fg, -mu),mu, fill=fg)) + 
->>>>>>> 7996b362542bee0a36770531ca68e16efa5b9317
   geom_bar(stat='identity') +
   geom_text(aes(label=round(mu,0)), vjust=-.5, size=2) +
   facet_wrap(~country, nrow=4) +
