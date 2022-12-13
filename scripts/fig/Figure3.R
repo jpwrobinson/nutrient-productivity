@@ -50,33 +50,45 @@ rr<-foc %>%
   group_by(country) %>% 
   summarise(min = min(biomass_kgha),max = max(biomass_kgha))
 
-post<-left_join(post, rr, by = 'country')
+post<-left_join(post, rr, by = 'country') %>% filter(fg != 'omnivore') %>% 
+  mutate(country = recode(country, 'Solomon Islands' = 'Solomon\nIslands'))
+
 post$biomass_kgha[post$biomass_kgha < post$min]<-NA
 post$biomass_kgha[post$biomass_kgha > post$max]<-NA
 
+## original scale biomass
+ss<-scale(log10(foc$biomass_kgha))
+post$biomass_kgha_org<-10^(post$biomass_kgha * attr(ss, 'scaled:scale') + attr(ss, 'scaled:center')) 
+
 ## get post averages by country - nutrient
 post_avg<-post %>% group_by(country, fg) %>% 
-  summarise(mu = mean(mu)*100)
+  summarise(mu = mean(mu)*100) %>% 
+  mutate(fg_lab = recode(fg, herbivore = 'Herbivore', invertivore_mobile = 'Invertivore', piscivore = 'Piscivore'))
 
-g1<-ggplot(post, aes(biomass_kgha, 100*mu, ymin = 100*lower, ymax = 100*upper, col=fg, fill=fg)) +
-  geom_ribbon(col=NA, alpha=0.5) +
+labber<-data.frame(fg = unique(post$fg), lab = c("Invertivore", 'Herbivore', 'Piscivore'), 
+                   x = 250, y = c(8, 70, 23), country='Belize', nutrient_lab = 'Calcium')
+
+g1<-ggplot(post, aes(biomass_kgha_org, 100*mu, col=fg, fill=fg)) +
+  geom_ribbon(col=NA, alpha=0.5, aes(ymin = 100*lower, ymax = 100*upper)) +
   geom_line() +
+  geom_text(data = labber, aes(x = x, y = y, label = lab), hjust = 1, size=2.7) +
   scale_colour_manual(values=colcol) +
   scale_fill_manual(values=colcol) +
+  scale_x_log10(breaks=c(30, 100, 500, 5000)) +
   facet_grid(country~nutrient_lab) +
-  labs(y = '% nutrient production', x='log10(biomass) kg ha') +
+  labs(y = '% nutrient production', x=expression(paste('fishable biomass kg ha'^-1))) +
   theme(strip.text.y=element_text(angle=360, hjust=.5),
         legend.title=element_blank(),
         legend.position = 'none')
 
-gr<-ggplot(post_avg, aes(fct_reorder(fg, -mu),mu*100, fill=fg)) + 
+gr<-ggplot(post_avg, aes(fct_reorder(fg_lab, -mu),mu, fill=fg)) + 
   geom_bar(stat='identity') +
-  geom_text(aes(label=round(mu*100,0)), vjust=-.5, size=2) +
+  geom_text(aes(label=round(mu,0)), vjust=-.5, size=2) +
   facet_wrap(~country, nrow=4) +
   scale_fill_manual(values = colcol) +
   scale_y_continuous(expand=c(0,0), position = 'right', breaks=c(0, 20, 40)) + # , labels=c('0%', '20%', '40%')) +
   labs(x = '', y ='') +
-  theme(axis.text.x = element_blank(), legend.position = 'none',
+  theme(axis.text.x = element_text(), legend.position = 'none',
         axis.text.y = element_text(size=9),
         axis.ticks.x = element_blank(),
         axis.line.y = element_line(colour='grey'),
@@ -85,9 +97,10 @@ gr<-ggplot(post_avg, aes(fct_reorder(fg, -mu),mu*100, fill=fg)) +
         plot.margin=unit(c(0,0,0,-.3), 'cm')) +
   coord_cartesian(clip = "off")
 
-pdf(file = 'fig/Figure3.pdf', width=11, height = 5)
-print(plot_grid(
-  g1, gr, align='h', rel_widths=c(1,.2), axis='tb'))
+pdf(file = 'fig/Figure3.pdf', width=10, height = 5)
+# print(plot_grid(
+#   g1, gr, align='h', rel_widths=c(1,.2), axis='tb'))
+print(g1)
 dev.off()
 
 # background panels
