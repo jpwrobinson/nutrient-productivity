@@ -19,7 +19,9 @@ for(i in 1:length(nuts)){
            var = str_split_fixed(fg, '_', 2)[,2],
            fg = str_split_fixed(fg, '_', 2)[,1]) %>% 
     group_by(fg, var) %>% 
-    summarise(med = median(mu), lw = HPDI(mu)[1], hi = HPDI(mu)[2]) 
+    summarise(med = median(mu), 
+              lw = HPDI(mu)[1], hi = HPDI(mu)[2],
+              lw50 = HPDI(mu, prob=.5)[1], hi50 = HPDI(mu, prob=.5)[2]) 
   # 
   # # use back-transformation to extract the estimated composition for level 1 (herbivores)
   # fix <- c("herbivore_bare_substrate" = 0,"herbivore_depth"= 0,
@@ -68,10 +70,18 @@ post_avg<-post %>% group_by(country, fg) %>%
 labber<-data.frame(fg = unique(post$fg), lab = c("Invertivore", 'Herbivore', 'Piscivore'), 
                    x = 250, y = c(8, 70, 23), country='Belize', nutrient_lab = 'Calcium')
 
+<<<<<<< HEAD
 g1<-ggplot(post, aes(biomass_kgha_org, 100*mu, col=fg, fill=fg)) +
   geom_ribbon(col=NA, alpha=0.5, aes(ymin = 100*lower, ymax = 100*upper)) +
   geom_line() +
   geom_text(data = labber, aes(x = x, y = y, label = lab), hjust = 1, size=2.7) +
+=======
+g1<-ggplot(post, aes(biomass_kgha, 100*mu, ymin = 100*lower, ymax = 100*upper, col=fg, fill=fg)) +
+  geom_ribbon(col=NA, alpha=0.3) +
+  geom_line() +
+  scale_y_continuous(expand=c(0,0)) +
+  scale_x_continuous(expand=c(0,0)) +
+>>>>>>> 7996b362542bee0a36770531ca68e16efa5b9317
   scale_colour_manual(values=colcol) +
   scale_fill_manual(values=colcol) +
   scale_x_log10(breaks=c(30, 100, 500, 5000)) +
@@ -81,7 +91,11 @@ g1<-ggplot(post, aes(biomass_kgha_org, 100*mu, col=fg, fill=fg)) +
         legend.title=element_blank(),
         legend.position = 'none')
 
+<<<<<<< HEAD
 gr<-ggplot(post_avg, aes(fct_reorder(fg_lab, -mu),mu, fill=fg)) + 
+=======
+gr<-ggplot(post_avg, aes(fct_reorder(fg, -mu),mu, fill=fg)) + 
+>>>>>>> 7996b362542bee0a36770531ca68e16efa5b9317
   geom_bar(stat='identity') +
   geom_text(aes(label=round(mu,0)), vjust=-.5, size=2) +
   facet_wrap(~country, nrow=4) +
@@ -114,13 +128,14 @@ covs$fg[covs$fg=='invertivoremobile']<-'invertivore_mobile'
 g2<-ggplot(covs, aes(med, var)) +
   geom_rect(data = rects, aes(ymin = ystart, ymax = yend, xmin = -Inf, xmax = Inf), fill = 'grey', alpha = 0.4) +
   geom_vline(xintercept = 0, linetype=5) +
-  geom_pointrange(aes(col=fg, xmin = lw, xmax = hi), position = position_dodge(0.5)) +
+  geom_pointrange(aes(col=fg, xmin = lw, xmax = hi),fatten=0, size=0.4, position = position_dodge(0.75)) +
+  geom_pointrange(aes(col=fg, xmin = lw50, xmax = hi50), fatten=1.1, size=1.2, position = position_dodge(0.75)) +
   labs(x = 'posterior value', y = '', col='') +
-  scale_colour_manual(values=colcol) +
-  scale_fill_manual(values=colcol) +
+  scale_colour_manual(values=colcol[-4]) +
+  scale_fill_manual(values=colcol[-4]) +
   scale_y_discrete(labels=rev(labs)) +
   facet_grid(~nutrient_lab)
 
-pdf(file = 'fig/FigureSX.pdf', width=10, height = 4)
+pdf(file = 'fig/FigureSX.pdf', width=10, height = 3)
 print(g2)
 dev.off()
