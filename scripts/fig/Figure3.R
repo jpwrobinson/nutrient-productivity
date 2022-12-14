@@ -8,6 +8,7 @@ nuts<-c('zinc.mg','calcium.mg','iron.mg','vitamin_a.mug','selenium.mug','omega3.
 colcol<-trophic_cols.named3[c(1,2,4,6)]
 post<-numeric()
 covs<-numeric()
+pyramid<-numeric()
 
 for(i in 1:length(nuts)){
   nut<-nuts[i]
@@ -34,6 +35,7 @@ for(i in 1:length(nuts)){
   # fix<-fix %>% group_by(var) %>% mutate(all = sum(mu), mu = mu / all)
   
   post<-rbind(post, ndl %>% mutate(nutrient = nut))
+  pyramid<-rbind(pyramid, focal %>% select(id2, nutrient, country, herbivore_mu, piscivore_mu,invertivore_mobile-mu)) 
   covs<-rbind(covs, pp %>% as.data.frame() %>% mutate(nutrient = nut))
 }
 
@@ -66,6 +68,12 @@ post$biomass_kgha_org<-10^(post$biomass_kgha * attr(ss, 'scaled:scale') + attr(s
 post_avg<-post %>% group_by(country, fg) %>% 
   summarise(mu = mean(mu)*100) %>% 
   mutate(fg_lab = recode(fg, herbivore = 'Herbivore', invertivore_mobile = 'Invertivore', piscivore = 'Piscivore'))
+
+## get top vs bottom heavy
+pys<-post %>% filter(fg != 'invertivore_mobile' & !is.na(biomass_kgha)) %>% 
+  select(nutrient, country, fg, mu, biomass_kgha) %>% 
+  pivot_wider(names_from = fg, values_from = mu) %>% 
+  mutate(tb = herbivore / piscivore)
 
 labber<-data.frame(fg = unique(post$fg), lab = c("Invertivore", 'Herbivore', 'Piscivore'), 
                    x = 250, y = c(8, 70, 23), country='Belize', nutrient_lab = 'Calcium')

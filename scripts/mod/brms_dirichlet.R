@@ -41,6 +41,21 @@ fit <- brm(bind(omnivore, invertivore_mobile, herbivore, piscivore) ~
              (1 + biomass_kgha | country), 
            data=focal, dirichlet)
 
+post_obs<-posterior_predict(fit, newdata = focal)
+name<-dimnames(post_obs)[[3]]
+for(i in 1:length(name)){
+  t<-post_obs[,,i]
+  mu<-apply(t, 2, median)
+  # lower<-apply(t, 2, HPDI, 0.95)[1,]
+  # upper<-apply(t, 2, HPDI, 0.95)[2,]
+  focal$mu<-mu
+  # focal$lower<-lower
+  # focal$upper<-upper
+  colnames(focal)[colnames(focal)=='mu']<-paste(name[i], 'mu', sep = '-')
+  # colnames(focal)[colnames(focal)=='lower']<-paste(name[i], 'lower', sep = '-')
+  # colnames(focal)[colnames(focal)=='upper']<-paste(name[i], 'upper', sep = '-')
+}
+
 ## predictor dat
 nd<-expand.grid(biomass_kgha = seq(min(focal$biomass_kgha), max(focal$biomass_kgha), 1), 
                 country = unique(focal$country), 
