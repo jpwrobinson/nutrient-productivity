@@ -99,4 +99,4 @@ ggplot(ndl, aes(biomass_kgha, mu, fill=fg)) +
   labs(subtitle = nut)
 )
 
-save(fit, ndl, file  = paste0('results/mod/', nut, '_brms.Rdata'))
+save(fit, ndl, focal, file  = paste0('results/mod/', nut, '_brms.Rdata'))
