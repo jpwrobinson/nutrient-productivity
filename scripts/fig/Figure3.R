@@ -35,7 +35,7 @@ for(i in 1:length(nuts)){
   # fix<-fix %>% group_by(var) %>% mutate(all = sum(mu), mu = mu / all)
   
   post<-rbind(post, ndl %>% mutate(nutrient = nut))
-  pyramid<-rbind(pyramid, focal %>% select(id2, nutrient, country, herbivore_mu, piscivore_mu,invertivore_mobile-mu)) 
+  pyramid<-rbind(pyramid, focal %>% clean_names() %>% select(id2, nutrient, country, herbivore_mu, piscivore_mu,invertivore_mobile_mu)) 
   covs<-rbind(covs, pp %>% as.data.frame() %>% mutate(nutrient = nut))
 }
 
@@ -46,6 +46,10 @@ post$nutrient_lab<-factor(post$nutrient_lab, levels=c('Calcium', 'Iron', 'Zinc',
 covs<-covs %>% mutate(nutrient_lab = recode(nutrient, 'calcium.mg' = 'Calcium', 'iron.mg' = 'Iron', 'zinc.mg' = 'Zinc',
                                             'selenium.mug' = 'Selenium', 'vitamin_a.mug' = 'Vitamin A', 'omega3.g' = 'Omega-3'))
 covs$nutrient_lab<-factor(covs$nutrient_lab, levels=c('Calcium', 'Iron', 'Zinc', 'Selenium', 'Vitamin A', 'Omega-3'))
+
+pyramid<-pyramid %>% mutate(nutrient_lab = recode(nutrient, 'calcium.mg' = 'Calcium', 'iron.mg' = 'Iron', 'zinc.mg' = 'Zinc',
+                                            'selenium.mug' = 'Selenium', 'vitamin_a.mug' = 'Vitamin A', 'omega3.g' = 'Omega-3'))
+pyramid$nutrient_lab<-factor(pyramid$nutrient_lab, levels=c('Calcium', 'Iron', 'Zinc', 'Selenium', 'Vitamin A', 'Omega-3'))
 
 # truncate biomass
 foc<-read.csv(paste0('py-notebook/', nut[1], '_unscaled.csv'))
@@ -70,14 +74,82 @@ post_avg<-post %>% group_by(country, fg) %>%
   mutate(fg_lab = recode(fg, herbivore = 'Herbivore', invertivore_mobile = 'Invertivore', piscivore = 'Piscivore'))
 
 ## get top vs bottom heavy
-pys<-post %>% filter(fg != 'invertivore_mobile' & !is.na(biomass_kgha)) %>% 
-  select(nutrient, country, fg, mu, biomass_kgha) %>% 
-  pivot_wider(names_from = fg, values_from = mu) %>% 
-  mutate(tb = herbivore / piscivore)
+pys<-pyramid %>% mutate(tb = log(piscivore_mu / herbivore_mu ))
+# bot<-seq(0, 1, length.out=100)
+# top<-rev(bot)
+# plot(top, log(bot/top))
 
+## biomass pyramids
+load(paste0('results/mod/biomass_brms.Rdata'))
+pypy<-focal %>% clean_names() %>% 
+  mutate(tb = log(piscivore_mu / herbivore_mu ), nutrient = 'Standing biomass')
+load(paste0('results/mod/productivity_brms.Rdata'))
+pypy<-rbind(pypy, focal %>% clean_names() %>% 
+              mutate(tb = log(piscivore_mu / herbivore_mu ), nutrient = 'Biomass turnover'))
+
+labber2<-data.frame(lab = c('Standing\nbiomass', 'Biomass\nturnover'),
+                    nutrient='Standing biomass',
+                   x = c(-1, -3), y = c(2,.6), country='Fiji')
+labber3<-data.frame(lab = c('Bottom-heavy', 'Top-heavy'),
+                    nutrient='Standing biomass',
+                    x = c(-1, 1), y = Inf, country='Belize')
+labber4<-data.frame(lab = c('Bottom-heavy', 'Top-heavy'),
+                    nutrient_lab='Calcium',
+                    x = c(-1, 1), y = Inf, country='Belize')
+labber5<-data.frame(lab = c('Calcium', 'Iron', 'Zinc', 'Vitamin A', 'Omega-3', 'Selenium'),
+                    nutrient_lab='Calcium',
+                    x = c(-1.8, -1, -2.2, 1, 0.6, 0.1), y = c(1.7, 2, 1.3, 1, 1.5, 1.9), country='Belize')
+
+
+gr<-ggplot(pypy, aes(tb, fill=nutrient)) + 
+  geom_density(alpha=0.5, col='transparent') + 
+  facet_wrap(~country, nrow=4, scales='free_y', strip.position = 'right') +
+  geom_text(data = labber2, aes(x = x, y = y, label = lab), col=c('black', 'red'), hjust = 0.5, size=2.3) +
+  geom_text(data = labber3, aes(x = x, y = y, label = lab), col='black',vjust=0, hjust = 0.5, size=2.3) +
+  geom_vline(xintercept = 0, linetype=2, col='black', size=0.4) +
+  labs(x = 'log(herbivore/piscivore)', y ='') +
+  scale_fill_manual(values = c('black', 'red')) +
+  scale_y_continuous(expand=c(0,0),position = 'left') +
+  scale_x_continuous(expand=c(0,0), limits=c(-4, 1)) +
+  theme(axis.text.x = element_text(), legend.position = 'none',
+        axis.text.y = element_text(size=9),
+        axis.ticks.x = element_blank(),
+        axis.line = element_line(colour='grey'),
+        panel.border=element_blank(),
+        strip.text.y=element_text(angle=0, hjust=0.5),
+        # plot.margin=unit(c(0,-.2,0,-.3), 'cm')
+  ) +
+  coord_cartesian(clip = "off")
+
+gr2<-ggplot(pys, aes(tb, fill=nutrient_lab)) + 
+  geom_density(alpha=0.5, col='transparent') + 
+  facet_wrap(~country, nrow=4, scales='free_y', strip.position = 'right') +
+  geom_vline(xintercept = 0, linetype=2, col='black', size=0.4) +
+  geom_text(data = labber4, aes(x = x, y = y, label = lab), col='black',vjust=0, hjust = 0.5, size=2.3) +
+  geom_text(data = labber5, aes(x = x, y = y, label = lab), col=as.character(nut.cols[1:6]),vjust=0, hjust = 0.5, size=2) +
+  labs(x = 'log(herbivore/piscivore)', y ='') +
+  scale_fill_manual(values = nut.cols) +
+  scale_y_continuous(expand=c(0,0),position = 'right') +
+  scale_x_continuous(expand=c(0,0), limits=c(-5, 2)) +
+  theme(axis.text.x = element_text(), legend.position = 'none',
+        axis.text.y = element_text(size=9),
+        axis.ticks.x = element_blank(),
+        axis.line = element_line(colour='grey'),
+        panel.border=element_blank(), 
+        strip.text.y=element_blank(),
+        plot.margin=unit(c(0,-.2,0,-.3), 'cm')
+  ) +
+  coord_cartesian(clip = "off")
+
+pdf(file = 'fig/Figure3.pdf', width=7, height = 4)
+print(plot_grid(
+  gr, gr2, align='h', rel_widths=c(1, 1), axis='tb', labels=c('(a)', '(b)'), label_size=9))
+dev.off()
+
+
+## nutrient prod over biomass gradient
 labber<-data.frame(fg = unique(post$fg), lab = c("Invertivore", 'Herbivore', 'Piscivore'), 
                    x = 250, y = c(8, 70, 23), country='Belize', nutrient_lab = 'Calcium')
-
 
 g1<-ggplot(post, aes(biomass_kgha_org, 100*mu, col=fg, fill=fg)) +
   geom_ribbon(col=NA, alpha=0.5, aes(ymin = 100*lower, ymax = 100*upper)) +
@@ -92,23 +164,9 @@ g1<-ggplot(post, aes(biomass_kgha_org, 100*mu, col=fg, fill=fg)) +
         legend.title=element_blank(),
         legend.position = 'none')
 
-gr<-ggplot(post_avg, aes(fct_reorder(fg_lab, -mu),mu, fill=fg)) + 
-  geom_bar(stat='identity') +
-  geom_text(aes(label=round(mu,0)), vjust=-.5, size=2) +
-  facet_wrap(~country, nrow=4) +
-  scale_fill_manual(values = colcol) +
-  scale_y_continuous(expand=c(0,0), position = 'right', breaks=c(0, 20, 40)) + # , labels=c('0%', '20%', '40%')) +
-  labs(x = '', y ='') +
-  theme(axis.text.x = element_text(), legend.position = 'none',
-        axis.text.y = element_text(size=9),
-        axis.ticks.x = element_blank(),
-        axis.line.y = element_line(colour='grey'),
-        panel.border=element_blank(), 
-        strip.text.x=element_blank(),
-        plot.margin=unit(c(0,0,0,-.3), 'cm')) +
-  coord_cartesian(clip = "off")
 
-pdf(file = 'fig/Figure3.pdf', width=10, height = 5)
+
+pdf(file = 'fig/FigureSX_nutprod_gradients.pdf', width=10.5, height = 5)
 # print(plot_grid(
 #   g1, gr, align='h', rel_widths=c(1,.2), axis='tb'))
 print(g1)

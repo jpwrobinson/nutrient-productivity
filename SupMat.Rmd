@@ -41,6 +41,14 @@ knitr::include_graphics("fig/FigureSX_benthic_cov.pdf"); i = i + 1
 \newpage
 
 ```{r, out.height="80%", echo=F,fig.align='center', warning=FALSE, message=FALSE}
+knitr::include_graphics("fig/FigureSX_nutprod_gradients.pdf"); i = i + 1
+```
+
+**Fig. S`r i`. Contribution to nutrient production by fishery target groups along gradient in fishable biomass.** Percent contribution to production of six nutrients along fishable biomass gradients in each country. Lines are posterior median values with 95% highest posterior density intervals, for herbivores (green), piscivores (blue) and mobile invertivores (orange). 
+
+\newpage
+
+```{r, out.height="80%", echo=F,fig.align='center', warning=FALSE, message=FALSE}
 knitr::include_graphics("fig/FigureSX.pdf"); i = i + 1
 ```
 
