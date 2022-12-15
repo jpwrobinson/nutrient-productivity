@@ -100,6 +100,11 @@ labber5<-data.frame(lab = c('Calcium', 'Iron', 'Zinc', 'Vitamin A', 'Omega-3', '
                     nutrient_lab='Calcium',
                     x = c(-1.8, -1, -2.2, 1, 0.6, 0.1), y = c(1.7, 2, 1.3, 1, 1.5, 1.9), country='Belize')
 
+## summary stats
+
+## n reefs with top heavy biomass
+pypy %>% group_by(nutrient) %>% summarise(prop_bottom = length(which(tb<0))/length(tb)*100)
+pys %>% group_by(nutrient_lab) %>% summarise(prop_bottom = length(which(tb<0))/length(tb)*100)
 
 gr<-ggplot(pypy, aes(tb, fill=nutrient)) + 
   geom_density(alpha=0.5, col='transparent') + 
@@ -111,6 +116,7 @@ gr<-ggplot(pypy, aes(tb, fill=nutrient)) +
   scale_fill_manual(values = c('black', 'red')) +
   scale_y_continuous(expand=c(0,0),position = 'left') +
   scale_x_continuous(expand=c(0,0), limits=c(-4, 1)) +
+  scale_x_log10(expand=c(0,0)) +
   theme(axis.text.x = element_text(), legend.position = 'none',
         axis.text.y = element_text(size=9),
         axis.ticks.x = element_blank(),
