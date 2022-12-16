@@ -11,6 +11,13 @@ fishp %>% group_by(country) %>% distinct(management_rules)
 fishp %>% group_by(country, site) %>% summarise(n=n_distinct(year)) %>% 
           group_by(country,n) %>% count()
 
+## browsers
+fishp %>% filter(fg == 'browser') %>% group_by(country) %>% distinct(fish_taxon) %>% 
+  data.frame()
+fishp %>% filter(fg == 'browser' & country=='Belize') %>% group_by(site,transect_number, fish_taxon) %>% 
+  summarise(biom = sum(biomass_kgha)) %>% 
+  group_by(fish_taxon) %>% 
+  summarise(biom = mean(biom)) 
 
 ## Figure 1 metadata
 fish2<-fishp %>% group_by(fish_taxon, fish_family, trophic_group, lmax, nscore,
