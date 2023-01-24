@@ -38,7 +38,7 @@ focal$depth<-scale(focal$depth)
 fit <- brm(bind(omnivore, invertivore_mobile, herbivore, piscivore) ~ 
              biomass_kgha + depth +
              hard_coral + macroalgae + turf_algae + bare_substrate + rubble +
-             (1 + biomass_kgha | country) + (1 | management_rules), 
+             (1 + biomass_kgha | country) + (1 | country : management_rules), 
            data=focal, dirichlet)
 
 post_obs<-posterior_predict(fit, newdata = focal)
@@ -59,6 +59,7 @@ for(i in 1:length(name)){
 ## predictor dat
 nd<-expand.grid(biomass_kgha = seq(min(focal$biomass_kgha), max(focal$biomass_kgha), 1), 
                 country = unique(focal$country), 
+                management_rules = unique(focal$management_rules)[1],
                 depth=mean(focal$depth),
                 hard_coral = mean(focal$hard_coral),
                 macroalgae = mean(focal$macroalgae),
@@ -100,15 +101,29 @@ ggplot(ndl, aes(biomass_kgha, mu, fill=fg)) +
 )
 
 
-pp<-as_draws_df(fit, variable = "country|management", regex=TRUE) %>% 
-  select(-.chain, -.iteration, -.draw) %>% 
-  pivot_longer(everything(), names_to = 'fg', values_to = 'mu') %>% 
-  mutate(fg = str_replace_all(fg, 'b_mu', ''),
-         var = str_split_fixed(fg, '_', 2)[,2],
-         fg = str_split_fixed(fg, '_', 2)[,1]) %>% 
-  group_by(fg, var) %>% 
-  summarise(med = median(mu), 
+pp_cats<-as_draws_df(fit, variable = "country|management", regex=TRUE) %>%
+  select(-.chain, -.iteration, -.draw) %>%
+  pivot_longer(everything(), names_to = 'var', values_to = 'mu') %>%
+  group_by(var) %>%
+  summarise(med = median(mu),
             lw = HPDI(mu)[1], hi = HPDI(mu)[2],
-            lw50 = HPDI(mu, prob=.5)[1], hi50 = HPDI(mu, prob=.5)[2]) 
+            lw50 = HPDI(mu, prob=.5)[1], hi50 = HPDI(mu, prob=.5)[2]) %>% 
+  filter(str_detect(var, 'r_country*|r_management*')) %>% 
+  filter(!str_detect(var, 'cor_country')) %>% 
+  mutate(cat = ifelse(str_detect(var, 'r_country'), 'Country', 'Management rules')) %>% 
+  mutate(#var2 = str_replace_all(var, 'r_', ''),
+    var2 = str_replace_all(var, 'mu', ''),
+    fg = str_split_fixed(var2, '__', 2)[,2],
+    var2 = str_split_fixed(var2, '__', 2)[,1],
+    covariate_type = str_split_fixed(fg, '\\[', 2)[,2],
+    fg = str_split_fixed(fg, '\\[', 2)[,1],
+    level = str_split_fixed(covariate_type, '\\,', 2)[,1],
+    covariate_type = str_split_fixed(covariate_type, '\\,', 2)[,2],
+    covariate_type = str_replace_all(covariate_type, '\\]', ''),
+    covariate_term = str_replace_all(var2, 'r_', ''),
+    country = ifelse(covariate_term =='country', level, str_split_fixed(level,'_', 2)[,1]),
+    manage = ifelse(covariate_term =='country', 'Country', str_split_fixed(level,'_', 2)[,2]),
+    level = ifelse(covariate_term =='country', level, str_replace_all(level, '_', ': '))) %>% select(-var2, -var)
 
-save(fit, ndl, focal, file  = paste0('results/mod/', nut, '_brms.Rdata'))
+
+save(fit, ndl, focal, pp_cats, file  = paste0('results/mod/', nut, '_brms.Rdata'))

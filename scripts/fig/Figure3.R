@@ -197,6 +197,8 @@ g2<-ggplot(covs, aes(med, var)) +
   scale_y_discrete(labels=rev(labs)) +
   facet_grid(~nutrient_lab)
 
-pdf(file = 'fig/FigureSX.pdf', width=10, height = 3)
+pdf(file = 'fig/FigureSX_benthic_posts.pdf', width=10, height = 3)
 print(g2)
 dev.off()
+
+source('scripts/fig/FigureSX_manage_posts.R')
