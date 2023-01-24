@@ -111,12 +111,11 @@ gr<-ggplot(pypy, aes(tb, fill=nutrient)) +
   facet_wrap(~country, nrow=4, scales='free_y', strip.position = 'right') +
   geom_text(data = labber2, aes(x = x, y = y, label = lab), col=c('black', 'red'), hjust = 0.5, size=2.3) +
   geom_text(data = labber3, aes(x = x, y = y, label = lab), col='black',vjust=0, hjust = 0.5, size=2.3) +
-  geom_vline(xintercept = 0, linetype=2, col='black', size=0.4) +
+  geom_vline(xintercept = 0, linetype=2, col='black', linewidth=0.4) +
   labs(x = 'log(herbivore/piscivore)', y ='') +
   scale_fill_manual(values = c('black', 'red')) +
   scale_y_continuous(expand=c(0,0),position = 'left') +
   scale_x_continuous(expand=c(0,0), limits=c(-4, 1)) +
-  scale_x_log10(expand=c(0,0)) +
   theme(axis.text.x = element_text(), legend.position = 'none',
         axis.text.y = element_text(size=9),
         axis.ticks.x = element_blank(),

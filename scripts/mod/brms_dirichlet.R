@@ -84,11 +84,11 @@ for(i in 1:length(name)){
   colnames(nd)[colnames(nd)=='upper']<-paste(name[i], 'upper', sep = '-')
 }
 
-ndl<-nd %>% pivot_longer(-c(biomass_kgha, country, depth,
+ndl<-nd %>% pivot_longer(-c(biomass_kgha, country, management_rules, depth,
                             hard_coral, macroalgae, turf_algae, bare_substrate, rubble),
                                     names_to = c(".value", "var"),
                                     names_sep = "-") %>% 
-  pivot_longer(-c(biomass_kgha, country, depth,hard_coral, macroalgae, 
+  pivot_longer(-c(biomass_kgha, country, management_rules, depth,hard_coral, macroalgae, 
                   turf_algae, bare_substrate, rubble,var), names_to = 'fg', values_to = 'pred') %>% 
   pivot_wider(names_from = 'var', values_from = 'pred')
 

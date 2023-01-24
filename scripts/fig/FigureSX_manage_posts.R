@@ -27,15 +27,15 @@ ranef$level <- factor(ranef$level, levels=unique(ranef$level))
 
 g1<-ggplot(ranef %>% filter(covariate_type=='Intercept'),
        aes(fct_reorder2(level, country, manage, .desc=TRUE), med, col = fg, ymin = lw, ymax = hi)) + 
+  geom_hline(yintercept= 0, linetype = 5) +
   geom_pointrange(position = position_dodge(width=0.5)) +
   coord_flip() +
-  geom_hline(yintercept= 0, linetype = 5) +
   scale_colour_manual(values=colcol) +
-  # facet_grid(~nutrient_lab) +
+  facet_grid(~nutrient_lab) +
   labs(x = '', y = 'Posterior median ± 95% HPDI') +
   theme(legend.title = element_blank())
 
 
-pdf(file = 'fig/FigureSX_manage_covs.pdf', width=10, height = 6)
+pdf(file = 'fig/FigureSX_manage_covs.pdf', width=10, height = 8)
 print(g1)
 dev.off()
