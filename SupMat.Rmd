@@ -11,7 +11,7 @@ output:
     df_print: paged
 ---
 
-# Nutrient production by coral reef fishes
+# Micronutrient production by coral reef fishes
 
 \newpage
 ```{r setup, include=FALSE}

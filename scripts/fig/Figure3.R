@@ -112,7 +112,7 @@ gr<-ggplot(pypy, aes(tb, fill=nutrient)) +
   geom_text(data = labber2, aes(x = x, y = y, label = lab), col=c('black', 'red'), hjust = 0.5, size=2.3) +
   geom_text(data = labber3, aes(x = x, y = y, label = lab), col='black',vjust=0, hjust = 0.5, size=2.3) +
   geom_vline(xintercept = 0, linetype=2, col='black', linewidth=0.4) +
-  labs(x = 'log(herbivore/piscivore)', y ='') +
+  labs(x = 'log(piscivore/herbivore)', y ='') +
   scale_fill_manual(values = c('black', 'red')) +
   scale_y_continuous(expand=c(0,0),position = 'left') +
   scale_x_continuous(expand=c(0,0), limits=c(-4, 1)) +
@@ -132,7 +132,7 @@ gr2<-ggplot(pys, aes(tb, fill=nutrient_lab)) +
   geom_vline(xintercept = 0, linetype=2, col='black', size=0.4) +
   geom_text(data = labber4, aes(x = x, y = y, label = lab), col='black',vjust=0, hjust = 0.5, size=2.3) +
   geom_text(data = labber5, aes(x = x, y = y, label = lab), col=as.character(nut.cols[1:6]),vjust=0, hjust = 0.5, size=2) +
-  labs(x = 'log(herbivore/piscivore)', y ='') +
+  labs(x = 'log(piscivore/herbivore)', y ='') +
   scale_fill_manual(values = nut.cols) +
   scale_y_continuous(expand=c(0,0),position = 'right') +
   scale_x_continuous(expand=c(0,0), limits=c(-5, 2)) +
