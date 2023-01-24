@@ -38,7 +38,7 @@ focal$depth<-scale(focal$depth)
 fit <- brm(bind(omnivore, invertivore_mobile, herbivore, piscivore) ~ 
              biomass_kgha + depth +
              hard_coral + macroalgae + turf_algae + bare_substrate + rubble +
-             (1 + biomass_kgha | country), 
+             (1 + biomass_kgha | country) + (1 | management_rules), 
            data=focal, dirichlet)
 
 post_obs<-posterior_predict(fit, newdata = focal)
@@ -98,5 +98,17 @@ ggplot(ndl, aes(biomass_kgha, mu, fill=fg)) +
   facet_wrap(~country) +
   labs(subtitle = nut)
 )
+
+
+pp<-as_draws_df(fit, variable = "country|management", regex=TRUE) %>% 
+  select(-.chain, -.iteration, -.draw) %>% 
+  pivot_longer(everything(), names_to = 'fg', values_to = 'mu') %>% 
+  mutate(fg = str_replace_all(fg, 'b_mu', ''),
+         var = str_split_fixed(fg, '_', 2)[,2],
+         fg = str_split_fixed(fg, '_', 2)[,1]) %>% 
+  group_by(fg, var) %>% 
+  summarise(med = median(mu), 
+            lw = HPDI(mu)[1], hi = HPDI(mu)[2],
+            lw50 = HPDI(mu, prob=.5)[1], hi50 = HPDI(mu, prob=.5)[2]) 
 
 save(fit, ndl, focal, file  = paste0('results/mod/', nut, '_brms.Rdata'))
