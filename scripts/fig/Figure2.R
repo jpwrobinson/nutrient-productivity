@@ -123,15 +123,21 @@ g2<-ggplot(prod_fg_co, aes(nutrient_lab, nutprop, fill=fg_lab)) +
   th_ticks
 
 ## biom distributions
+blabs<-prod_reef %>% filter(nutrient == 'calcium.mg') %>% group_by(country) %>% summarise(x = median(biomass_kgha)) %>% mutate(y =c(37,60,20,35))
 g3<-ggplot(prod_reef %>% filter(nutrient == 'calcium.mg') %>% mutate(x = log10(biomass_kgha)),
                 aes(x = x)) +
+  stat_summary(aes(x = 1, y = x, xintercept = stat(y), group = country),
+               fun = median, geom = "vline", linetype = 5, col='#cb181d',size = 0.8) +
         geom_histogram(col = 'black', fill='grey60', bins = 10) +
         facet_grid(~country) +
-        labs(x = expression(paste('Log'[10], ' biomass kg ha'^-1)), y = 'N sites') +
-        stat_summary(aes(x = 1, y = x, xintercept = stat(y), group = country),
-               fun = median, geom = "vline", linetype = 5, col='#e31a1c',size = 0.8) +
+        # labs(x = expression(paste('Log'[10], ' biomass kg ha'^-1)), y = 'N sites') +
+        labs(x = expression(paste('biomass kg ha'^-1)), y = 'N sites') +
         scale_y_continuous(expand=c(0,0)) +
-        scale_x_continuous(expand=c(0,0)) +
+        scale_x_continuous(expand=c(0,0), breaks=c(1:3), labels=c(10,100, '1,000')) +
+      coord_cartesian(clip='off') +
+      geom_text(data = blabs, aes(x = log10(x), y = y, 
+                            label = paste0(round(x, 0), '~kg~ha',"^-1")), 
+            parse=TRUE, hjust=-0.1, col='#cb181d', size=2.4) + 
         th + th_ticks
         
 
