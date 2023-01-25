@@ -2,6 +2,8 @@
 library(tidyverse)
 load(file = 'results/wcs_productivity.rds')
 load(file = 'results/wcs_nut_prod.rds')
+# fish<-read.csv(file = 'data/wcs/wcs_nutrients_individuals.csv')
+
 
 ## UVC metadata
 fishp %>% summarise(n=n_distinct(site))
@@ -10,6 +12,11 @@ fishp %>% group_by(country) %>% summarise(n=n_distinct(site))
 fishp %>% group_by(country) %>% distinct(management_rules)
 fishp %>% group_by(country, site) %>% summarise(n=n_distinct(year)) %>% 
           group_by(country,n) %>% count()
+
+with(fishp, table(transect_width, transect_length)/dim(fishp)[1]*100)
+fishp %>% group_by(country, site) %>% summarise(n = n_distinct(transect_number)) %>% 
+  ungroup() %>% 
+  reframe(range(n), median(n))
 
 ## browsers
 fishp %>% filter(fg == 'browser') %>% group_by(country) %>% distinct(fish_taxon) %>% 
