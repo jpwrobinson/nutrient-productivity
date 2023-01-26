@@ -33,7 +33,8 @@ fish2<-fishp %>% group_by(fish_taxon, fish_family, trophic_group, lmax, nscore,
 
 cor(fish2$Kmax, fish2$nscore)
 fish2 %>% filter(nscore > 350) %>% summarise(mean(Kmax))
-fish2 %>% filter(nscore < 200 & nscore > 90) %>% summarise(range(Kmax))
+fish2 %>% filter(nscore > 350 & Kmax > 1) %>% pull(fish_taxon)
+fish2 %>% filter(nscore < 250 & nscore > 90) %>% reframe(range(Kmax))
 fish2 %>% filter(log10(Kmax) > 0) %>% distinct(fish_taxon,  fish_family, trophic_group) %>% data.frame()
 
 ## top nutrient productivity species
@@ -49,7 +50,7 @@ prod_fg_avg %>% mutate_if(is.numeric, function(x) round(x, 0)) %>% filter(nutrie
 prod_fg_co %>% group_by(nutrient, fg_lab) %>% summarise(nutprop= mean(nutprop)) %>% 
     mutate(fg2 = ifelse(str_detect(fg_lab, 'Herb|mobile'), 'herbi-mobi', 'other')) %>% 
     group_by(fg2, nutrient) %>% summarise(sum(nutprop))
-                        
+
 
 ## Sessile inverts
 # go to 03_estimate_nut_prod hashtag the filter

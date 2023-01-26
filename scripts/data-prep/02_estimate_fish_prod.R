@@ -110,6 +110,11 @@ db$lmax<-db$MaxSizeTL
 db<-droplevels(db)
 fish<-droplevels(fish)
 
+## check overlap of species
+length(unique(fish$fish_taxon[!fish$fish_taxon %in% db$Species])) # 371 sp in WCS not in Morais db
+length(unique(fish$fish_taxon)) # 561 sp in WCS - 4 countries
+371/561*100
+
 # adapt formula from Morais & Bellwood 2018
 fmod <- formula (~ sstmean + lmax + trophic_group) 
 

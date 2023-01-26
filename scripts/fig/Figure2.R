@@ -123,7 +123,7 @@ g2<-ggplot(prod_fg_co, aes(nutrient_lab, nutprop, fill=fg_lab)) +
   th_ticks
 
 ## biom distributions
-blabs<-prod_reef %>% filter(nutrient == 'calcium.mg') %>% group_by(country) %>% summarise(x = median(biomass_kgha)) %>% mutate(y =c(37,60,20,35))
+blabs<-prod_reef %>% filter(nutrient == 'calcium.mg') %>% group_by(country) %>% summarise(x = median(biomass_kgha)) %>% mutate(y =c(40,60,20,35))
 g3<-ggplot(prod_reef %>% filter(nutrient == 'calcium.mg') %>% mutate(x = log10(biomass_kgha)),
                 aes(x = x)) +
   stat_summary(aes(x = 1, y = x, xintercept = stat(y), group = country),
@@ -137,7 +137,7 @@ g3<-ggplot(prod_reef %>% filter(nutrient == 'calcium.mg') %>% mutate(x = log10(b
       coord_cartesian(clip='off') +
       geom_text(data = blabs, aes(x = log10(x), y = y, 
                             label = paste0(round(x, 0), '~kg~ha',"^-1")), 
-            parse=TRUE, hjust=-0.1, col='#cb181d', size=2.4) + 
+            parse=TRUE, hjust=c(1.1, -.1, -.1,-0.1), col='#cb181d', size=2.4) + 
         th + th_ticks
         
 
@@ -150,7 +150,7 @@ g4<-ggplot(prod_sp, aes(log10(biomass_kgha), nutprop, col=fg_lab)) +
 
 
 pdf(file='fig/Figure2.pdf', height=5, width=14)
-rp<-plot_grid(g3, g2, nrow =2, rel_heights=c(0.5, 1), align='v', labels=c('', '(c)'))
+rp<-plot_grid(g3, g2, nrow =2, rel_heights=c(0.5, 1), align='v', labels=c('', '(c)'), vjust=0)
 print(
   plot_grid(g1, rp, nrow=1, labels=c('(a)', '(b)'), rel_widths=c(0.7, 1))
 )
