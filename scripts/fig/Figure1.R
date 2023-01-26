@@ -15,6 +15,7 @@ fish2<-fishp %>% group_by(fish_taxon, trophic_group, dietP, lmax, nscore,
 fish2$trophic_lab<-trophic.cols$FG_lab[match(fish2$trophic_group, trophic.cols$FG)]
 fish2$dietP_lab<-diet.cols$dietP_lab[match(fish2$dietP, diet.cols$dietP)]
 
+## top species by biomass in each fg
 topsp<-fishp %>% 
   group_by(fish_taxon, trophic_group, site, country, transect_number) %>% 
   summarise(biomass_kgha = sum(biomass_kgha)) %>% 
@@ -22,10 +23,12 @@ topsp<-fishp %>%
   summarise(biomass_kgha = mean(biomass_kgha)) %>% 
   group_by(fish_taxon, trophic_group, country) %>% 
   summarise(biomass_kgha = mean(biomass_kgha)) %>% 
+  group_by(fish_taxon, trophic_group) %>% 
+  summarise(biomass_kgha = mean(biomass_kgha)) %>% 
   ungroup() %>% 
   group_by(trophic_group) %>% 
-  slice_max(n =2, order_by = biomass_kgha) %>%
-  distinct(trophic_group, fish_taxon) %>% 
+  slice_max(n =2, order_by = biomass_kgha, with_ties = FALSE) %>%
+  distinct(trophic_group, fish_taxon) %>%
   left_join(fish2, by = 'fish_taxon')
 
 ## species labs
@@ -45,13 +48,13 @@ hlabs<-fish2 %>% group_by(trophic_lab) %>% mutate(Kmax = log10(Kmax)) %>%
   summarise(sek = se(Kmax), sen = se(nscore), Kmax = mean(Kmax), nscore = mean(nscore)) %>% 
   mutate(Klo = Kmax - 2*sek, Khi = Kmax + 2*sek, nhi = nscore + 2*sen, nlo = nscore - 2*sen)
 
-gg<-ggplot(fish2, aes(log10(Kmax), nscore, col=trophic_lab)) + 
+gg<-ggplot(fish2, aes(Kmax, nscore, col=trophic_lab)) + 
   geom_point(size=2.5, pch=21, col='black', alpha=0.8, aes(fill=trophic_lab)) +
   # geom_pointrange(data = hlabs, fatten=5.5, aes(ymin = nlo, ymax = nhi, fill=trophic_lab),col='black', pch=21) +
   # geom_errorbarh(data = hlabs, aes(xmin = Klo, xmax = Khi)) +
   # geom_label_repel(data = fish2 %>% filter(nscore>400), aes(label = species.lab), fontface=1,size=2, show.legend=FALSE) +
   # geom_label_repel(data = fish2 %>% filter(Kmax>0.4), aes(label = species.lab), fontface=1,size=2, show.legend=FALSE) +
-  geom_label_repel(data = topsp, aes(label = fish_taxon), fontface=1,size=2, min.segment.length = 0, 
+  geom_label_repel(data = topsp, aes(label = fish_taxon), fontface=3,size=2, min.segment.length = 0, 
                    box.padding = .5,max.overlaps=Inf, point.padding = 0.5, force = 30, show.legend=FALSE) +
   labs(x = 'Derived growth coefficent (Kmax)', y = 'Nutrient density, %') +
   th +
@@ -59,7 +62,9 @@ gg<-ggplot(fish2, aes(log10(Kmax), nscore, col=trophic_lab)) +
         panel.border=element_rect(color='black'),
         axis.line = element_blank()) +
   scale_fill_manual(values = trophic_cols.named) +
-  scale_colour_manual(values = trophic_cols.named)
+  scale_colour_manual(values = trophic_cols.named) +
+  scale_x_log10()
+  # scale_x_continuous(breaks=c(-1.5, -1, -.5, 0, .5), labels=c(0.03, 0.1, 0.3, 1, 3.2))
 
 gpan<-ggplot(fish2l, aes(log10(Kmax), conc)) +
   geom_point(size=2.5, pch=21, col='black', aes(fill=trophic_lab)) +
