@@ -61,3 +61,11 @@ knitr::include_graphics("fig/FigureSX_manage_covs.pdf"); i = i + 1
 ```
 
 **Fig. S`r i`. Effects of country and management type on trophic structure of nutrient production.** Points are median posterior effects of each covariate on each of the three trophic groups (herbivores, mobile invertivores, piscivores), with 95% highest posterior density intervals. 
+
+\newpage
+
+```{r, out.height="80%", echo=F,fig.align='center', warning=FALSE, message=FALSE}
+knitr::include_graphics("fig/FigureSX_benthic_pyramids.pdf"); i = i + 1
+```
+
+**Fig. S`r i`. Trophic pyramids along gradients in benthic cover (%) and depth (m).** Points are the predicted trophic pyramid (median posterior value) at each reef, for each fishery service and benthic covariate. Top-heavy reefs are coloured blue and bottom-heavy reefs are coloured green.

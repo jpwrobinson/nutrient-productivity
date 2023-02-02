@@ -30,7 +30,7 @@ g1<-ggplot(pys_unscaled, aes(value, tb, col = type)) +
   labs(y = 'log(piscivore/herbivore)', x ='benthic cover (%) or depth (m)') +
   guides(colour = guide_legend(override.aes = list(size=3, alpha=1))) +
   theme(strip.text.y=element_text(angle=360), 
-        legend.position=c(0.18, 0.90), 
+        legend.position=c(0.08, 0.8), 
         legend.title = element_blank(),
         legend.key.size = unit(.3, "cm"),
         legend.text = element_text(size = 7))
