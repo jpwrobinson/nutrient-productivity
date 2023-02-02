@@ -88,3 +88,18 @@ pairs2(turns[,-c(1:3)])
 
 prods<-prod_reef %>% ungroup() %>% dplyr::select(country, site, year, nutrient, nut_prod_day_ha) %>% pivot_wider(names_from = 'nutrient', values_from = 'nut_prod_day_ha')
 pairs2(prods[,-c(1:3)])
+
+
+## depth 
+foc<-read.csv(paste0('py-notebook/calcium.mg_unscaled.csv'))
+py<-read.csv(file = 'results/pyramid_preds.csv')
+
+py$depth<-foc$depth[match(py$id2, foc$id2)]
+py$biomass_kgha<-foc$biomass_kgha[match(py$id2, foc$id2)]
+
+ggplot(py, aes(depth, tb, col = country)) + geom_point() + 
+  scale_x_continuous(breaks=seq(0,15,1)) +
+  facet_wrap(~nutrient_lab)
+
+# ggplot(py, aes(depth, biomass_kgha, col = country)) + geom_point() + facet_wrap(~nutrient_lab)
+  

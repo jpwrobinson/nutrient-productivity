@@ -3,6 +3,7 @@ source('scripts/0_plot_theme.R')
 library(rethinking)
 library(brms)
 library(ggradar)
+library(janitor)
 nuts<-c('zinc.mg','calcium.mg','iron.mg','vitamin_a.mug','selenium.mug','omega3.g')
 
 colcol<-trophic_cols.named3[c(1,2,4,6)]
@@ -75,6 +76,7 @@ post_avg<-post %>% group_by(country, fg) %>%
 
 ## get top vs bottom heavy
 pys<-pyramid %>% mutate(tb = log(piscivore_mu / herbivore_mu ))
+write.csv(pys, file = 'results/pyramid_preds.csv')
 # bot<-seq(0, 1, length.out=100)
 # top<-rev(bot)
 # plot(top, log(bot/top))
@@ -86,6 +88,7 @@ pypy<-focal %>% clean_names() %>%
 load(paste0('results/mod/productivity_brms.Rdata'))
 pypy<-rbind(pypy, focal %>% clean_names() %>% 
               mutate(tb = log(piscivore_mu / herbivore_mu ), nutrient = 'Biomass turnover'))
+write.csv(pypy, file = 'results/pyramid_preds_biom_prod.csv')
 
 labber2<-data.frame(lab = c('Standing\nbiomass', 'Biomass\nturnover'),
                     nutrient='Standing biomass',
