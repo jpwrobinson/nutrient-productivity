@@ -57,7 +57,7 @@ for(i in 1:length(name)){
 }
 
 ## predictor dat
-nd<-expand.grid(biomass_kgha = seq(min(focal$biomass_kgha), max(focal$biomass_kgha), 1), 
+nd<-expand.grid(biomass_kgha = seq(min(focal$biomass_kgha), max(focal$biomass_kgha), 100), 
                 country = unique(focal$country), 
                 management_rules = unique(focal$management_rules)[1],
                 depth=mean(focal$depth),
