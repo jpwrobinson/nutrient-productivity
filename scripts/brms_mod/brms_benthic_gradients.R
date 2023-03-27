@@ -1,3 +1,4 @@
+rm(ndl_all, nd, ndl)
 
 covs<-c('hard_coral',
          'macroalgae',
@@ -10,13 +11,12 @@ nuts<-c('zinc.mg','calcium.mg','iron.mg',#'vitamin_a.mug','selenium.mug','omega3
 
 bind <- function(...) cbind(...)
 
-ndl_all<-numeric()
 
 for(i in 1:length(nuts)){
   nut<-nuts[i]
   load(paste0('results/mod/', nut, '_brms.Rdata'))
 
-
+  ndl_all<-numeric()
   for(a in 1:length(covs)){
 
     ## predictor dat
