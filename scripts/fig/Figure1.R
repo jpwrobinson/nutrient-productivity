@@ -66,24 +66,40 @@ gg<-ggplot(fish2, aes(Kmax, nscore, col=trophic_lab)) +
   scale_x_log10()
   # scale_x_continuous(breaks=c(-1.5, -1, -.5, 0, .5), labels=c(0.03, 0.1, 0.3, 1, 3.2))
 
-gpan<-ggplot(fish2l, aes(log10(Kmax), conc)) +
-  geom_point(size=2.5, pch=21, col='black', aes(fill=trophic_lab)) +
+gpan<-ggplot(fish2l, aes(Kmax, conc)) +
+  geom_point(size=1.5, pch=21, col='black', aes(fill=trophic_lab)) +
   labs(x = 'Derived growth coefficent (Kmax)', y = conc_lab) +
   # scale_x_continuous(breaks=seq(0, 0.6, by = 0.1)) +
   th +
-  facet_wrap(~nutrient_lab, scales='free', nrow=5) +
-  theme(legend.position = 'right') +
+  facet_grid(nutrient_lab~., scales='free_y') +
+  theme(legend.position = 'none', strip.text.y = element_text(angle=360)) +
   scale_fill_manual(values = trophic_cols.named) +
+  scale_x_log10() +
   scale_colour_manual(values = trophic_cols.named) +
   geom_smooth(method = 'gam', col='black')
 
+gsup<-ggplot(fish2l, aes(lmax, conc)) +
+  geom_point(size=1.5, pch=21, col='black', aes(fill=trophic_lab)) +
+  labs(x = 'maximum body size (Lmax, cm)', y = conc_lab) +
+  # scale_x_continuous(breaks=seq(0, 0.6, by = 0.1)) +
+  th +
+  facet_wrap(nutrient_lab~., scales='free_y', nrow=3) +
+  theme(legend.position = 'none', strip.text.y = element_text(angle=360)) +
+  scale_fill_manual(values = trophic_cols.named) +
+  scale_x_log10() +
+  scale_colour_manual(values = trophic_cols.named) +
+  geom_smooth(method = 'gam', col='black')
 
-pdf(file = 'fig/Figure1.pdf', height=6, width=8)
-print(ggExtra::ggMarginal(gg, type='histogram', fill='grey50', col='white', bins=20))
+pdf(file = 'fig/Figure1.pdf', height=6, width=11)
+print(plot_grid(
+  ggExtra::ggMarginal(gg, type='histogram', fill='grey50', col='white', bins=20),
+  gpan,
+  labels=c('(a)', '(b)'),
+  ncol=2, rel_widths=c(1, 0.5)))
 dev.off()
 
 pdf(file = 'fig/FigureS1.pdf', height=8, width=11)
-print(gpan)
+print(gsup)
 dev.off()
 
 

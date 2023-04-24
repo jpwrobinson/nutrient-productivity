@@ -28,7 +28,7 @@ i = 0
 knitr::include_graphics("fig/FigureS1.pdf"); i = i + 1
 ```
 
-**Fig. S`r i`. Association between nutrient concentrations and growth potential of 541 coral reef fish species.** Points are individual species observed across Belize, Fiji, Madagascar, and the Solomon Islands. Nutrient concentrations are per 100 g of white muscle tissue, for calcium, iron, selenium, zinc, omega-3 fatty acids and vitamin A. The growth coefficient Kmax is the value of growth coefficient K for each species at its theoretical maximum size, derived from the von Bertalanffy equation.
+**Fig. S`r i`. Association between nutrient concentrations and body size (maximum length, Lmax) of 541 coral reef fish species.** Points are individual species observed across Belize, Fiji, Madagascar, and the Solomon Islands. Nutrient concentrations are per 100 g of white muscle tissue, for calcium, iron, selenium, zinc, omega-3 fatty acids and vitamin A. Body size is species' maximum length (cm).
 
 \newpage
 

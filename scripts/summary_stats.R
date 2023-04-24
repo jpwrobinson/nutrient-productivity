@@ -4,6 +4,9 @@ load(file = 'results/wcs_productivity.rds')
 load(file = 'results/wcs_nut_prod.rds')
 # fish<-read.csv(file = 'data/wcs/wcs_nutrients_individuals.csv')
 
+prod_reef %>% ungroup() %>%  slice_max(biomass_kgha) %>% pull(biomass_kgha)
+prod_reef %>% ungroup() %>%  slice_min(biomass_kgha) %>% pull(biomass_kgha)
+prod_reef %>% group_by(site, year, nutrient) %>%  summarise(biomass_kgha=sum(biomass_kgha)) %>% ungroup() %>% slice_max(biomass_kgha) %>% pull(biomass_kgha)
 
 ## UVC metadata
 fishp %>% summarise(n=n_distinct(site))
