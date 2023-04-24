@@ -75,7 +75,7 @@ post_avg<-post %>% group_by(country, fg) %>%
   mutate(fg_lab = recode(fg, herbivore = 'Herbivore', invertivore_mobile = 'Invertivore', piscivore = 'Piscivore'))
 
 ## get top vs bottom heavy
-pys<-pyramid %>% mutate(tb = log(piscivore_mu / herbivore_mu ))
+pys<-pyramid %>% mutate(tb = piscivore_mu / herbivore_mu)
 write.csv(pys, file = 'results/pyramid_preds.csv')
 # bot<-seq(0, 1, length.out=100)
 # top<-rev(bot)
@@ -84,24 +84,24 @@ write.csv(pys, file = 'results/pyramid_preds.csv')
 ## biomass pyramids
 load(paste0('results/mod/biomass_brms.Rdata'))
 pypy<-focal %>% clean_names() %>% 
-  mutate(tb = log(piscivore_mu / herbivore_mu ), nutrient = 'Standing biomass')
+  mutate(tb = piscivore_mu / herbivore_mu , nutrient = 'Standing biomass')
 load(paste0('results/mod/productivity_brms.Rdata'))
 pypy<-rbind(pypy, focal %>% clean_names() %>% 
-              mutate(tb = log(piscivore_mu / herbivore_mu ), nutrient = 'Biomass turnover'))
+              mutate(tb = piscivore_mu / herbivore_mu, nutrient = 'Biomass turnover'))
 write.csv(pypy, file = 'results/pyramid_preds_biom_prod.csv')
 
 labber2<-data.frame(lab = c('Standing\nbiomass', 'Biomass\nturnover'),
                     nutrient='Standing biomass',
-                   x = c(-1, -3), y = c(2,.6), country='Fiji')
+                   x = c(0.9, 0.4), y = c(400,450), country='Fiji')
 labber3<-data.frame(lab = c('Bottom-heavy', 'Top-heavy'),
                     nutrient='Standing biomass',
-                    x = c(-1, 1), y = Inf, country='Belize')
+                    x = c(0.75, 1.25), y = Inf, country='Belize')
 labber4<-data.frame(lab = c('Bottom-heavy', 'Top-heavy'),
                     nutrient_lab='Calcium',
-                    x = c(-1, 1), y = Inf, country='Belize')
+                    x = c(0.75, 1.25), y = Inf, country='Belize')
 labber5<-data.frame(lab = c('Calcium', 'Iron', 'Zinc', 'Vitamin A', 'Omega-3', 'Selenium'),
                     nutrient_lab='Calcium',
-                    x = c(-1.8, -1, -2.2, 1, 0.6, 0.1), y = c(1.7, 2, 1.3, 1, 1.5, 1.9), country='Belize')
+                    x = c(0.4, 0.44, 0.3, 1.1, 0.9, 0.8), y = c(45), country='Belize')
 
 ## summary stats
 
@@ -109,16 +109,19 @@ labber5<-data.frame(lab = c('Calcium', 'Iron', 'Zinc', 'Vitamin A', 'Omega-3', '
 pypy %>% group_by(nutrient) %>% summarise(prop_bottom = length(which(tb<0))/length(tb)*100)
 pys %>% group_by(nutrient_lab) %>% summarise(prop_bottom = length(which(tb<0))/length(tb)*100)
 
-gr<-ggplot(pypy, aes(tb, fill=nutrient)) + 
-  geom_density(alpha=0.5, col='transparent') + 
+gr<-ggplot(pypy, aes(x=tb, y=..count.., fill=nutrient, col=nutrient)) + 
+  ggridges::geom_density_line(alpha=0.5, col='transparent') +
   facet_wrap(~country, nrow=4, scales='free_y', strip.position = 'right') +
   geom_text(data = labber2, aes(x = x, y = y, label = lab), col=c('black', 'red'), hjust = 0.5, size=2.3) +
   geom_text(data = labber3, aes(x = x, y = y, label = lab), col='black',vjust=0, hjust = 0.5, size=2.3) +
-  geom_vline(xintercept = 0, linetype=2, col='black', linewidth=0.4) +
-  labs(x = 'log(piscivore/herbivore)', y ='') +
+  geom_vline(xintercept = 1, linetype=2, col='black', linewidth=0.4) +
+  labs(y ='number of reefs', x = 'piscivore/herbivore') +
+  # xlab(expression(frac(piscivore,herbivore))) + 
   scale_fill_manual(values = c('black', 'red')) +
-  scale_y_continuous(expand=c(0,0),position = 'left') +
-  scale_x_continuous(expand=c(0,0), limits=c(-4, 1)) +
+  scale_colour_manual(values = c('black', 'red')) +
+  scale_y_continuous(expand=c(0, 0)) +
+  # scale_y_continuous(expand=c(0, 0), labels = scales::percent_format(accuracy = 1)) +
+  scale_x_continuous(expand=c(0,0)) +
   theme(axis.text.x = element_text(), legend.position = 'none',
         axis.text.y = element_text(size=9),
         axis.ticks.x = element_blank(),
@@ -129,27 +132,29 @@ gr<-ggplot(pypy, aes(tb, fill=nutrient)) +
   ) +
   coord_cartesian(clip = "off")
 
-gr2<-ggplot(pys, aes(tb, fill=nutrient_lab)) + 
-  geom_density(alpha=0.5, col='transparent') + 
+gr2<-ggplot(pys, aes(tb, y = after_stat(count), fill=nutrient_lab)) + 
+  ggridges::geom_density_line(alpha=0.5, col='transparent') +
   facet_wrap(~country, nrow=4, scales='free_y', strip.position = 'right') +
-  geom_vline(xintercept = 0, linetype=2, col='black', size=0.4) +
+  geom_vline(xintercept = 1, linetype=2, col='black', size=0.4) +
   geom_text(data = labber4, aes(x = x, y = y, label = lab), col='black',vjust=0, hjust = 0.5, size=2.3) +
   geom_text(data = labber5, aes(x = x, y = y, label = lab), col=as.character(nut.cols[1:6]),vjust=0, hjust = 0.5, size=2) +
-  labs(x = 'log(piscivore/herbivore)', y ='') +
+  labs(y ='number of reefs', x = 'piscivore/herbivore') +
+  # xlab(expression(frac(piscivore,herbivore))) + 
   scale_fill_manual(values = nut.cols) +
   scale_y_continuous(expand=c(0,0),position = 'right') +
-  scale_x_continuous(expand=c(0,0), limits=c(-5, 2)) +
+  scale_x_continuous(expand=c(0,0), limits=c(0, 1.5)) +
   theme(axis.text.x = element_text(), legend.position = 'none',
         axis.text.y = element_text(size=9),
         axis.ticks.x = element_blank(),
         axis.line = element_line(colour='grey'),
         panel.border=element_blank(), 
         strip.text.y=element_blank(),
-        plot.margin=unit(c(0,-.2,0,-.3), 'cm')
+        plot.margin=unit(c(0,0,0,-.3), 'cm')
   ) +
   coord_cartesian(clip = "off")
 
-pdf(file = 'fig/Figure3.pdf', width=7, height = 4)
+
+pdf(file = 'fig/Figure3_dump.pdf', width=7, height = 4)
 print(plot_grid(
   gr, gr2, align='h', rel_widths=c(1, 1), axis='tb', labels=c('(a)', '(b)'), label_size=9))
 dev.off()

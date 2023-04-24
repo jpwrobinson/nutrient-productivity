@@ -4,6 +4,7 @@ source('scripts/0_plot_theme.R')
 ## pivot and estimate nutrient productivity per nutrient
 # definitions: https://github.com/jpwrobinson/nut-prod/issues/1
 load(file = 'results/wcs_productivity.rds')
+load(file = 'results/wcs_nut_prod.rds')
 
 ## estimate productivity, accounting for edible yield
 prod<-fishp %>% rowwise() %>% 
@@ -73,4 +74,4 @@ prod_fg<-prod %>%
 ## labelling for plots
 prod_sp$fg_lab<-fg.cols$FG_lab[match(prod_sp$fg, trophic.cols$FG)]
 
-save(prod_fg,prod_sp, file = 'results/wcs_nut_prod_Figure2.rds')
+save(prod_reef, prod_fg,prod_sp, file = 'results/wcs_nut_prod_Figure2.rds')
