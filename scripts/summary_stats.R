@@ -7,6 +7,11 @@ load(file = 'results/wcs_nut_prod.rds')
 prod_reef %>% ungroup() %>%  slice_max(biomass_kgha) %>% pull(biomass_kgha)
 prod_reef %>% ungroup() %>%  slice_min(biomass_kgha) %>% pull(biomass_kgha)
 prod_reef %>% group_by(site, year, nutrient) %>%  summarise(biomass_kgha=sum(biomass_kgha)) %>% ungroup() %>% slice_max(biomass_kgha) %>% pull(biomass_kgha)
+prod_reef %>% ungroup() %>% slice_min(biomass_turnover) %>% data.frame()
+prod_reef %>% ungroup() %>% slice_max(biomass_turnover) %>% data.frame()
+
+prod_reef %>% ungroup() %>% slice_min(prod_day_ha) %>% data.frame()
+prod_reef %>% ungroup() %>% slice_max(prod_day_ha) %>% data.frame()
 
 ## UVC metadata
 fishp %>% summarise(n=n_distinct(site))

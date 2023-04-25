@@ -113,7 +113,7 @@ pys_agg$nutrient_lab<-factor(pys_agg$nutrient_lab, levels=levels(pyramids$nutrie
 
 labber<-data.frame(lab = c('Bottom-heavy', 'Top-heavy'),
                    nutrient_lab='Standing biomass',
-                   piscivore_mu = c(0.15, 0.65), herbivore_mu = c(0.8, 0.05), country='Belize')
+                   piscivore_mu = c(0.17, 0.63), herbivore_mu = c(0.78, 0.08), country='Belize')
 labber$nutrient_lab<-factor(labber$nutrient_lab, levels=levels(pyramids$nutrient_lab))
 
 gl<-ggplot(pyramids, aes(piscivore_mu, herbivore_mu, colour=nutrient_lab)) + 
@@ -124,8 +124,10 @@ gl<-ggplot(pyramids, aes(piscivore_mu, herbivore_mu, colour=nutrient_lab)) +
   geom_text_repel(data = pys_agg, aes(label = country), col='black', size=2, force=4, force_pull = 0) + 
   scale_colour_manual(values=nut.cols) +
   scale_fill_manual(values=nut.cols) +
+  scale_y_continuous(expand=c(0, 0), labels = scales::percent_format(accuracy = 1)) +
+  scale_x_continuous(expand=c(0, 0), labels = scales::percent_format(accuracy = 1)) +
   facet_wrap(~nutrient_lab, nrow=2) +
-  labs(x = 'piscivore contribution, %', y = 'herbivore contribution, %') +
+  labs(x = 'piscivore contribution', y = 'herbivore contribution') +
   guides(colour='none', fill='none') +
   geom_text(data = labber, aes(label = lab), colour='grey50', size = 3, hjust=0.5, vjust = 0.5)
 

@@ -25,10 +25,36 @@ i = 0
 ```
 
 ```{r, out.height="80%", echo=F,fig.align='center', warning=FALSE, message=FALSE}
+knitr::include_graphics("fig/FigureSX_reef_services.pdf"); i = i + 1
+```
+
+**Fig. S`r i`. Association between fishery services at each reef.** Points are individual reef values for biomass turnover (a), biomass production (b), and nutrient production (c), coloured by country. X-axis is standing fish biomass in all panels.
+
+\newpage
+
+```{r, out.height="80%", echo=F,fig.align='center', warning=FALSE, message=FALSE}
 knitr::include_graphics("fig/FigureS1.pdf"); i = i + 1
 ```
 
 **Fig. S`r i`. Association between nutrient concentrations and body size (maximum length, Lmax) of 541 coral reef fish species.** Points are individual species observed across Belize, Fiji, Madagascar, and the Solomon Islands. Nutrient concentrations are per 100 g of white muscle tissue, for calcium, iron, selenium, zinc, omega-3 fatty acids and vitamin A. Body size is species' maximum length (cm).
+
+\newpage
+
+
+```{r, out.height="80%", echo=F,fig.align='center', warning=FALSE, message=FALSE}
+knitr::include_graphics("fig/FigureSX_nutprod_gradients.pdf"); i = i + 1
+```
+
+**Fig. S`r i`. Contribution to nutrient production by fishery target groups along gradient in fishable biomass.** Percent contribution to production of six nutrients along fishable biomass gradients in each country. Lines are posterior median values with 95% highest posterior density intervals, for herbivores (green), piscivores (blue) and mobile invertivores (orange). 
+
+\newpage
+
+```{r, out.height="80%", echo=F,fig.align='center', warning=FALSE, message=FALSE}
+knitr::include_graphics("fig/FigureSX_manage_covs.pdf"); i = i + 1
+```
+
+**Fig. S`r i`. Effects of country and management type on trophic structure of nutrient production.** Points are median posterior effects of each covariate on each of the three trophic groups (herbivores, mobile invertivores, piscivores), with 95% highest posterior density intervals. 
+
 
 \newpage
 
@@ -41,14 +67,6 @@ knitr::include_graphics("fig/FigureSX_benthic_cov.pdf"); i = i + 1
 \newpage
 
 ```{r, out.height="80%", echo=F,fig.align='center', warning=FALSE, message=FALSE}
-knitr::include_graphics("fig/FigureSX_nutprod_gradients.pdf"); i = i + 1
-```
-
-**Fig. S`r i`. Contribution to nutrient production by fishery target groups along gradient in fishable biomass.** Percent contribution to production of six nutrients along fishable biomass gradients in each country. Lines are posterior median values with 95% highest posterior density intervals, for herbivores (green), piscivores (blue) and mobile invertivores (orange). 
-
-\newpage
-
-```{r, out.height="80%", echo=F,fig.align='center', warning=FALSE, message=FALSE}
 knitr::include_graphics("fig/FigureSX_benthic_posts.pdf"); i = i + 1
 ```
 
@@ -57,15 +75,8 @@ knitr::include_graphics("fig/FigureSX_benthic_posts.pdf"); i = i + 1
 \newpage
 
 ```{r, out.height="80%", echo=F,fig.align='center', warning=FALSE, message=FALSE}
-knitr::include_graphics("fig/FigureSX_manage_covs.pdf"); i = i + 1
-```
-
-**Fig. S`r i`. Effects of country and management type on trophic structure of nutrient production.** Points are median posterior effects of each covariate on each of the three trophic groups (herbivores, mobile invertivores, piscivores), with 95% highest posterior density intervals. 
-
-\newpage
-
-```{r, out.height="80%", echo=F,fig.align='center', warning=FALSE, message=FALSE}
 knitr::include_graphics("fig/FigureSX_benthic_pyramids.pdf"); i = i + 1
 ```
 
 **Fig. S`r i`. Trophic pyramids along gradients in benthic cover (%) and depth (m).** Points are the predicted trophic pyramid (median posterior value) at each reef, for each fishery service and benthic covariate. Top-heavy reefs are coloured blue and bottom-heavy reefs are coloured green.
+
