@@ -11,7 +11,7 @@ output:
     df_print: paged
 ---
 
-# Micronutrient production by coral reef fishes
+# Trophic distribution of nutrient production in coral reef fisheries
 
 \newpage
 ```{r setup, include=FALSE}
@@ -25,6 +25,13 @@ i = 0
 ```
 
 ```{r, out.height="80%", echo=F,fig.align='center', warning=FALSE, message=FALSE}
+knitr::include_graphics("fig/FigureS1.pdf"); i = i + 1
+```
+
+**Fig. S`r i`. Association between nutrient concentrations and body size (maximum length, Lmax) of 541 coral reef fish species.** Points are individual species observed across Belize, Fiji, Madagascar, and the Solomon Islands. Nutrient concentrations are per 100 g of white muscle tissue, for calcium, iron, selenium, zinc, omega-3 fatty acids and vitamin A. Body size is species' maximum length (cm).
+
+\newpage
+```{r, out.height="80%", echo=F,fig.align='center', warning=FALSE, message=FALSE}
 knitr::include_graphics("fig/FigureSX_reef_services.pdf"); i = i + 1
 ```
 
@@ -32,13 +39,6 @@ knitr::include_graphics("fig/FigureSX_reef_services.pdf"); i = i + 1
 
 \newpage
 
-```{r, out.height="80%", echo=F,fig.align='center', warning=FALSE, message=FALSE}
-knitr::include_graphics("fig/FigureS1.pdf"); i = i + 1
-```
-
-**Fig. S`r i`. Association between nutrient concentrations and body size (maximum length, Lmax) of 541 coral reef fish species.** Points are individual species observed across Belize, Fiji, Madagascar, and the Solomon Islands. Nutrient concentrations are per 100 g of white muscle tissue, for calcium, iron, selenium, zinc, omega-3 fatty acids and vitamin A. Body size is species' maximum length (cm).
-
-\newpage
 
 
 ```{r, out.height="80%", echo=F,fig.align='center', warning=FALSE, message=FALSE}
