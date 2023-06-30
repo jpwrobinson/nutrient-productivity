@@ -119,3 +119,14 @@ ggplot(py, aes(depth, tb, col = country)) + geom_point() +
 
 # ggplot(py, aes(depth, biomass_kgha, col = country)) + geom_point() + facet_wrap(~nutrient_lab)
   
+
+## all pyramids fig 3 proportions
+pys<-read.csv(file = 'results/pyramid_preds.csv')
+load(paste0('results/mod/biomass_brms.Rdata'))
+pypy<-focal %>% clean_names() %>% 
+  mutate(tb = piscivore_mu / herbivore_mu , nutrient = 'Standing biomass', nutrient_lab = 'Standing biomass')
+pyramids<-rbind(pyramid, pypy %>%  select(names(pyramid)))
+
+pyramids %>% group_by(nutrient_lab) %>% summarise(length(which(tb < 1))/length(tb)*100)
+pyramids %>% group_by(nutrient_lab, country) %>% summarise(length(which(tb < 1))/length(tb)*100) %>% 
+  filter(country=='Belize')

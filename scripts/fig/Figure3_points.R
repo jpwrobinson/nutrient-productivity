@@ -94,18 +94,13 @@ pyramids<-rbind(pyramids, pypy %>%  select(names(pyramids)))
 
 write.csv(pypy, file = 'results/pyramid_preds_biom_prod.csv')
 
-pys_agg<-rbind(
-  pypy %>% group_by(country, nutrient_lab) %>% 
-      summarise(se_herb = se(herbivore_mu), herbivore_mu = mean(herbivore_mu),
-                se_pisc = se(piscivore_mu), piscivore_mu = mean(piscivore_mu)) %>% 
-    mutate(lower_herb = herbivore_mu - 2*se_herb, upper_herb = herbivore_mu + 2*se_herb,
-           lower_pisc = piscivore_mu - 2*se_pisc, upper_pisc = piscivore_mu + 2*se_pisc),
-  pys %>% group_by(country, nutrient_lab) %>% 
-      summarise(se_herb = se(herbivore_mu), herbivore_mu = mean(herbivore_mu),
-                se_pisc = se(piscivore_mu), piscivore_mu = mean(piscivore_mu)) %>% 
+pyramids_agg<-pyramids %>% group_by(country, nutrient_lab) %>% 
+      summarise(se_herb = funk::se(herbivore_mu), herbivore_mu = mean(herbivore_mu),
+                se_pisc = funk::se(piscivore_mu), piscivore_mu = mean(piscivore_mu)) %>% 
     mutate(lower_herb = herbivore_mu - 2*se_herb, upper_herb = herbivore_mu + 2*se_herb,
            lower_pisc = piscivore_mu - 2*se_pisc, upper_pisc = piscivore_mu + 2*se_pisc)
-)
+
+write.csv(pyramids_agg, file = 'results/pyramid_uncertainty.csv')
 
 pyramids$nutrient_lab<-factor(pyramids$nutrient_lab, levels=levels(pyramids$nutrient_lab)[c(7,8,1:6)])
 pys_agg$nutrient_lab<-factor(pys_agg$nutrient_lab, levels=levels(pyramids$nutrient_lab))
@@ -117,11 +112,11 @@ labber<-data.frame(lab = c('Bottom-heavy', 'Top-heavy'),
 labber$nutrient_lab<-factor(labber$nutrient_lab, levels=levels(pyramids$nutrient_lab))
 
 gl<-ggplot(pyramids, aes(piscivore_mu, herbivore_mu, colour=nutrient_lab)) + 
-  geom_point(alpha=0.5) + 
-  geom_errorbarh(data = pys_agg, aes(xmin = lower_pisc, xmax = upper_pisc), colour='black') +
-  geom_pointrange(data = pys_agg, aes(ymin = lower_herb, ymax = upper_herb, fill=nutrient_lab), pch=21, size=0.7, colour='black') +
+  geom_point(alpha=0.5) +
+  geom_errorbarh(data = pyramids_agg, aes(xmin = lower_pisc, xmax = upper_pisc), colour='black') +
+  geom_pointrange(data = pyramids_agg, aes(ymin = lower_herb, ymax = upper_herb, fill=nutrient_lab), pch=21, size=0.5, colour='black') +
   geom_abline(intercept = 0, slope = 1, linetype=5) +
-  geom_text_repel(data = pys_agg, aes(label = country), col='black', size=2, force=4, force_pull = 0) + 
+  geom_text_repel(data = pyramids_agg, aes(label = country), col='black', size=2, force=4, force_pull = 0) + 
   scale_colour_manual(values=nut.cols) +
   scale_fill_manual(values=nut.cols) +
   scale_y_continuous(expand=c(0, 0), labels = scales::percent_format(accuracy = 1)) +
