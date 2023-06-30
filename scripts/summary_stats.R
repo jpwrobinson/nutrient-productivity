@@ -23,8 +23,16 @@ fishp %>% group_by(country, site) %>% summarise(n=n_distinct(year)) %>%
 
 with(fishp, table(transect_width, transect_length)/dim(fishp)[1]*100)
 fishp %>% group_by(country, site) %>% summarise(n = n_distinct(transect_number)) %>% 
-  ungroup() %>% 
+  # ungroup() %>% 
   reframe(range(n), median(n))
+
+# transect area
+fishp %>% group_by(country, transect_length) %>% summarise(n = n_distinct(transect_length)) 
+fishp %>% group_by(country, transect_area) %>% summarise(n = n_distinct(site)) 
+
+# variability in counts
+fishp %>% group_by(country, site, id, transect_number) %>% summarise(n = sum(count)) %>% 
+  group_by(country) %>% summarise(sd(n))
 
 ## browsers
 fishp %>% filter(fg == 'browser') %>% group_by(country) %>% distinct(fish_taxon) %>% 

@@ -43,8 +43,10 @@ prod_fg_avg<-prod_fg %>%
 prod_fg_country<-prod_fg %>% 
   filter(!fg %in% c('invertivore-sessile', 'detritivore')) %>% 
   mutate(nutrient_lab = recode(nutrient, 'calcium.mg' = 'Calcium', 'iron.mg' = 'Iron', 'zinc.mg' = 'Zinc',
-                               'selenium.mug' = 'Selenium', 'vitamin_a.mug' = 'Vitamin A', 'omega3.g' = 'Omega-3\nfatty acids')) %>% 
-  group_by(country, fg_lab,nutrient,nutrient_lab) %>% 
+                               'selenium.mug' = 'Selenium', 'vitamin_a.mug' = 'Vitamin A', 'omega3.g' = 'Omega-3\nfatty acids'),
+         nutrient_lab2 = recode(nutrient, 'calcium.mg' = 'Ca', 'iron.mg' = 'Fe', 'zinc.mg' = 'Zn',
+                                       'selenium.mug' = 'Se', 'vitamin_a.mug' = 'Vit-A', 'omega3.g' = 'O-3')) %>% 
+  group_by(country, fg_lab,nutrient,nutrient_lab, nutrient_lab2) %>% 
   summarise(
     nut_prod_day_ha = sum(nut_prod_day_ha),
     prod_g_day_ha = sum(prod_g_day_ha),
@@ -61,6 +63,9 @@ prod_fg2<-prod_fg_avg %>% group_by(fg_lab) %>% summarise(se = funk::se(nutprop),
 ## average nut contr by country + nutrient
 prod_fg_co<-prod_fg_country %>% group_by(nutrient,nutrient_lab, nutrient_lab2, country, fg_lab) %>% 
   summarise(se = funk::se(nutprop), nutprop = mean(nutprop)) %>% 
+  mutate(lower = nutprop - 2*se, upper = nutprop + 2*se)
+
+prod_fg_co_avg<-prod_fg_co %>% group_by(fg_lab, country) %>% summarise(se = funk::se(nutprop), nutprop = mean(nutprop)) %>% 
   mutate(lower = nutprop - 2*se, upper = nutprop + 2*se)
 
 prod_fg_co_biom<-prod_fg_country %>% filter(nutrient=='calcium.mg') %>% 
@@ -97,7 +102,7 @@ prod_reef$country<-factor(prod_reef$country, levels = meds$country)
 levs<-c('Herbivore (macroalgae)', 'Herbivore (detritivore)', 'Planktivore', 'Invertivore (mobile)','Omnivore', 'Piscivore')
 prod_fg_avg$fg_lab<-factor(prod_fg_avg$fg_lab, levels = levs)
 prod_fg2$fg_lab<-factor(prod_fg2$fg_lab, levels = levs)
-prod_fg_co$fg_lab<-factor(prod_fg_co$fg_lab, levels = rev(levs))
+prod_fg_co$fg_lab<-factor(prod_fg_co$fg_lab, levels = (levs))
 
 # plabs<-c('Herbivore/detritivore zinc.mg', 'Herbivore/detritivore vitamin_a.mug', 'Invertivore (mobile) vitamin_a.mug')
 g1<-ggplot(prod_fg_avg, aes(fg_lab ,nutprop, fill=fg_lab),col='black') + 
@@ -153,6 +158,21 @@ g4<-ggplot(prod_sp, aes(log10(biomass_kgha), nutprop, col=fg_lab)) +
   labs(x = expression(paste('Log'[10], ' biomass kg ha'^-1)), y = 'proportion of nutrient productivity, %') +
   th + theme(legend.position = 'none')
 
+g5<-ggplot(prod_fg_co %>% filter(!nutrient %in% c('Standing biomass', 'Biomass turnover')), aes(fg_lab, nutprop, fill=fg_lab)) + 
+  geom_point(size=2, pch=21) +
+  # geom_text_repel(aes(label=nutrient_lab, col=fg_lab), size=2, point.padding=0, force=0.4, force_pull=2) +
+  geom_text(aes(label=nutrient_lab2, col=fg_lab), size=3, nudge_x = -.25) +
+  geom_pointrange(data = prod_fg_co_avg, aes(ymin = lower, ymax = upper), size=1, fatten=3, pch=21) +
+  # geom_label_repel(data = prod_fg %>% filter(id %in% plabs), aes(label=nutrient_lab), fill='white', size=2) +
+  coord_flip() +
+  facet_grid(.~country, scales = 'free') +
+  th + theme(legend.position = 'none') +
+  scale_fill_manual(values = trophic_cols.named)  +
+  scale_color_manual(values = trophic_cols.named) +
+  scale_y_continuous(breaks=seq(0, 80, by = 10), labels=seq(0, 80, by = 10)) +
+  labs(x = '', y = "proportion of nutrient productivity, %") +
+  th_ticks
+
 
 pdf(file='fig/Figure2.pdf', height=5, width=14)
 rp<-plot_grid(g3, g2, nrow =2, rel_heights=c(0.5, 1), align='v', labels=c('', '(c)'), vjust=0)
@@ -163,5 +183,9 @@ dev.off()
 
 pdf(file='fig/FigureS2.pdf', height=6, width=10)
 print(g4)
+dev.off()
+
+pdf(file='fig/FigureS3.pdf', height=4, width=14)
+print(g5)
 dev.off()
 
