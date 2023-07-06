@@ -7,7 +7,7 @@ th_ticks<-theme(axis.ticks.x = element_line(colour='black'))
 # load(file = 'results/wcs_nut_prod.rds')
 load(file = 'results/wcs_nut_prod_Figure2.rds')
 
-fishp$fg_lab<-trophic.cols$FG_lab[match(fishp$fg, trophic.cols$FG)]
+# fishp$fg_lab<-trophic.cols$FG_lab[match(fishp$fg, trophic.cols$FG)]
 prod_fg$fg_lab<-trophic.cols$FG_lab[match(prod_fg$fg, trophic.cols$FG)]
 prod_sp$fg_lab<-trophic.cols$FG_lab[match(prod_sp$fg, trophic.cols$FG)]
 
@@ -165,7 +165,7 @@ g5<-ggplot(prod_fg_co %>% filter(!nutrient %in% c('Standing biomass', 'Biomass t
   geom_pointrange(data = prod_fg_co_avg, aes(ymin = lower, ymax = upper), size=1, fatten=3, pch=21) +
   # geom_label_repel(data = prod_fg %>% filter(id %in% plabs), aes(label=nutrient_lab), fill='white', size=2) +
   coord_flip() +
-  facet_grid(.~country, scales = 'free') +
+  facet_grid(.~country, scales = 'fixed') +
   th + theme(legend.position = 'none') +
   scale_fill_manual(values = trophic_cols.named)  +
   scale_color_manual(values = trophic_cols.named) +
